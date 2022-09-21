@@ -1,16 +1,14 @@
-#include <ros/ros.h>
-
 #include <plan_manager.h>
 
 using namespace cane_planner;
 
-int main(int argc, char  *argv[])
+int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "cane_planner_node");
     ros::NodeHandle nh("~");
 
     int planner;
-    nh.param("planner_node/planner",planner,-1);
+    nh.param("planner_node/planner", planner, -1);
 
     // CanePlannerManager plan_manage(planner);
 

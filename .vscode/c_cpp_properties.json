@@ -11,7 +11,9 @@
                 "/usr/include/**",
                 "${workspaceFolder}",
                 "${workspaceFolder}/cane_plan_manage/include",
-                "${workspaceFolder}/cane_path_searching/include"
+                "${workspaceFolder}/cane_path_searching/include",
+                "/opt/ros/noetic/include",
+                "/usr/include/eigen3"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

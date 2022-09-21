@@ -12,6 +12,7 @@ find_package(catkin REQUIRED
 		roscpp
 		rospy
 		std_msgs
+		nav_msgs
 )
 
 catkin_package(
@@ -28,10 +29,18 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-		SYSTEM
-		include
-		${catkin_INCLUDE_DIRS}
-		${Eigen3_INCLUDE_DIRS} 
+	SYSTEM
+	include
+	${catkin_INCLUDE_DIRS}
+	${Eigen3_INCLUDE_DIRS} 
     ${PCL_INCLUDE_DIRS}
 )
 
+
+add_library(cane_path_searching
+	src/Astar_searcher
+)
+
+target_link_libraries(cane_path_searching
+	${catkin_LIBRARIES} 	
+)
