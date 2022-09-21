@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>path_searching</name>
+  <name>cane_path_searching</name>
   <version>0.0.0</version>
   <description>The path_searching package</description>
 

@@ -10,8 +10,8 @@
                 "/opt/ros/noetic/include/**",
                 "/usr/include/**",
                 "${workspaceFolder}",
-                "${workspaceFolder}/plan_manage/include",
-                "${workspaceFolder}/path_searchin/include"
+                "${workspaceFolder}/cane_plan_manage/include",
+                "${workspaceFolder}/path_searching/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
