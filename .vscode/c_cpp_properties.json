@@ -11,7 +11,7 @@
                 "/usr/include/**",
                 "${workspaceFolder}",
                 "${workspaceFolder}/cane_plan_manage/include",
-                "${workspaceFolder}/path_searching/include"
+                "${workspaceFolder}/cane_path_searching/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
