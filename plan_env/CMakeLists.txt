@@ -45,6 +45,7 @@ add_library( plan_env
     src/edt_environment.cpp 
     src/raycast.cpp
     src/map_ros.cpp
+    src/edt_compress.cpp
     )
 target_link_libraries( plan_env
     ${catkin_LIBRARIES} 
