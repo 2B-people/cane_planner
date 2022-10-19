@@ -14,14 +14,14 @@
   <arg name="odometry_topic" value="/vins_estimator/camera_pose" />
   
   <!-- using PointCloud2 and PoseStamped -->
-  <!-- <arg name="cloud_topic"/>
-  <arg name="sensor_pose_topic"/> -->
+  <arg name="cloud_topic" value="/map_generator/global_cloud"/>
+  <arg name="sensor_pose_topic" value="/map_generator/pose"/>
 
   <node pkg="plan_env" name="esdf_test_node" type="esdf_test_node" output="screen">
     <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
     <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
-    <!-- <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
-    <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
+    <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
+    <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/> 
 
     <param name="sdf_map/map_size_x"   value="$(arg map_size_x)" /> 
     <param name="sdf_map/map_size_y"   value="$(arg map_size_y)" /> 
@@ -39,7 +39,7 @@
     <param name="sdf_map/p_max"  value="0.90"/>
     <param name="sdf_map/p_occ"  value="0.80"/>
     <param name="sdf_map/min_ray_length" value="0.5"/>
-    <param name="sdf_map/max_ray_length" value="4.5"/>
+    <param name="sdf_map/max_ray_length" value="50"/>
     <param name="sdf_map/virtual_ceil_height"   value="3.2"/>
     <param name="sdf_map/optimistic" value="true" type="bool"/>
     <param name="sdf_map/signed_dist" value="true" type="bool"/>

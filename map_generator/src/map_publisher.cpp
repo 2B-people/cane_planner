@@ -4,6 +4,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <geometry_msgs/PoseStamped.h>
 
 using namespace std;
 string file_name;
@@ -14,6 +15,8 @@ int main(int argc, char** argv) {
 
   ros::Publisher cloud_pub =
       node.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 10, true);
+  ros::Publisher pose_pub = 
+      node.advertise<geometry_msgs::PoseStamped>("/map_generator/pose", 10, true);
   file_name = argv[1];
 
   ros::Duration(1.0).sleep();
@@ -56,12 +59,22 @@ int main(int argc, char** argv) {
 
   sensor_msgs::PointCloud2 msg;
   pcl::toROSMsg(cloud, msg);
+  geometry_msgs::PoseStamped pose;
+  pose.header.frame_id = "world";
+  pose.pose.position.x = 0.0;
+  pose.pose.position.y = 0.0;
+  pose.pose.position.z = 0.0;
+  pose.pose.orientation.w = 1.0;
+  pose.pose.orientation.x = 0.0;
+  pose.pose.orientation.y = 0.0;
+  pose.pose.orientation.z = 0.0;
   msg.header.frame_id = "world";
-
+  
   int count = 0;
   while (ros::ok()) {
     ros::Duration(0.3).sleep();
     cloud_pub.publish(msg);
+    pose_pub.publish(pose);
     ++count;
     if (count > 10) {
       // break;
