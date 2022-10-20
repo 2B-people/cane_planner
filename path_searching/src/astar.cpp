@@ -144,6 +144,7 @@ int Astar::search(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt, bool dynamic
           // edt_environment_->evaluateCoarseEDT(pro_pos, cur_node->time + dt) :
           //                         edt_environment_->evaluateCoarseEDT(pro_pos,
           //                         -1.0);
+          // TODO：这里改成我自己的collision free
           double dist = edt_environment_->evaluateCoarseEDT(pro_pos, -1.0);
           if (dist <= margin_) {
             continue;
@@ -203,13 +204,19 @@ int Astar::search(Eigen::Vector3d start_pt, Eigen::Vector3d end_pt, bool dynamic
 }
 
 void Astar::setParam(ros::NodeHandle& nh) {
-  nh.param("astar/resolution_astar", resolution_, -1.0);
-  nh.param("astar/time_resolution", time_resolution_, -1.0);
-  nh.param("astar/lambda_heu", lambda_heu_, -1.0);
-  nh.param("astar/margin", margin_, -1.0);
-  nh.param("astar/allocate_num", allocate_num_, -1);
-  tie_breaker_ = 1.0 + 1.0 / 10000;
 
+  // resolution 可以理解成最小分辨率
+  nh.param("astar/resolution_astar", resolution_, -1.0);
+  // 这里的astar可以加上时间维度
+  nh.param("astar/time_resolution", time_resolution_, -1.0);
+  // 用于放大f_score的一个倍速；
+  nh.param("astar/lambda_heu", lambda_heu_, -1.0);
+  // 安全距离，就是离障碍物多远算危险距离；
+  nh.param("astar/margin", margin_, -1.0);
+  // 分配的最大可以搜索的数量；
+  nh.param("astar/allocate_num", allocate_num_, -1);
+  //tie_breaker 见路径规划课程
+  tie_breaker_ = 1.0 + 1.0 / 10000;
   cout << "margin:" << margin_ << endl;
 }
 

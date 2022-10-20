@@ -48,6 +48,7 @@ namespace fast_planner {
 #define NOT_EXPAND 'c'
 #define inf 1 >> 30
 
+// node 中需要保存的数据
 class Node {
 public:
   /* -------------------- */
@@ -88,6 +89,7 @@ struct matrix_hash0 : std::unary_function<T, size_t> {
   }
 };
 
+//用hash表来存close_set
 class NodeHashTable0 {
 private:
   /* data */

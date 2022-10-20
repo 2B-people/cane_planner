@@ -107,7 +107,7 @@ void MapROS::visCallback(const ros::TimerEvent& e) {
     }
   }
   // publishUnknown();
-  // publishESDF();
+  publishESDF();
 
   // publishUpdateRange();
   // publishDepth();

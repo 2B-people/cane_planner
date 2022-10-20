@@ -1,13 +1,4 @@
 <launch>
-  <arg name="map_size_x" value="40.0"/>
-  <arg name="map_size_y" value="20.0"/>
-  <arg name="map_size_z" value=" 5.0"/>
-
-  <!-- intrinsic params of the depth camera -->
-  <arg name="cx" value="321.04638671875"/>
-  <arg name="cy" value="243.44969177246094"/>
-  <arg name="fx" value="387.229248046875"/>
-  <arg name="fy" value="387.229248046875"/>
 
   <!-- using Image and odom -->
   <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
@@ -23,13 +14,13 @@
     <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
     <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/> 
 
-    <param name="sdf_map/map_size_x"   value="$(arg map_size_x)" /> 
-    <param name="sdf_map/map_size_y"   value="$(arg map_size_y)" /> 
-    <param name="sdf_map/map_size_z"   value="$(arg map_size_z)" /> 
+    <param name="sdf_map/map_size_x"   value="40.0" /> 
+    <param name="sdf_map/map_size_y"   value="20.0" /> 
+    <param name="sdf_map/map_size_z"   value="5.0" /> 
     <param name="sdf_map/resolution"             value="0.1" /> 
     <param name="sdf_map/obstacles_inflation"    value="0.099" /> 
     <param name="sdf_map/local_bound_inflate"    value="0.5"/>
-    <param name="sdf_map/local_map_margin"       value="50"/>
+    <param name="sdf_map/local_map_margin"       value="4.5"/>
     <param name="sdf_map/ground_height"          value="-1.0"/>
     <param name="sdf_map/default_dist"           value="5.0"/>
 
@@ -39,21 +30,21 @@
     <param name="sdf_map/p_max"  value="0.90"/>
     <param name="sdf_map/p_occ"  value="0.80"/>
     <param name="sdf_map/min_ray_length" value="0.5"/>
-    <param name="sdf_map/max_ray_length" value="50"/>
+    <param name="sdf_map/max_ray_length" value="5.0"/>
     <param name="sdf_map/virtual_ceil_height"   value="3.2"/>
     <param name="sdf_map/optimistic" value="true" type="bool"/>
     <param name="sdf_map/signed_dist" value="true" type="bool"/>
 
-    <param name="map_ros/cx" value="$(arg cx)"/>
-    <param name="map_ros/cy" value="$(arg cy)"/>
-    <param name="map_ros/fx" value="$(arg fx)"/>
-    <param name="map_ros/fy" value="$(arg fy)"/>
+    <param name="map_ros/cx" value="321.04638671875"/>
+    <param name="map_ros/cy" value="243.44969177246094"/>
+    <param name="map_ros/fx" value="387.229248046875"/>
+    <param name="map_ros/fy" value="387.229248046875"/>
     <param name="map_ros/depth_filter_maxdist"   value="5.0"/>
     <param name="map_ros/depth_filter_mindist"   value="0.2"/>
     <param name="map_ros/depth_filter_margin"    value="2"/>
     <param name="map_ros/k_depth_scaling_factor" value="1000.0"/>
     <param name="map_ros/skip_pixel" value="2"/>
-    <param name="map_ros/esdf_slice_height" value="0.3"/>
+    <param name="map_ros/esdf_slice_height" value="1.0"/>
     <param name="map_ros/visualization_truncate_height"   value="3.09"/>
     <param name="map_ros/visualization_truncate_low"   value="-2.0"/>
     <param name="map_ros/show_occ_time"  value="true"/>

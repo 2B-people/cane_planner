@@ -17,6 +17,10 @@ namespace cane_planner
   {
   private:
     /* data */
+    ros::NodeHandle node_;
+    ros::Publisher esdf_vis_pub_;
+    ros::Timer compress_timer_,vis_timer;
+
     unique_ptr<MapParam> mp_2d_;
     unique_ptr<MapData> md_2d_;
     shared_ptr<SDFMap> sdf_map_;
@@ -28,6 +32,9 @@ namespace cane_planner
 
     void init(ros::NodeHandle &nh);
     void setMap(shared_ptr<SDFMap>& map);
+
+    void CompressUpdateCallback(const ros::TimerEvent & /*event*/);
+    void visCallback(const ros::TimerEvent & /*event*/);
 
     typedef shared_ptr<EDTCompress> Ptr;
 
