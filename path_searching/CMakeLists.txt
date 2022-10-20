@@ -4,6 +4,8 @@ project(path_searching)
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.7 REQUIRED)
 
+set(CMAKE_CXX_FLAGS "-std=c++14 ${CMAKE_CXX_FLAGS} -O3 -Wall")
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
@@ -29,7 +31,6 @@ include_directories(
     ${PCL_INCLUDE_DIRS}
 )
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} -O3 -Wall")
 
 add_library( path_searching 
     src/astar.cpp
