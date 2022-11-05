@@ -1,4 +1,5 @@
 #include <plan_manager.h>
+#include <path_searching/astar.h>
 
 using namespace cane_planner;
 

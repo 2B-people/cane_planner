@@ -6,6 +6,10 @@ namespace cane_planner
     {
         
     }
+    CanePlannerManager::~CanePlannerManager()
+    {
+        
+    }
 } // namespace cane_planner
 
 

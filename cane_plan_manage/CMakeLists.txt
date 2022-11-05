@@ -11,11 +11,15 @@ find_package(PCL REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
 	std_msgs
+  plan_env
+  path_searching
 )
 
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES plan_manage
+ CATIKIN_DEPENDS plan_env
+ path_searching
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 
