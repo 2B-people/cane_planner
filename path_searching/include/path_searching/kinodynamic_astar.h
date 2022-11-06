@@ -18,7 +18,7 @@
 
 using namespace std;
 
-namespace cane_plnner
+namespace cane_planner
 {
 
 #define IN_CLOSE_SET 'a'
@@ -104,14 +104,56 @@ namespace cane_plnner
   class KinodynamicAstar
   {
   private:
-    /* data */
-  public:
-    KinodynamicAstar(/* args */);
-    ~KinodynamicAstar();
-  };
-  
-  
+    /* ---------- main data structure----------  */
+    vector<KdNodePtr> path_node_pool_;
+    int use_node_num_, iter_num_;
+    KdNodeHashTable expanded_nodes_;
+    std::priority_queue<KdNodePtr, std::vector<KdNodePtr>, KdNodeComparator> open_set_;
+    std::vector<KdNodePtr> path_nodes_;
 
-} // namespace cane_plnner
+    /*----------  paramter  ---------- */
+    int allocate_num_;
+    EDTEnvironment::Ptr edt_environment_;
+
+    /* helper */
+    Eigen::Vector2i posToIndex(Eigen::Vector2d pt);
+    int timeToIndex(double time);
+    void retrievePath(KdNodePtr end_node);
+
+    /* shot trajectory */
+
+    /*Compute Heuristic*/
+
+    /* state propagation */
+    void statTransit();
+
+  public:
+    KinodynamicAstar(){};
+    ~KinodynamicAstar();
+
+    enum
+    {
+      REACH_END = 1,
+      NO_PATH = 2,
+      NEAR_END = 3
+    };
+
+    /* main API */    
+    int search(Eigen::Vector2d start_pt, Eigen::Vector2d start_vel,
+               Eigen::Vector2d end_pt, Eigen::Vector2d end_vel,
+               bool init, bool dynamic = false);
+    
+    void setParam(ros::NodeHandle &nh);
+    void init();
+    void reset();
+
+    void setEnvironment(const EDTEnvironment::Ptr &env);
+
+    std::vector<Eigen::Vector2d> getKinWalk();
+
+    typedef shared_ptr<KinodynamicAstar> Ptr;
+  };
+
+} // namespace cane_planner
 
 #endif

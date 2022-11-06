@@ -12,7 +12,6 @@ using std::shared_ptr;
 using std::unique_ptr;
 namespace cane_planner
 {
-
   class EDTCompress
   {
   private:
