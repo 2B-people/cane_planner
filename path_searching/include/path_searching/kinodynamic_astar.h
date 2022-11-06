@@ -35,7 +35,7 @@ namespace cane_planner
     Eigen::Vector2d position;
     double g_score, f_score;
     KdNode *parent;
-    char KdNode_state;
+    char kdnode_state;
 
     double time; // dyn
     int time_idx;
@@ -44,7 +44,7 @@ namespace cane_planner
     KdNode()
     {
       parent = NULL;
-      KdNode_state = NOT_EXPAND;
+      kdnode_state = NOT_EXPAND;
     }
     ~KdNode(){};
   };
@@ -113,6 +113,8 @@ namespace cane_planner
 
     /*----------  paramter  ---------- */
     int allocate_num_;
+    double resolution_, inv_resolution_, time_resolution_, inv_time_resolution_;
+    Eigen::Vector2d origin_, map_size_2d_;
     EDTEnvironment::Ptr edt_environment_;
 
     /* helper */
