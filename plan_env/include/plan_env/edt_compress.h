@@ -18,25 +18,27 @@ namespace cane_planner
     /* data */
     ros::NodeHandle node_;
     ros::Publisher esdf_vis_pub_;
-    ros::Timer compress_timer_,vis_timer;
+    ros::Timer compress_timer_, vis_timer;
 
-    unique_ptr<MapParam> mp_2d_;
-    unique_ptr<MapData> md_2d_;
+    double resolution_inv_;
+    Eigen::Vector3d esdf_slice_height_;
     shared_ptr<SDFMap> sdf_map_;
 
   public:
-    EDTCompress(/* args */);
+    EDTCompress(/* args */){};
     ~EDTCompress();
 
-
     void init(ros::NodeHandle &nh);
-    void setMap(shared_ptr<SDFMap>& map);
+    void setMap(shared_ptr<SDFMap> &map);
 
     void CompressUpdateCallback(const ros::TimerEvent & /*event*/);
     void visCallback(const ros::TimerEvent & /*event*/);
 
+    void getSurroundDistance(Eigen::Vector3d pts[2][2][2], double dists[2][2][2]);
+    double evaluateCoarseEDT(Eigen::Vector3d &pos, double time);
+    Eigen::Vector3d evaluateEDTCompress(Eigen::Vector2d &pos);
+    
     typedef shared_ptr<EDTCompress> Ptr;
-
   };
 
 } // namespace cane_planner

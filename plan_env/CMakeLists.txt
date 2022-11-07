@@ -63,7 +63,8 @@ add_executable(esdf_test_node
     test/esdf_test.cpp
     src/sdf_map.cpp 
     src/raycast.cpp
-    src/map_ros.cpp   
+    src/map_ros.cpp
+    src/edt_compress.cpp
     )
 
 target_link_libraries(esdf_test_node
