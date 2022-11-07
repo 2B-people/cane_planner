@@ -113,6 +113,8 @@ namespace cane_planner
 
     /*----------  paramter  ---------- */
     int allocate_num_;
+    double lambda_heu_;
+    double tie_breaker_;
     double resolution_, inv_resolution_, time_resolution_, inv_time_resolution_;
     Eigen::Vector2d origin_, map_size_2d_;
     EDTEnvironment::Ptr edt_environment_;
@@ -125,7 +127,10 @@ namespace cane_planner
     /* shot trajectory */
 
     /*Compute Heuristic*/
-
+    /* heuristic function */
+    double getDiagHeu(Eigen::Vector2d x1, Eigen::Vector2d x2);
+    double getManhHeu(Eigen::Vector2d x1, Eigen::Vector2d x2);
+    double getEuclHeu(Eigen::Vector2d x1, Eigen::Vector2d x2);
     /* state propagation */
     void statTransit();
 

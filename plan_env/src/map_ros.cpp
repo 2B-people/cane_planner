@@ -211,7 +211,8 @@ void MapROS::cloudPoseCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
   pcl::fromROSMsg(*msg, cloud);
   int num = cloud.points.size();
 
-  map_->inputPointCloud(cloud, num, camera_pos_);
+// 使用独立的一个方法来解决建图中过程点云的问题；
+  map_->BuildsimulationMap(cloud, num, camera_pos_);
 
   if (local_updated_) {
     map_->clearAndInflateLocalMap();
@@ -465,7 +466,7 @@ void MapROS::publishESDF() {
       dist = max(dist, min_dist);
       pt.x = pos(0);
       pt.y = pos(1);
-      pt.z = -0.2;
+      pt.z = pos(2);
       pt.intensity = (dist - min_dist) / (max_dist - min_dist);
       cloud.push_back(pt);
     }

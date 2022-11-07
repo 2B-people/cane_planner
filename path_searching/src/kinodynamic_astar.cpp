@@ -60,7 +60,7 @@ namespace cane_planner
             iter_num_ += 1;
 
             /* ---------- Explore the next gait point ---------- */
-            //TODO
+            // TODO
         }
 
         /* ---------- open set empty, no path ---------- */
@@ -69,7 +69,6 @@ namespace cane_planner
         cout << "iter num: " << iter_num_ << endl;
         return NO_PATH;
     }
-
 
     void KinodynamicAstar::statTransit()
     {
@@ -97,7 +96,7 @@ namespace cane_planner
     {
         KdNodePtr cur_node = end_node;
         path_nodes_.push_back(cur_node);
-        while (cur_node->parent !=NULL)
+        while (cur_node->parent != NULL)
         {
             cur_node = cur_node->parent;
             path_nodes_.push_back(cur_node);
@@ -108,7 +107,15 @@ namespace cane_planner
 
     void KinodynamicAstar::setParam(ros::NodeHandle &nh)
     {
+        // 用于放大f_score的一个倍速
+        nh.param("kinastar/lambda_heu", lambda_heu_, -1.0);
+        // 这里的加上时间维度
+        nh.param("kinastar/time_resolution", time_resolution_, -1.0);
+        // resolution 可以理解成最小分辨率
+        nh.param("kinastar/resolution_astar", resolution_, -1.0);
+        // 分配的最大可以搜索的数量；
         nh.param("kinastar/allocate_num", allocate_num_, -1);
+        tie_breaker_ = 1.0 + 1.0 / 10000;
     }
     void KinodynamicAstar::init()
     {
@@ -137,10 +144,35 @@ namespace cane_planner
 
         use_node_num_ = 0;
         iter_num_ = 0;
-    }    
+    }
     void KinodynamicAstar::setEnvironment(const EDTEnvironment::Ptr &env)
     {
         this->edt_environment_ = env;
+    }
+
+    double KinodynamicAstar::getDiagHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)
+    {
+        double dx = fabs(x1(0) - x2(0));
+        double dy = fabs(x1(1) - x2(1));
+
+        double h = (dx + dy) + (sqrt(2.0) - 2) * min(dx, dy);
+
+        return tie_breaker_ * h;
+    }
+
+    double KinodynamicAstar::getManhHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)
+    {
+        double dx = fabs(x1(0) - x2(0));
+        double dy = fabs(x1(1) - x2(1));
+        // double dz = fabs(x1(2) - x2(2));
+
+        // return tie_breaker_ * (dx + dy + dz);
+        return tie_breaker_ * (dx + dy);
+    }
+
+    double KinodynamicAstar::getEuclHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)
+    {
+        return tie_breaker_ * (x2 - x1).norm();
     }
 
 } // namespace cane_planner

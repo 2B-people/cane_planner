@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
       node.advertise<geometry_msgs::PoseStamped>("/map_generator/pose", 10, true);
   file_name = argv[1];
 
-  ros::Duration(1.0).sleep();
+  ros::Duration(10.0).sleep();
 
   /* load cloud from pcd */
   pcl::PointCloud<pcl::PointXYZ> cloud;
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
   
   int count = 0;
   while (ros::ok()) {
-    ros::Duration(0.3).sleep();
+    ros::Duration(1).sleep();
     cloud_pub.publish(msg);
     pose_pub.publish(pose);
     ++count;
