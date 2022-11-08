@@ -45,7 +45,7 @@ add_library( plan_env
     src/edt_environment.cpp 
     src/raycast.cpp
     src/map_ros.cpp
-    src/edt_compress.cpp
+    src/collision_detection.cpp
     )
 target_link_libraries( plan_env
     ${catkin_LIBRARIES} 
@@ -64,7 +64,7 @@ add_executable(esdf_test_node
     src/sdf_map.cpp 
     src/raycast.cpp
     src/map_ros.cpp
-    src/edt_compress.cpp
+    src/collision_detection.cpp
     )
 
 target_link_libraries(esdf_test_node

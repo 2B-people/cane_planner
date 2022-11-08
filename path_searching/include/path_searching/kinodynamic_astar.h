@@ -13,7 +13,7 @@
 #include <ros/ros.h>
 
 #include <path_searching/matrix_hash.h>
-#include <plan_env/edt_compress.h>
+#include <plan_env/collision_detection.h>
 #include <plan_env/edt_environment.h>
 
 using namespace std;

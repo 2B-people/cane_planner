@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 
 #include <plan_env/sdf_map.h>
-#include <plan_env/edt_compress.h>
+#include <plan_env/collision_detection.h>
 
 using namespace fast_planner;
 using namespace cane_planner;
@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("~");
     SDFMap::Ptr esdf_map;
     esdf_map.reset(new SDFMap);
-    EDTCompress edf;
+    CollisionDetection edf;
     esdf_map->initMap(nh);
     edf.init(nh);
     edf.setMap(esdf_map);
@@ -21,14 +21,7 @@ int main(int argc, char **argv)
     pos2(1) = pos(1) = 10.0;
     pos2(2) = 1.2;
     ros::Duration(1.0).sleep();
-    while (ros::ok())
-    {
-        Eigen::Vector3d distance = edf.evaluateEDTCompress(pos);
-        double test_dis = edf.evaluateCoarseEDT(pos2, -1.0);
-        ROS_WARN("pos: %lf,%lf,distance: %lf,%lf,%lf", pos(0), pos(1), distance(0), distance(1), distance(2));
-        ROS_WARN("test: %lf", test_dis);
-        ros::spinOnce();
-    }
+    ros::spin();
 
     return 0;
 }
