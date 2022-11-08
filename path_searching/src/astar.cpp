@@ -131,10 +131,9 @@ namespace cane_planner
           // edt_environment_->evaluateCoarseEDT(pro_pos, cur_node->time + dt) :
           //                         edt_environment_->evaluateCoarseEDT(pro_pos,
           //                         -1.0);
-          // TODO：这里改成我自己的collision free
           // double dist = edt_environment_->evaluateCoarseEDT(pro_pos, -1.0);
-          double dist;
-          if (dist <= margin_)
+          // 这里改成我自己的collision free
+          if (collision_->isTraversable(pro_pos))
           {
             continue;
           }
@@ -293,6 +292,11 @@ namespace cane_planner
   void Astar::setEnvironment(const EDTEnvironment::Ptr &env)
   {
     this->edt_environment_ = env;
+  }
+  
+  void Astar::setCollision(const CollisionDetection::Ptr &col)
+  {
+    this->collision_ = col;
   }
 
   void Astar::reset()

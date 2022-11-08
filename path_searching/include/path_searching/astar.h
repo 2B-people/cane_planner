@@ -112,6 +112,7 @@ namespace cane_planner
 
     /* ---------- record data ---------- */
     EDTEnvironment::Ptr edt_environment_;
+    CollisionDetection::Ptr collision_;
     bool has_path_ = false;
 
     /* ---------- parameter ---------- */
@@ -154,6 +155,7 @@ namespace cane_planner
                double time_start = -1.0);
 
     void setEnvironment(const EDTEnvironment::Ptr &env);
+    void setCollision(const CollisionDetection::Ptr &col);
     std::vector<Eigen::Vector2d> getPath();
     std::vector<NodePtr> getVisitedNodes();
 

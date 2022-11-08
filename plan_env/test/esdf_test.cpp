@@ -11,10 +11,10 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("~");
     SDFMap::Ptr esdf_map;
     esdf_map.reset(new SDFMap);
-    CollisionDetection edf;
+    CollisionDetection collision_detection;
     esdf_map->initMap(nh);
-    edf.init(nh);
-    edf.setMap(esdf_map);
+    collision_detection.init(nh);
+    collision_detection.setMap(esdf_map);
     Eigen::Vector2d pos;
     Eigen::Vector3d pos2;
     pos2(0) = pos(0) = -5.0;
