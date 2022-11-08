@@ -1,5 +1,3 @@
-
-
 #include <path_searching/astar.h>
 #include <sstream>
 
@@ -27,7 +25,7 @@ namespace cane_planner
 
     // Eigen::Vector2d end_state(6);
     Eigen::Vector2i end_index;
-    double time_to_goal;
+    // double time_to_goal;
 
     end_index = posToIndex(end_pt);
     cur_node->f_score = lambda_heu_ * getEuclHeu(cur_node->position, end_pt);
@@ -47,7 +45,7 @@ namespace cane_planner
     else
       expanded_nodes_.insert(cur_node->index, cur_node);
 
-    NodePtr neighbor = NULL;
+    // NodePtr neighbor = NULL;
     NodePtr terminate_node = NULL;
 
     /* ---------- search loop ---------- */
@@ -139,7 +137,8 @@ namespace cane_planner
           }
 
           /* ---------- compute cost ---------- */
-          double time_to_goal, tmp_g_score, tmp_f_score;
+          // double time_to_goal = 0.0;
+          double tmp_g_score, tmp_f_score;
           tmp_g_score = d_pos.squaredNorm() + cur_node->g_score;
           tmp_f_score = tmp_g_score + lambda_heu_ * getEuclHeu(pro_pos, end_pt);
 
@@ -338,5 +337,6 @@ namespace cane_planner
 
   int Astar::timeToIndex(double time) {
   int idx = floor((time - time_origin_) * inv_time_resolution_);
+  return idx;
 }
 } // namespace fast_planner

@@ -54,7 +54,7 @@
   </node>
 
   <!-- visualisation -->
-  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find cane_plan_manage)/config/traj.rviz" />
+  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />
   <!-- map generator 16X36的办公室地图-->
   <!-- <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office.pcd" /> -->
 </launch>
