@@ -11,6 +11,7 @@ find_package(PCL REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
 	std_msgs
+  geometry_msgs
   plan_env
   path_searching
 )

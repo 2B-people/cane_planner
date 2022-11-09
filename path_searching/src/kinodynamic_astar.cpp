@@ -145,9 +145,14 @@ namespace cane_planner
         use_node_num_ = 0;
         iter_num_ = 0;
     }
-    void KinodynamicAstar::setEnvironment(const EDTEnvironment::Ptr &env)
+    // void KinodynamicAstar::setEnvironment(const EDTEnvironment::Ptr &env)
+    // {
+    //     this->edt_environment_ = env;
+    // }
+
+    void KinodynamicAstar::setCollision(const CollisionDetection::Ptr &col)
     {
-        this->edt_environment_ = env;
+        this->collision_ = col;
     }
 
     double KinodynamicAstar::getDiagHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)

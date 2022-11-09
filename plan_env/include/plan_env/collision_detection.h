@@ -39,6 +39,10 @@ namespace cane_planner
     bool isTraversable(Eigen::Vector3d state, double times);
 
     void getSurroundDistance(Eigen::Vector2d pts[2][2][2], double dists[2][2][2]);
+    void getMapRegion(Eigen::Vector3d &ori, Eigen::Vector3d &size)
+    {
+      sdf_map_->getRegion(ori, size);
+    }
 
     typedef shared_ptr<CollisionDetection> Ptr;
   };

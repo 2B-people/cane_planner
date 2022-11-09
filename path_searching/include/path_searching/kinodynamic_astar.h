@@ -14,7 +14,7 @@
 
 #include <path_searching/matrix_hash.h>
 #include <plan_env/collision_detection.h>
-#include <plan_env/edt_environment.h>
+// #include <plan_env/edt_environment.h>
 
 using namespace std;
 
@@ -117,7 +117,9 @@ namespace cane_planner
     double tie_breaker_;
     double resolution_, inv_resolution_, time_resolution_, inv_time_resolution_;
     Eigen::Vector2d origin_, map_size_2d_;
-    EDTEnvironment::Ptr edt_environment_;
+    CollisionDetection::Ptr collision_;
+
+    // EDTEnvironment::Ptr edt_environment_;
 
     /* helper */
     Eigen::Vector2i posToIndex(Eigen::Vector2d pt);
@@ -154,7 +156,9 @@ namespace cane_planner
     void init();
     void reset();
 
-    void setEnvironment(const EDTEnvironment::Ptr &env);
+    // void setEnvironment(const EDTEnvironment::Ptr &env);
+    void setCollision(const CollisionDetection::Ptr &col);
+
 
     std::vector<Eigen::Vector2d> getKinWalk();
 

@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /PointCloud21
+        - /PointCloud22
       Splitter Ratio: 0.5
     Tree Height: 1204
   - Class: rviz/Selection
@@ -74,7 +75,7 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.05000000074505806
+      Size (m): 0.10000000149011612
       Style: Flat Squares
       Topic: /sdf_map/esdf
       Unreliable: false
@@ -84,14 +85,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 2.4000000953674316
+        Min Value: -0.5
         Value: true
       Axis: Z
-      Channel Name: intensity
+      Channel Name: x
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -102,8 +103,8 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Size (m): 0.10000000149011612
+      Style: Boxes
       Topic: /map_generator/global_cloud
       Unreliable: false
       Use Fixed Frame: true
@@ -137,7 +138,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 33.4339714050293
+      Distance: 31.960437774658203
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -153,9 +154,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.884796142578125
+      Pitch: 0.6347966194152832
       Target Frame: <Fixed Frame>
-      Yaw: 3.223588228225708
+      Yaw: 1.4385870695114136
     Saved: ~
 Window Geometry:
   Displays:

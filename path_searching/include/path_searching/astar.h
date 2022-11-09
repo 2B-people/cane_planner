@@ -14,7 +14,7 @@
 
 #include <path_searching/matrix_hash.h>
 #include <plan_env/collision_detection.h>
-#include <plan_env/edt_environment.h>
+// #include <plan_env/edt_environment.h>
 
 using namespace std;
 namespace cane_planner
@@ -111,7 +111,7 @@ namespace cane_planner
     std::vector<NodePtr> path_nodes_;
 
     /* ---------- record data ---------- */
-    EDTEnvironment::Ptr edt_environment_;
+    // EDTEnvironment::Ptr edt_environment_;
     CollisionDetection::Ptr collision_;
     bool has_path_ = false;
 
@@ -153,7 +153,7 @@ namespace cane_planner
     int search(Eigen::Vector2d start_pt, Eigen::Vector2d end_pt, bool dynamic = false,
                double time_start = -1.0);
 
-    void setEnvironment(const EDTEnvironment::Ptr &env);
+    // void setEnvironment(const EDTEnvironment::Ptr &env);
     void setCollision(const CollisionDetection::Ptr &col);
     std::vector<Eigen::Vector2d> getPath();
     std::vector<NodePtr> getVisitedNodes();

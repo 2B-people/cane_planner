@@ -14,7 +14,8 @@
                 "/usr/include/eigen3",
                 "${workspaceFolder}/path_searching/include",
                 "${workspaceFolder}/plan_env/include",
-                "${workspaceFolder}/plan_manage/include"
+                "${workspaceFolder}/plan_manage/include",
+                "/usr/include/pcl-1.10"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

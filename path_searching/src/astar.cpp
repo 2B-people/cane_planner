@@ -209,7 +209,7 @@ namespace cane_planner
     // 用于放大f_score的一个倍速；
     nh.param("astar/lambda_heu", lambda_heu_, -1.0);
     // 分配的最大可以搜索的数量；
-    nh.param("astar/allocate_num", allocate_num_, -1);
+    nh.param("astar/allocate_num", allocate_num_, 1);
     // tie_breaker 见路径规划课程
     tie_breaker_ = 1.0 + 1.0 / 10000;
   }
@@ -269,7 +269,10 @@ namespace cane_planner
     this->inv_resolution_ = 1.0 / resolution_;
     inv_time_resolution_ = 1.0 / time_resolution_;
     // TODO: edt_evironment is change
-    // edt_environment_->getMapRegion(origin_, map_size_3d_);
+    Eigen::Vector3d ori,map_size_3d;
+    collision_->getMapRegion(ori,map_size_3d);
+    origin_ << ori(0),ori(1);
+    map_size_2d_ << map_size_3d(0),map_size_3d(1);
 
     cout << "origin_: " << origin_.transpose() << endl;
     cout << "map size: " << map_size_2d_.transpose() << endl;
@@ -285,10 +288,10 @@ namespace cane_planner
     iter_num_ = 0;
   }
 
-  void Astar::setEnvironment(const EDTEnvironment::Ptr &env)
-  {
-    this->edt_environment_ = env;
-  }
+  // void Astar::setEnvironment(const EDTEnvironment::Ptr &env)
+  // {
+  //   this->edt_environment_ = env;
+  // }
   
   void Astar::setCollision(const CollisionDetection::Ptr &col)
   {

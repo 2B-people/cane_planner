@@ -13,9 +13,10 @@ namespace cane_planner
     {
         node_ = nh;
         node_.param("Collision/margin", margin_, -1.0);
-        node_.param("Collision/slice_height_", slice_height_, -1.0);
+        node_.param("Collision/SliceHeight", slice_height_, -1.0);
         
-        cout << "margin:" << margin_ << endl;
+        cout << "Collision Detection[18]:margin:" << margin_ << endl;
+        cout << "Collision Detection[18]:SliceHeight:" << slice_height_ << endl;
     }
     void CollisionDetection::setMap(shared_ptr<SDFMap> &map)
     {

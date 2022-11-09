@@ -9,10 +9,12 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh("~");
 
     int planner;
-    nh.param("planner_node/planner", planner, -1);
+    bool simulation;
+    nh.param("planner_node/planner", planner, 1);
+    nh.param("planner_node/planner", simulation, true);
 
-    // CanePlannerManager plan_manage(planner);
-
+    PlannerManager plan_manage(planner,simulation);
+    plan_manage.init(nh);
     ros::Duration(1.0).sleep();
     ros::spin();
     return 0;
