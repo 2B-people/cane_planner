@@ -1,7 +1,6 @@
 #include <plan_manager.h>
 #include <sstream>
 
-
 namespace cane_planner
 {
 
@@ -59,13 +58,16 @@ namespace cane_planner
             nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
         odom_sub_ =
             nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
+
+        // visial
+        traj_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/trajectory", 20);
     }
 
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
     {
         end_pt_(0) = goal->pose.position.x;
         end_pt_(1) = goal->pose.position.y;
-        ROS_WARN( "set end pos is: %lf and %lf",end_pt_(0),end_pt_(1));
+        ROS_INFO"set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
         have_target_ = true;
     }
 
@@ -73,7 +75,7 @@ namespace cane_planner
     {
         odom_pos_(0) = start->pose.pose.position.x;
         odom_pos_(1) = start->pose.pose.position.y;
-        ROS_WARN( "set start pos is:%lf and %lf",odom_pos_(0),odom_pos_(1));
+        ROS_INFO("set start pos is:%lf and %lf", odom_pos_(0), odom_pos_(1));
         have_odom_ = true;
     }
 
@@ -155,7 +157,8 @@ namespace cane_planner
         }
         case EXEC_TRAJ:
         {
-            // TODO visiual
+            // visiual
+            displayPath();
             have_target_ = false;
             changeFSMExecState(WAIT_TARGET);
             break;
@@ -166,15 +169,52 @@ namespace cane_planner
 
     bool PlannerManager::callAstarPlan()
     {
-        ROS_WARN("callAstarPlan--------");
-        ROS_WARN("start (%lf,%lf)",start_pt_(0),start_pt_(1));
-        ROS_WARN("end (%lf,%lf)",end_pt_(0),end_pt_(1));
+        astar_finder_->reset();
         bool plan_success = astar_finder_->search(start_pt_, end_pt_);
         return plan_success;
     }
 
     bool PlannerManager::callKinodynamicAstarPlan()
     {
+    }
+
+    void PlannerManager::displayPath()
+    {
+        visualization_msgs::Marker mk;
+        mk.header.frame_id = "world";
+        mk.header.stamp = ros::Time::now();
+        mk.type = visualization_msgs::Marker::SPHERE_LIST;
+        mk.action = visualization_msgs::Marker::DELETE;
+        mk.id = 0;
+
+        mk.action = visualization_msgs::Marker::ADD;
+        mk.pose.orientation.x = 0.0;
+        mk.pose.orientation.y = 0.0;
+        mk.pose.orientation.z = 0.0;
+        mk.pose.orientation.w = 1.0;
+
+        mk.color.r = 1.0;
+        mk.color.g = 0.0;
+        mk.color.b = 0.0;
+        mk.color.a = 1;
+
+        mk.scale.x = 0.1;
+        mk.scale.y = 0.1;
+        mk.scale.z = 0.1;
+
+        geometry_msgs::Point pt;
+        vector<Eigen::Vector2d> list;
+        list = astar_finder_->getPath();
+        for (int i = 0; i < int(list.size()); i++)
+        {
+            pt.x = list[i](0);
+            pt.y = list[i](1);
+            pt.z = 1.2;
+            mk.points.push_back(pt);
+        }
+
+        traj_pub_.publish(mk);
+        ros::Duration(0.001).sleep();
     }
 
 } // namespace cane_planner

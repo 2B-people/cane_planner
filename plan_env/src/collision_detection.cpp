@@ -33,11 +33,11 @@ namespace cane_planner
         double dis = sdf_map_->getDistance(index);
         if (dis <= margin_)
         {
-            return true;
+            return false;
         }
         else
         {
-            return false;
+            return true;
         }
     }
 

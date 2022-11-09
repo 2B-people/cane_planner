@@ -53,7 +53,7 @@ namespace cane_planner
     {
       /* ---------- get lowest f_score node ---------- */
       cur_node = open_set_.top();
-      // cout << "pos: " << cur_node->state.head(3).transpose() << endl;
+      // cout << "pos: " << cur_node->position.transpose() << endl;
       // cout << "time: " << cur_node->time << endl;
       // cout << "dist: " <<
       // edt_environment_->evaluateCoarseEDT(cur_node->state.head(3),
@@ -131,8 +131,9 @@ namespace cane_planner
           //                         -1.0);
           // double dist = edt_environment_->evaluateCoarseEDT(pro_pos, -1.0);
           // 这里改成我自己的collision free
-          if (collision_->isTraversable(pro_pos))
+          if (!collision_->isTraversable(pro_pos))
           {
+            // cout << "Can't Traversable" << endl;
             continue;
           }
 
@@ -140,8 +141,8 @@ namespace cane_planner
           // double time_to_goal = 0.0;
           double tmp_g_score, tmp_f_score;
           tmp_g_score = d_pos.squaredNorm() + cur_node->g_score;
-          tmp_f_score = tmp_g_score + lambda_heu_ * getEuclHeu(pro_pos, end_pt);
-
+          tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pro_pos, end_pt);
+                
           if (pro_node == NULL)
           {
             pro_node = path_node_pool_[use_node_num_];
@@ -269,10 +270,10 @@ namespace cane_planner
     this->inv_resolution_ = 1.0 / resolution_;
     inv_time_resolution_ = 1.0 / time_resolution_;
     // TODO: edt_evironment is change
-    Eigen::Vector3d ori,map_size_3d;
-    collision_->getMapRegion(ori,map_size_3d);
-    origin_ << ori(0),ori(1);
-    map_size_2d_ << map_size_3d(0),map_size_3d(1);
+    Eigen::Vector3d ori, map_size_3d;
+    collision_->getMapRegion(ori, map_size_3d);
+    origin_ << ori(0), ori(1);
+    map_size_2d_ << map_size_3d(0), map_size_3d(1);
 
     cout << "origin_: " << origin_.transpose() << endl;
     cout << "map size: " << map_size_2d_.transpose() << endl;
@@ -292,7 +293,7 @@ namespace cane_planner
   // {
   //   this->edt_environment_ = env;
   // }
-  
+
   void Astar::setCollision(const CollisionDetection::Ptr &col)
   {
     this->collision_ = col;
@@ -335,8 +336,9 @@ namespace cane_planner
     return idx;
   }
 
-  int Astar::timeToIndex(double time) {
-  int idx = floor((time - time_origin_) * inv_time_resolution_);
-  return idx;
-}
+  int Astar::timeToIndex(double time)
+  {
+    int idx = floor((time - time_origin_) * inv_time_resolution_);
+    return idx;
+  }
 } // namespace fast_planner

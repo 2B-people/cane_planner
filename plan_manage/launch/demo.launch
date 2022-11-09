@@ -53,11 +53,11 @@
     <param name="map_ros/frame_id"      value="world"/>
 
     <param name="astar/resolution_astar" value="0.1"/>
-    <param name="astar/time_resolution" value="0.1"/>
-    <param name="astar/lambda_heu" value="10"/>
+    <param name="astar/time_resolution" value="0.0001"/>
+    <param name="astar/lambda_heu" value="0.001"/>
     <param name="astar/allocate_num" value="100000"/>
 
-    <param name="Collision/margin" value="0.2"/>
+    <param name="Collision/margin" value="0.5"/>
     <param name="Collision/SliceHeight" value="1.0"/>
     
   </node>

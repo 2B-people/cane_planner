@@ -9,6 +9,8 @@
 #include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <visualization_msgs/Marker.h>
+
 
 // #include <nav_msgs/OccupancyGrid.h>
 
@@ -50,11 +52,12 @@ namespace cane_planner
         ros::Timer exec_timer_;
         ros::Subscriber odom_sub_, waypoint_sub_;
         ros::Subscriber goal_sub_, start_sub_;
+        ros::Publisher traj_pub_;
 
         /*---------- helper function -----------*/
         bool callAstarPlan();
         bool callKinodynamicAstarPlan();
-
+        void displayPath();
         void changeFSMExecState(FSM_STATE new_state);
 
         /*---------- ROS function -----------*/
