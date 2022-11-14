@@ -14,21 +14,29 @@ namespace cane_planner
         }
     }
 
-    int KinodynamicAstar::search(Eigen::Vector2d start_pt, Eigen::Vector2d start_vel,
-                                 Eigen::Vector2d end_pt, Eigen::Vector2d end_vel,
-                                 bool init, bool dynamic)
+    int KinodynamicAstar::search(Eigen::Vector3d start_state, Eigen::Vector3d start_input,
+                                 Eigen::Vector3d end_state, Eigen::Vector3d end_input)
     {
         /* ---------- initialize --------*/
         KdNodePtr cur_node = path_node_pool_[0];
         cur_node->parent = NULL;
-        cur_node->position = start_pt;
-        cur_node->index = posToIndex(start_pt);
+        cur_node->state_variable = start_state;
+        cur_node->index = stateToIndex(start_state);
         cur_node->g_score = 0.0;
+        // launch foot,
+        if (launch_foot_)
+        {
+            cur_node->walk_num_ = 0;
+        }
+        else
+        {
+            cur_node->walk_num_ = 1;
+        }
 
         Eigen::Vector2i end_index;
-        end_index = posToIndex(end_pt);
+        end_index = stateToIndex(end_state);
         // TODO: Heuristic compute
-        // cur_node->f_score =
+        cur_node->f_score = lambda_heu_ * getEuclHeu(start_state, end_state);
         cur_node->kdnode_state = IN_OPEN_SET;
 
         open_set_.push(cur_node);
@@ -38,29 +46,77 @@ namespace cane_planner
 
         KdNodePtr neighbor = NULL;
         KdNodePtr terminate_node = NULL;
-        bool init_search = init;
-        const int tolerance = ceil(1 / resolution_);
 
         /* ---------- search loop ---------- */
-        // TODO:
         while (!open_set_.empty())
         {
             cur_node = open_set_.top();
 
             /* ---------- determine termination ---------- */
             bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
-                            abs(cur_node->index(1) - end_index(1)) <= 1;
-            // TODO:Check whether shot traj exist
+                            abs(cur_node->index(1) - end_index(1)) <= 1 &&
+                            abs(cur_node->state_variable(3) - end_state(3)) <= 0.1;
+
             if (near_end)
             {
+                cout << "[Kin-Astar]:---------------------- " << use_node_num_ << endl;
+                cout << "use node num: " << use_node_num_ << endl;
+                cout << "iter num: " << iter_num_ << endl;
+                terminate_node = cur_node;
+                retrievePath(terminate_node);
+                return REACH_END;
             }
+
             /* ---------- pop node and add to close set ---------- */
             open_set_.pop();
             cur_node->kdnode_state = IN_CLOSE_SET;
             iter_num_ += 1;
 
-            /* ---------- Explore the next gait point ---------- */
-            // TODO
+            /* ---------- param for next gait point ---------- */
+            double sx_res = 1 / 2.0, sy_res = 1 / 2.0, pi_res = 1 / 3.0;
+            Eigen::Vector3d cur_state = cur_node->state_variable;
+            int walk_n = cur_node->walk_num_;
+            Eigen::Vector3d pur_state;
+            vector<KdNodePtr> tmp_expand_nodes;
+            vector<Eigen::Vector3d> inputs;
+            Eigen::Vector3d um;
+
+            /* ----------set input list ---------- */
+            for (double ax = max_sx_ * sx_res; ax < max_sx_ + 1e-3; ax += max_sx_ * sx_res)
+                for (double ay = max_sy_ * sy_res; ay < max_sy_ + 1e-3; ay += max_sy_ * sy_res)
+                    for (double api = -max_pi_; api < max_pi_ + 1e-3; api += max_pi_ * pi_res)
+                    {
+                        um << ax, ay, api;
+                        inputs.push_back(um);
+                    }
+
+            /* ----------Explore the next gait point ---------- */
+            for (int i = 0; i < inputs.size(); i++)
+            {
+                // state transit,explore the next gait point.
+                um = inputs[i];
+                statTransit(cur_state, pur_state, um, walk_n);
+                Eigen::Vector3i pro_id = stateToIndex(pur_state);
+
+                // check if in feasible space
+                if (pur_state(0) <= origin_(0) || pur_state(0) >= map_size_2d_(0) 
+                 || pur_state(1) <= origin_(1) || pur_state(1) >= map_size_2d_(1))
+                {
+                    cout << "outside map" << endl;
+                    continue;
+                }
+
+                // Check if in close set
+                KdNodePtr pro_node = expanded_nodes_.find(pro_id);
+                if (pro_node != NULL && pro_node->kdnode_state == IN_CLOSE_SET)
+                {
+                    std::cout << "close" << std::endl;
+                    continue;
+                }
+
+                // Check safety
+                // TODO: 其他部分
+            }
         }
 
         /* ---------- open set empty, no path ---------- */
@@ -70,26 +126,28 @@ namespace cane_planner
         return NO_PATH;
     }
 
-    void KinodynamicAstar::statTransit()
+    void KinodynamicAstar::statTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
+                                       Eigen::Vector3d input, int n)
     {
-        // TODO:
-    }
-
-    std::vector<Eigen::Vector2d> KinodynamicAstar::getKinWalk()
-    {
-        vector<Vector2d> state_list;
-        /* ---------- get walking patten point of searching ---------- */
-        for (int i = 0; i < path_nodes_.size(); i++)
-        {
-            state_list.push_back(path_nodes_[i]->position);
-        }
-        return state_list;
+        double yaw_new = state1(2) + input(2);
+        state2(0) = state1(0) + cos(yaw_new) * input(0) - sin(yaw_new) * input(1);
+        state2(1) = state1(1) + sin(yaw_new) * input(0) - pow(-1, n) * cos(yaw_new) * input(1);
+        state2(2) = yaw_new;
+        cout << "new px:" << state2(0) << endl;
+        cout << "new py:" << state2(1) << endl;
+        cout << "new yaw:" << state2(2) << endl;
     }
 
     Eigen::Vector2i KinodynamicAstar::posToIndex(Eigen::Vector2d pt)
     {
         Vector2i idx = ((pt - origin_) * inv_resolution_).array().floor().cast<int>();
         return idx;
+    }
+    Eigen::Vector2d KinodynamicAstar::stateToPos(Eigen::Vector3d state)
+    {
+        Vector2d pos;
+        pos << state(0), state(1);
+        return pos;
     }
 
     void KinodynamicAstar::retrievePath(KdNodePtr end_node)
@@ -110,11 +168,17 @@ namespace cane_planner
         // 用于放大f_score的一个倍速
         nh.param("kinastar/lambda_heu", lambda_heu_, -1.0);
         // 这里的加上时间维度
-        nh.param("kinastar/time_resolution", time_resolution_, -1.0);
-        // resolution 可以理解成最小分辨率
         nh.param("kinastar/resolution_astar", resolution_, -1.0);
+        inv_resolution_ = ceil(1 / resolution_);
         // 分配的最大可以搜索的数量；
         nh.param("kinastar/allocate_num", allocate_num_, -1);
+        // 启动的脚，左脚为1，右脚为0,
+        nh.param("kinastar/launch_foot", launch_foot_, false);
+        // 人体动力学限制参数
+        nh.param("kinastar/max_sx", max_sx_, -1.0);
+        nh.param("kinastar/max_sy", max_sy_, -1.0);
+        nh.param("kinastar/max_pi", max_pi_, -1.0);
+
         tie_breaker_ = 1.0 + 1.0 / 10000;
     }
     void KinodynamicAstar::init()
@@ -155,29 +219,29 @@ namespace cane_planner
         this->collision_ = col;
     }
 
-    double KinodynamicAstar::getDiagHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)
+    double KinodynamicAstar::getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2)
     {
         double dx = fabs(x1(0) - x2(0));
         double dy = fabs(x1(1) - x2(1));
-
         double h = (dx + dy) + (sqrt(2.0) - 2) * min(dx, dy);
 
         return tie_breaker_ * h;
     }
 
-    double KinodynamicAstar::getManhHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)
+    double KinodynamicAstar::getManhHeu(Eigen::Vector3d x1, Eigen::Vector3d x2)
     {
         double dx = fabs(x1(0) - x2(0));
         double dy = fabs(x1(1) - x2(1));
         // double dz = fabs(x1(2) - x2(2));
 
-        // return tie_breaker_ * (dx + dy + dz);
         return tie_breaker_ * (dx + dy);
     }
 
-    double KinodynamicAstar::getEuclHeu(Eigen::Vector2d x1, Eigen::Vector2d x2)
+    double KinodynamicAstar::getEuclHeu(Eigen::Vector3d x1, Eigen::Vector3d x2)
     {
-        return tie_breaker_ * (x2 - x1).norm();
+        auto pos1 = stateToPos(x1);
+        auto pos2 = stateToPos(x2);
+        return tie_breaker_ * (pos2 - pos1).norm();
     }
 
 } // namespace cane_planner

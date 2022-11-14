@@ -104,8 +104,8 @@ namespace cane_planner
 
           /* ---------- check if in feasible space ---------- */
           /* inside map range */
-          if (pro_pos(0) <= origin_(0) || pro_pos(0) >= map_size_2d_(0) || pro_pos(1) <= origin_(1) ||
-              pro_pos(1) >= map_size_2d_(1))
+          if (pro_pos(0) <= origin_(0) || pro_pos(0) >= map_size_2d_(0) 
+           || pro_pos(1) <= origin_(1) || pro_pos(1) >= map_size_2d_(1))
           {
             // cout << "outside map" << endl;
             continue;
@@ -114,10 +114,8 @@ namespace cane_planner
           /* not in close set */
           Eigen::Vector2i pro_id = posToIndex(pro_pos);
           int pro_t_id = timeToIndex(pro_t);
-
           NodePtr pro_node =
               dynamic ? expanded_nodes_.find(pro_id, pro_t_id) : expanded_nodes_.find(pro_id);
-
           if (pro_node != NULL && pro_node->node_state == IN_CLOSE_SET)
           {
             // cout << "in closeset" << endl;
@@ -125,12 +123,6 @@ namespace cane_planner
           }
 
           /* collision free */
-          // double dist = dynamic ?
-          // edt_environment_->evaluateCoarseEDT(pro_pos, cur_node->time + dt) :
-          //                         edt_environment_->evaluateCoarseEDT(pro_pos,
-          //                         -1.0);
-          // double dist = edt_environment_->evaluateCoarseEDT(pro_pos, -1.0);
-          // 这里改成我自己的collision free
           if (!collision_->isTraversable(pro_pos))
           {
             // cout << "Can't Traversable" << endl;

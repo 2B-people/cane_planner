@@ -31,14 +31,14 @@ namespace cane_planner
   {
   public:
     /* -------------------- */
+    // node's index(from px,py)
     Eigen::Vector2i index;
-    Eigen::Vector2d position;
+    // state variable: px,py,yaw
+    Eigen::Vector3d state_variable;
+    int walk_num_;
     double g_score, f_score;
     KdNode *parent;
     char kdnode_state;
-
-    double time; // dyn
-    int time_idx;
 
     /* -------------------- */
     KdNode()
@@ -59,7 +59,7 @@ namespace cane_planner
     }
   };
 
-  //用hash表来存close_set
+  //用hash表来存Open_set,再塞入std的priority_queue中
   class KdNodeHashTable
   {
   private:
@@ -115,7 +115,9 @@ namespace cane_planner
     int allocate_num_;
     double lambda_heu_;
     double tie_breaker_;
-    double resolution_, inv_resolution_, time_resolution_, inv_time_resolution_;
+    bool launch_foot_;
+    double resolution_, inv_resolution_;
+    double max_sx_,max_sy_,max_pi_;
     Eigen::Vector2d origin_, map_size_2d_;
     CollisionDetection::Ptr collision_;
 
@@ -123,18 +125,22 @@ namespace cane_planner
 
     /* helper */
     Eigen::Vector2i posToIndex(Eigen::Vector2d pt);
-    int timeToIndex(double time);
+    Eigen::Vector2d stateToPos(Eigen::Vector3d state);
+    Eigen::Vector2i stateToIndex(Eigen::Vector3d state);
+
     void retrievePath(KdNodePtr end_node);
 
     /* shot trajectory */
 
     /*Compute Heuristic*/
     /* heuristic function */
-    double getDiagHeu(Eigen::Vector2d x1, Eigen::Vector2d x2);
-    double getManhHeu(Eigen::Vector2d x1, Eigen::Vector2d x2);
-    double getEuclHeu(Eigen::Vector2d x1, Eigen::Vector2d x2);
+    double getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
+    double getManhHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
+    double getEuclHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
+
     /* state propagation */
-    void statTransit();
+    void statTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
+                     Eigen::Vector3d input, int n);
 
   public:
     KinodynamicAstar(){};
@@ -147,20 +153,16 @@ namespace cane_planner
       NEAR_END = 3
     };
 
-    /* main API */    
-    int search(Eigen::Vector2d start_pt, Eigen::Vector2d start_vel,
-               Eigen::Vector2d end_pt, Eigen::Vector2d end_vel,
-               bool init, bool dynamic = false);
-    
+    /* main API */
+    int search(Eigen::Vector3d start_state, Eigen::Vector3d start_input,
+               Eigen::Vector3d end_state, Eigen::Vector3d end_input);
+
     void setParam(ros::NodeHandle &nh);
     void init();
     void reset();
 
     // void setEnvironment(const EDTEnvironment::Ptr &env);
     void setCollision(const CollisionDetection::Ptr &col);
-
-
-    std::vector<Eigen::Vector2d> getKinWalk();
 
     typedef shared_ptr<KinodynamicAstar> Ptr;
   };
