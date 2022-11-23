@@ -35,7 +35,7 @@ namespace cane_planner
     Eigen::Vector2i index;
     // state variable: px,py,yaw
     Eigen::Vector3d state_variable;
-    int walk_num_;
+    int walk_num;
     double g_score, f_score;
     KdNode *parent;
     char kdnode_state;
@@ -133,6 +133,7 @@ namespace cane_planner
     /* shot trajectory */
 
     /*Compute Heuristic*/
+    double estimateHeuristic(Eigen::Vector3d input);
     /* heuristic function */
     double getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
     double getManhHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);

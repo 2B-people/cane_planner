@@ -67,7 +67,7 @@ namespace cane_planner
     {
         end_pt_(0) = goal->pose.position.x;
         end_pt_(1) = goal->pose.position.y;
-        ROS_INFO"set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
+        ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
         have_target_ = true;
     }
 
@@ -176,6 +176,10 @@ namespace cane_planner
 
     bool PlannerManager::callKinodynamicAstarPlan()
     {
+        kin_finder_->reset();
+        // todo
+        bool plan_success = false;
+        return plan_success;
     }
 
     void PlannerManager::displayPath()

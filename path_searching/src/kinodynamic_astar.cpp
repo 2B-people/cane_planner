@@ -26,11 +26,11 @@ namespace cane_planner
         // launch foot,
         if (launch_foot_)
         {
-            cur_node->walk_num_ = 0;
+            cur_node->walk_num = 0;
         }
         else
         {
-            cur_node->walk_num_ = 1;
+            cur_node->walk_num = 1;
         }
 
         Eigen::Vector2i end_index;
@@ -75,7 +75,7 @@ namespace cane_planner
             /* ---------- param for next gait point ---------- */
             double sx_res = 1 / 2.0, sy_res = 1 / 2.0, pi_res = 1 / 3.0;
             Eigen::Vector3d cur_state = cur_node->state_variable;
-            int walk_n = cur_node->walk_num_;
+            int walk_n = cur_node->walk_num;
             Eigen::Vector3d pur_state;
             vector<KdNodePtr> tmp_expand_nodes;
             vector<Eigen::Vector3d> inputs;
@@ -96,11 +96,10 @@ namespace cane_planner
                 // state transit,explore the next gait point.
                 um = inputs[i];
                 statTransit(cur_state, pur_state, um, walk_n);
-                Eigen::Vector3i pro_id = stateToIndex(pur_state);
+                Eigen::Vector2i pro_id = stateToIndex(pur_state);
 
                 // check if in feasible space
-                if (pur_state(0) <= origin_(0) || pur_state(0) >= map_size_2d_(0) 
-                 || pur_state(1) <= origin_(1) || pur_state(1) >= map_size_2d_(1))
+                if (pur_state(0) <= origin_(0) || pur_state(0) >= map_size_2d_(0) || pur_state(1) <= origin_(1) || pur_state(1) >= map_size_2d_(1))
                 {
                     cout << "outside map" << endl;
                     continue;
@@ -115,7 +114,55 @@ namespace cane_planner
                 }
 
                 // Check safety
-                // TODO: 其他部分
+                // TODO 这里先用着这个astar的chheck方法，看看有啥问题
+                /* collision free */
+                Eigen::Vector2d pro_pos;
+                pro_pos << pur_state(0), pur_state(1);
+                if (!collision_->isTraversable(pro_pos))
+                {
+                    cout << "Can't Traversable" << endl;
+                    continue;
+                }
+                // TODO
+                double tmp_g_score = estimateHeuristic(um);
+                double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state, end_state);
+
+                if (pro_node == NULL)
+                {
+                    pro_node = path_node_pool_[use_node_num_];
+                    pro_node->index = pro_id;
+                    pro_node->state_variable = pur_state;
+                    pro_node->walk_num = cur_node->walk_num + 1;
+                    pro_node->f_score = tmp_f_score;
+                    pro_node->g_score = tmp_g_score;
+                    pro_node->parent = cur_node;
+                    pro_node->kdnode_state = IN_OPEN_SET;
+                    //push in set
+                    open_set_.push(pro_node);
+                    expanded_nodes_.insert(pro_id, pro_node);
+                    // add used node num
+                    use_node_num_ += 1;
+                    if (use_node_num_ == allocate_num_)
+                    {
+                        cout << "run out of memory." << endl;
+                        return NO_PATH;
+                    }
+                }
+                else if (pro_node->kdnode_state == IN_OPEN_SET)
+                {
+                    if (tmp_g_score < pro_node->g_score)
+                    {
+                        pro_node->state_variable = pur_state;
+                        pro_node->walk_num = cur_node->walk_num + 1;
+                        pro_node->f_score = tmp_f_score;
+                        pro_node->g_score = tmp_g_score;
+                        pro_node->parent = cur_node;
+                    }
+                }
+                else
+                {
+                    cout << "error type in searching: " << pro_node->kdnode_state << endl;
+                }
             }
         }
 
@@ -148,6 +195,12 @@ namespace cane_planner
         Vector2d pos;
         pos << state(0), state(1);
         return pos;
+    }
+    Eigen::Vector2i KinodynamicAstar::stateToIndex(Eigen::Vector3d state)
+    {
+        auto pos = stateToPos(state);
+        Vector2i idx = posToIndex(pos);
+        return idx;
     }
 
     void KinodynamicAstar::retrievePath(KdNodePtr end_node)
@@ -242,6 +295,14 @@ namespace cane_planner
         auto pos1 = stateToPos(x1);
         auto pos2 = stateToPos(x2);
         return tie_breaker_ * (pos2 - pos1).norm();
+    }
+
+    double KinodynamicAstar::estimateHeuristic(Eigen::Vector3d input)
+    {
+        Eigen::Vector2d acc_x_y;
+        acc_x_y << input(0), input(1);
+        double heu = acc_x_y.norm() + input(2);
+        return heu;
     }
 
 } // namespace cane_planner
