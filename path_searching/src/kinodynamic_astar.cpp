@@ -51,17 +51,20 @@ namespace cane_planner
         while (!open_set_.empty())
         {
             cur_node = open_set_.top();
+            std::cout << "Explore while is " << use_node_num_ << std::endl;
+            std::cout << "----------------------------" << std::endl;
 
             /* ---------- determine termination ---------- */
             bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
-                            abs(cur_node->index(1) - end_index(1)) <= 1 &&
-                            abs(cur_node->state_variable(3) - end_state(3)) <= 0.1;
+                            abs(cur_node->index(1) - end_index(1)) <= 1;
+                            // abs(cur_node->state_variable(2) - end_state(2)) <= 0.1;
+            ;
 
             if (near_end)
             {
-                cout << "[Kin-Astar]:---------------------- " << use_node_num_ << endl;
-                cout << "use node num: " << use_node_num_ << endl;
-                cout << "iter num: " << iter_num_ << endl;
+                std::cout << "[Kin-Astar]:---------------------- " << use_node_num_ << std::endl;
+                std::cout << "use node num: " << use_node_num_ << std::endl;
+                std::cout << "iter num: " << iter_num_ << std::endl;
                 terminate_node = cur_node;
                 retrievePath(terminate_node);
                 return REACH_END;
@@ -73,7 +76,7 @@ namespace cane_planner
             iter_num_ += 1;
 
             /* ---------- param for next gait point ---------- */
-            double sx_res = 1 / 2.0, sy_res = 1 / 2.0, pi_res = 1 / 3.0;
+            double sx_res = 1 / 1.0, sy_res = 1 / 1.0, pi_res = 1 / 2.0;
             Eigen::Vector3d cur_state = cur_node->state_variable;
             int walk_n = cur_node->walk_num;
             Eigen::Vector3d pur_state;
@@ -84,24 +87,26 @@ namespace cane_planner
             /* ----------set input list ---------- */
             for (double ax = max_sx_ * sx_res; ax < max_sx_ + 1e-3; ax += max_sx_ * sx_res)
                 for (double ay = max_sy_ * sy_res; ay < max_sy_ + 1e-3; ay += max_sy_ * sy_res)
-                    for (double api = -max_pi_; api < max_pi_ + 1e-3; api += max_pi_ * pi_res)
+                    for (double api = -max_pi_; api < max_pi_ + 1e-2; api += max_pi_ * pi_res)
                     {
                         um << ax, ay, api;
                         inputs.push_back(um);
                     }
-
+            std::cout << "new state explore,size: " << inputs.size() << std::endl;
             /* ----------Explore the next gait point ---------- */
             for (int i = 0; i < inputs.size(); i++)
             {
+
                 // state transit,explore the next gait point.
                 um = inputs[i];
+                std::cout << "input:sx,sy,yaw" << um.transpose() << std::endl;
                 statTransit(cur_state, pur_state, um, walk_n);
                 Eigen::Vector2i pro_id = stateToIndex(pur_state);
 
                 // check if in feasible space
                 if (pur_state(0) <= origin_(0) || pur_state(0) >= map_size_2d_(0) || pur_state(1) <= origin_(1) || pur_state(1) >= map_size_2d_(1))
                 {
-                    cout << "outside map" << endl;
+                    std::cout << "outside map" << std::endl;
                     continue;
                 }
 
@@ -109,7 +114,7 @@ namespace cane_planner
                 KdNodePtr pro_node = expanded_nodes_.find(pro_id);
                 if (pro_node != NULL && pro_node->kdnode_state == IN_CLOSE_SET)
                 {
-                    std::cout << "close" << std::endl;
+                    std::cout << "in close" << std::endl;
                     continue;
                 }
 
@@ -120,15 +125,16 @@ namespace cane_planner
                 pro_pos << pur_state(0), pur_state(1);
                 if (!collision_->isTraversable(pro_pos))
                 {
-                    cout << "Can't Traversable" << endl;
+                    std::cout << "can't Traversable" << std::endl;
                     continue;
                 }
                 // TODO
-                double tmp_g_score = estimateHeuristic(um);
+                double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
                 double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state, end_state);
 
                 if (pro_node == NULL)
                 {
+                    std::cout << "find new pro_node" << std::endl;
                     pro_node = path_node_pool_[use_node_num_];
                     pro_node->index = pro_id;
                     pro_node->state_variable = pur_state;
@@ -137,14 +143,14 @@ namespace cane_planner
                     pro_node->g_score = tmp_g_score;
                     pro_node->parent = cur_node;
                     pro_node->kdnode_state = IN_OPEN_SET;
-                    //push in set
+                    // push in set
                     open_set_.push(pro_node);
                     expanded_nodes_.insert(pro_id, pro_node);
                     // add used node num
                     use_node_num_ += 1;
                     if (use_node_num_ == allocate_num_)
                     {
-                        cout << "run out of memory." << endl;
+                        std::cout << "run out of memory." << std::endl;
                         return NO_PATH;
                     }
                 }
@@ -152,6 +158,7 @@ namespace cane_planner
                 {
                     if (tmp_g_score < pro_node->g_score)
                     {
+                        std::cout << "update new_node" << std::endl;
                         pro_node->state_variable = pur_state;
                         pro_node->walk_num = cur_node->walk_num + 1;
                         pro_node->f_score = tmp_f_score;
@@ -161,15 +168,15 @@ namespace cane_planner
                 }
                 else
                 {
-                    cout << "error type in searching: " << pro_node->kdnode_state << endl;
+                    std::cout << "error type in searching: " << pro_node->kdnode_state << std::endl;
                 }
             }
         }
 
         /* ---------- open set empty, no path ---------- */
-        cout << "open set empty, no path!" << endl;
-        cout << "use node num: " << use_node_num_ << endl;
-        cout << "iter num: " << iter_num_ << endl;
+        std::cout << "open set empty, no path!" << std::endl;
+        std::cout << "use node num: " << use_node_num_ << std::endl;
+        std::cout << "iter num: " << iter_num_ << std::endl;
         return NO_PATH;
     }
 
@@ -177,12 +184,21 @@ namespace cane_planner
                                        Eigen::Vector3d input, int n)
     {
         double yaw_new = state1(2) + input(2);
+        if (yaw_new > M_PI)
+        {
+            yaw_new -= M_PI;
+        }
+        else if (yaw_new < -M_PI)
+        {
+            yaw_new += M_PI;
+        }
+
         state2(0) = state1(0) + cos(yaw_new) * input(0) - sin(yaw_new) * input(1);
         state2(1) = state1(1) + sin(yaw_new) * input(0) - pow(-1, n) * cos(yaw_new) * input(1);
         state2(2) = yaw_new;
-        cout << "new px:" << state2(0) << endl;
-        cout << "new py:" << state2(1) << endl;
-        cout << "new yaw:" << state2(2) << endl;
+        std::cout << "new px:" << state2(0) << std::endl;
+        std::cout << "new py:" << state2(1) << std::endl;
+        std::cout << "new yaw:" << state2(2) << std::endl;
     }
 
     Eigen::Vector2i KinodynamicAstar::posToIndex(Eigen::Vector2d pt)
@@ -236,6 +252,7 @@ namespace cane_planner
     }
     void KinodynamicAstar::init()
     {
+        /* ---------- pre-allocated node ---------- */
         path_node_pool_.resize(allocate_num_);
         for (int i = 0; i < allocate_num_; i++)
         {
@@ -244,6 +261,16 @@ namespace cane_planner
 
         use_node_num_ = 0;
         iter_num_ = 0;
+
+        /* ---------- map params ---------- */
+        this->inv_resolution_ = 1.0 / resolution_;
+        Eigen::Vector3d ori, map_size_3d;
+        collision_->getMapRegion(ori, map_size_3d);
+        origin_ << ori(0), ori(1);
+        map_size_2d_ << map_size_3d(0), map_size_3d(1);
+
+        std::cout << "origin_: " << origin_.transpose() << std::endl;
+        std::cout << "map size: " << map_size_2d_.transpose() << std::endl;
     }
     void KinodynamicAstar::reset()
     {
@@ -302,6 +329,7 @@ namespace cane_planner
         Eigen::Vector2d acc_x_y;
         acc_x_y << input(0), input(1);
         double heu = acc_x_y.norm() + input(2);
+        std::cout << "this heu is " << heu << endl;
         return heu;
     }
 

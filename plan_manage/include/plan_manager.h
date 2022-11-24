@@ -10,6 +10,7 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <visualization_msgs/Marker.h>
+#include <tf/transform_datatypes.h>
 
 
 // #include <nav_msgs/OccupancyGrid.h>
@@ -45,8 +46,11 @@ namespace cane_planner
 
         Eigen::Vector3d odom_pos_, odom_vel_;
 
-        Eigen::Vector2d start_pt_; // start state
-        Eigen::Vector2d end_pt_;   // target state
+        Eigen::Vector2d start_pt_; // start pos
+        Eigen::Vector2d end_pt_;   // target pos
+
+        Eigen::Vector3d start_state_; //start state
+        Eigen::Vector3d end_state_;//end state
 
         /*---------- Ros utils -----------*/
         ros::Timer exec_timer_;
@@ -59,6 +63,7 @@ namespace cane_planner
         bool callKinodynamicAstarPlan();
         void displayPath();
         void changeFSMExecState(FSM_STATE new_state);
+        double QuatenionToYaw(geometry_msgs::Quaternion ori);
 
         /*---------- ROS function -----------*/
         void execFSMCallback(const ros::TimerEvent &e);

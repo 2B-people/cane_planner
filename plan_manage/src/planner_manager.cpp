@@ -68,14 +68,26 @@ namespace cane_planner
         end_pt_(0) = goal->pose.position.x;
         end_pt_(1) = goal->pose.position.y;
         ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
+
+        end_state_(0) = goal->pose.position.x;
+        end_state_(1) = goal->pose.position.y;
+        double yaw = QuatenionToYaw(goal->pose.orientation);
+        end_state_(2) = yaw;
+        cout << "goal yaw:" << yaw << endl;
         have_target_ = true;
     }
 
     void PlannerManager::startCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start)
     {
-        odom_pos_(0) = start->pose.pose.position.x;
-        odom_pos_(1) = start->pose.pose.position.y;
-        ROS_INFO("set start pos is:%lf and %lf", odom_pos_(0), odom_pos_(1));
+        start_pt_(0) = start->pose.pose.position.x;
+        start_pt_(1) = start->pose.pose.position.y;
+        ROS_INFO("set start pos is:%lf and %lf", start_pt_(0), start_pt_(1));
+
+        start_state_(0) = start->pose.pose.position.x;
+        start_state_(1) = start->pose.pose.position.y;
+        double yaw = QuatenionToYaw(start->pose.pose.orientation);
+        start_state_(2) = yaw;
+        cout << "yaw:" << yaw << endl;
         have_odom_ = true;
     }
 
@@ -142,8 +154,6 @@ namespace cane_planner
         case GEN_NEW_TRAJ:
         {
             // TODO:这里先用Odom当作start_pt;
-            start_pt_(0) = odom_pos_(0);
-            start_pt_(1) = odom_pos_(1);
             bool success = false;
             if (planner_ == 1)
                 success = callAstarPlan();
@@ -158,7 +168,14 @@ namespace cane_planner
         case EXEC_TRAJ:
         {
             // visiual
-            displayPath();
+            if (planner_ == 1)
+            {
+                displayPath();
+            }
+            else if (planner_ == 2)
+            {
+            }
+
             have_target_ = false;
             changeFSMExecState(WAIT_TARGET);
             break;
@@ -178,7 +195,9 @@ namespace cane_planner
     {
         kin_finder_->reset();
         // todo
-        bool plan_success = false;
+        Eigen::Vector3d input;
+        input << 0.0, 0.0, 0.0;
+        bool plan_success = kin_finder_->search(start_state_, input, end_state_, input);
         return plan_success;
     }
 
@@ -219,6 +238,15 @@ namespace cane_planner
 
         traj_pub_.publish(mk);
         ros::Duration(0.001).sleep();
+    }
+
+    double PlannerManager::QuatenionToYaw(geometry_msgs::Quaternion ori)
+    {
+        tf::Quaternion quat;
+        tf::quaternionMsgToTF(ori, quat);
+        double roll, pitch, yaw;
+        tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+        return yaw;
     }
 
 } // namespace cane_planner
