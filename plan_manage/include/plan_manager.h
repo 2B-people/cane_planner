@@ -39,7 +39,6 @@ namespace cane_planner
         unique_ptr<Astar> astar_finder_;
         unique_ptr<KinodynamicAstar> kin_finder_;
 
-        int planner_;
         FSM_STATE exec_state_;
         bool have_odom_, have_target_;
         bool simulation_;
@@ -56,12 +55,13 @@ namespace cane_planner
         ros::Timer exec_timer_;
         ros::Subscriber odom_sub_, waypoint_sub_;
         ros::Subscriber goal_sub_, start_sub_;
-        ros::Publisher traj_pub_;
+        ros::Publisher astar_pub_,kin_pub_;
 
         /*---------- helper function -----------*/
         bool callAstarPlan();
         bool callKinodynamicAstarPlan();
-        void displayPath();
+        void displayAstar();
+        void displayKinastar();
         void changeFSMExecState(FSM_STATE new_state);
         double QuatenionToYaw(geometry_msgs::Quaternion ori);
 
@@ -74,9 +74,8 @@ namespace cane_planner
         // void MapCallback(const nav_msgs::OccupancyGrid::Ptr map);
 
     public:
-        PlannerManager(int planner, bool simulation)
+        PlannerManager(bool simulation)
         {
-            planner_ = planner;
             simulation_ = simulation;
         }
         ~PlannerManager();

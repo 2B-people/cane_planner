@@ -14,8 +14,6 @@
     <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
     <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/> 
 
-    <param name="planner_node/planner"   value="2" /> 
-
     <param name="sdf_map/map_size_x"   value="20.0" /> 
     <param name="sdf_map/map_size_y"   value="50.0" /> 
     <param name="sdf_map/map_size_z"   value="10.0" /> 
@@ -58,12 +56,16 @@
     <param name="kinastar/launch_foot" value="false"/>
     <param name="kinastar/lambda_heu" value="0.01"/>
     <param name="kinastar/allocate_num" value="1000000"/>
-    <param name="kinastar/max_sx" value="0.4"/>
-    <param name="kinastar/max_sy" value="0.1"/>
+    <param name="kinastar/max_sx" value="0.5"/>
+    <param name="kinastar/max_sy" value="0.2"/>
     <param name="kinastar/max_pi" value="1.04"/>
 
+    <param name="astar/resolution_astar" value="0.1"/>
+    <param name="astar/time_resolution" value="0"/>
+    <param name="astar/lambda_heu" value="0.01"/>
+    <param name="astar/allocate_num" value="1000000"/>
 
-    <param name="Collision/margin" value="0.5"/>
+    <param name="Collision/margin" value="0.4"/>
     <param name="Collision/SliceHeight" value="1.0"/>
     
   </node>

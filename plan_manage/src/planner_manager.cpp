@@ -23,26 +23,18 @@ namespace cane_planner
         collision_->setMap(sdf_map_);
 
         // init planner
-        if (planner_ == 1)
-        {
-            ROS_WARN("choose Astar planer");
-            astar_finder_.reset(new Astar);
-            astar_finder_->setParam(nh);
-            astar_finder_->setCollision(collision_);
-            astar_finder_->init();
-        }
-        else if (planner_ == 2)
-        {
-            ROS_WARN("choose kinodynamic planer");
-            kin_finder_.reset(new KinodynamicAstar);
-            kin_finder_->setParam(nh);
-            kin_finder_->setCollision(collision_);
-            kin_finder_->init();
-        }
-        else
-        {
-            ROS_ERROR("Not choose planner");
-        }
+
+        ROS_WARN(" Astar planer start");
+        astar_finder_.reset(new Astar);
+        astar_finder_->setParam(nh);
+        astar_finder_->setCollision(collision_);
+        astar_finder_->init();
+
+        ROS_WARN(" kinodynamic planer start");
+        kin_finder_.reset(new KinodynamicAstar);
+        kin_finder_->setParam(nh);
+        kin_finder_->setCollision(collision_);
+        kin_finder_->init();
 
         // callback
         if (simulation_)
@@ -60,7 +52,8 @@ namespace cane_planner
             nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
 
         // visial
-        traj_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/trajectory", 20);
+        astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
+        kin_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
     }
 
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
@@ -154,12 +147,12 @@ namespace cane_planner
         case GEN_NEW_TRAJ:
         {
             // TODO:这里先用Odom当作start_pt;
-            bool success = false;
-            if (planner_ == 1)
-                success = callAstarPlan();
-            else if (planner_ == 2)
-                success = callKinodynamicAstarPlan();
-            if (success)
+            bool success1 = false;
+            bool success2 = false;
+
+            success1 = callAstarPlan();
+            success2 = callKinodynamicAstarPlan();
+            if (success1 && success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(GEN_NEW_TRAJ);
@@ -168,13 +161,8 @@ namespace cane_planner
         case EXEC_TRAJ:
         {
             // visiual
-            if (planner_ == 1)
-            {
-                displayPath();
-            }
-            else if (planner_ == 2)
-            {
-            }
+            displayAstar();
+            displayKinastar();
 
             have_target_ = false;
             changeFSMExecState(WAIT_TARGET);
@@ -201,7 +189,7 @@ namespace cane_planner
         return plan_success;
     }
 
-    void PlannerManager::displayPath()
+    void PlannerManager::displayAstar()
     {
         visualization_msgs::Marker mk;
         mk.header.frame_id = "world";
@@ -215,12 +203,10 @@ namespace cane_planner
         mk.pose.orientation.y = 0.0;
         mk.pose.orientation.z = 0.0;
         mk.pose.orientation.w = 1.0;
-
         mk.color.r = 1.0;
         mk.color.g = 0.0;
         mk.color.b = 0.0;
         mk.color.a = 1;
-
         mk.scale.x = 0.1;
         mk.scale.y = 0.1;
         mk.scale.z = 0.1;
@@ -236,7 +222,44 @@ namespace cane_planner
             mk.points.push_back(pt);
         }
 
-        traj_pub_.publish(mk);
+        astar_pub_.publish(mk);
+        ros::Duration(0.001).sleep();
+    }
+
+    void PlannerManager::displayKinastar()
+    {
+        visualization_msgs::Marker mk;
+        mk.header.frame_id = "world";
+        mk.header.stamp = ros::Time::now();
+        mk.type = visualization_msgs::Marker::SPHERE_LIST;
+        mk.action = visualization_msgs::Marker::DELETE;
+        mk.id = 0;
+
+        mk.action = visualization_msgs::Marker::ADD;
+        mk.pose.orientation.x = 0.0;
+        mk.pose.orientation.y = 0.0;
+        mk.pose.orientation.z = 0.0;
+        mk.pose.orientation.w = 1.0;
+        mk.color.r = 0.0;
+        mk.color.g = 0.0;
+        mk.color.b = 1.0;
+        mk.color.a = 1;
+        mk.scale.x = 0.1;
+        mk.scale.y = 0.1;
+        mk.scale.z = 0.1;
+
+        geometry_msgs::Point pt;
+        vector<Eigen::Vector3d> list;
+        list = kin_finder_->getPath();
+        for (int i = 0; i < int(list.size()); i++)
+        {
+            pt.x = list[i](0);
+            pt.y = list[i](1);
+            pt.z = 1.2;
+            mk.points.push_back(pt);
+        }
+
+        kin_pub_.publish(mk);
         ros::Duration(0.001).sleep();
     }
 

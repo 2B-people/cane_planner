@@ -157,6 +157,7 @@ namespace cane_planner
     /* main API */
     int search(Eigen::Vector3d start_state, Eigen::Vector3d start_input,
                Eigen::Vector3d end_state, Eigen::Vector3d end_input);
+    std::vector<Eigen::Vector3d> getPath();
 
     void setParam(ros::NodeHandle &nh);
     void init();

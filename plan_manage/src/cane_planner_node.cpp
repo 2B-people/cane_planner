@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     nh.param("planner_node/planner", planner, 1);
     nh.param("planner_node/planner", simulation, true);
 
-    PlannerManager plan_manage(planner,simulation);
+    PlannerManager plan_manage(simulation);
     plan_manage.init(nh);
     ros::Duration(1.0).sleep();
     ros::spin();

@@ -8,6 +8,8 @@ Panels:
         - /Status1
         - /PointCloud21
         - /PointCloud22
+        - /Marker1
+        - /Marker2
       Splitter Ratio: 0.5
     Tree Height: 1068
   - Class: rviz/Selection
@@ -112,10 +114,18 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /planning_vis/trajectory
+      Marker Topic: /planning_vis/astar
       Name: Marker
       Namespaces:
         {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /planning_vis/kin_astar
+      Name: Marker
+      Namespaces:
+        "": true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -146,7 +156,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 31.960437774658203
+      Distance: 44.9021110534668
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -182,5 +192,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 2548
-  X: 2560
-  Y: 0
+  X: 2617
+  Y: -42
