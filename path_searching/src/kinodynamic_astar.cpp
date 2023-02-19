@@ -99,7 +99,7 @@ namespace cane_planner
                 // state transit,explore the next gait point.
                 um = inputs[i];
                 // std::cout << "input:sx,sy,yaw" << um.transpose() << std::endl;
-                statTransit(cur_state, pur_state, um, walk_n);
+                stateTransit(cur_state, pur_state, um, walk_n);
                 Eigen::Vector2i pro_id = stateToIndex(pur_state);
 
                 // check if in feasible space
@@ -179,7 +179,7 @@ namespace cane_planner
         return NO_PATH;
     }
 
-    void KinodynamicAstar::statTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
+    void KinodynamicAstar::stateTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
                                        Eigen::Vector3d input, int n)
     {
         double yaw_new = state1(2) + input(2);
@@ -195,6 +195,9 @@ namespace cane_planner
         state2(0) = state1(0) + cos(yaw_new) * input(0) - sin(yaw_new) * input(1);
         state2(1) = state1(1) + sin(yaw_new) * input(0) - pow(-1, n) * cos(yaw_new) * input(1);
         state2(2) = yaw_new;
+
+        //TODO using LFPC to next step location
+        
         // std::cout << "new px:" << state2(0) << std::endl;
         // std::cout << "new py:" << state2(1) << std::endl;
         // std::cout << "new yaw:" << state2(2) << std::endl;

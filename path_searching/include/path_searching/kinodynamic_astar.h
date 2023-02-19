@@ -140,7 +140,7 @@ namespace cane_planner
     double getEuclHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
 
     /* state propagation */
-    void statTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
+    void stateTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
                      Eigen::Vector3d input, int n);
 
   public:
