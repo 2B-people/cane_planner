@@ -41,7 +41,7 @@ class LFPC:
         self.aw = 0.0
         self.theta = 0.0
 
-        #这里的为全局的坐标
+        # 这里的为全局的坐标
         self.left_foot_pos = [0.0, 0.0, 0.0]
         self.right_foot_pos = [0.0, 0.0, 0.0]
         self.COM_pos = [0.0, 0.0, 0.0]
@@ -52,10 +52,11 @@ class LFPC:
         self.left_foot_pos = left_foot_pos
         self.right_foot_pos = right_foot_pos
 
-        self.zc = self.COM_pos[2]
+        self.zc = 1.0
         self.T_c = np.sqrt(self.zc / 10)  # set gravity parameter as 9.8
         self.C = np.cosh(self.T_sup/self.T_c)
         self.S = np.sinh(self.T_sup/self.T_c)
+        print('tc:',self.T_c,'c',self.C,'s',self.S)
 
     def SetCtrlParams(self, al, aw, theta):
         self.al = al
@@ -98,30 +99,38 @@ class LFPC:
 
     def updateNextFootLocation(self):
         x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
-        xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d,vy_d)
+        print('---- update foot\n')
+        xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d, vy_d)
         self.p_x1 = self.COM_pos[0] + xf1
-        self.p_x2 = self.COM_pos[0] + xf2 
+        self.p_x2 = self.COM_pos[0] + xf2
         self.p_y1 = self.COM_pos[1] + yf1
-        self.p_y2 = self.COM_pos[1] + yf2 
+        self.p_y2 = self.COM_pos[1] + yf2
         return
 
     def switchSupportLeg(self):
-
-        xf1, xf2, yf1, yf2 = self.updateLFPC(self.vx_0,self.vy_0)
-
+        x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
+        al = self.al
+        aw = self.aw
+        theta = self.theta
+        b = self.b
 
         if self.support_leg is 'left_leg':
             print('\n---- switch the support leg to the right leg')
             self.support_leg = 'right_leg'
-            self.x_0 = -xf1
-            self.y_0 = -yf1
+            a1 = -al * np.cos(theta) + aw * np.sin(theta)
+            a2 = -al * np.sin(theta) - aw * np.cos(theta)
         elif self.support_leg is 'right_leg':
             print('\n---- switch the support leg to the left leg')
             self.support_leg = 'left_leg'
-            self.x_0 = -xf2
-            self.y_0 = -yf2
+            a1 = -al * np.cos(theta) - aw * np.sin(theta)
+            a2 = -al * np.sin(theta) + aw * np.cos(theta)
 
-        x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
-        self.t = 0
+        self.x_0 = -a1 - b * (self.x_0*self.S/self.T_c +self.vx_0*self.C)
+        self.y_0 = -a2 - b * (self.y_0*self.S/self.T_c +self.vy_0*self.C)
+        print('x_0', self.x_0 ,'y_0',self.y_0)
         self.vx_0 = vx_d
-        self.vy_0 = vy_d        
+        self.vy_0 = vy_d
+        print('vx_0', self.vx_0 ,'vy_0',self.vy_0)
+        self.t = 0
+
+
