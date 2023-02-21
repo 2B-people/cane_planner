@@ -53,7 +53,7 @@ class LFPC:
         self.right_foot_pos = right_foot_pos
 
         self.zc = self.COM_pos[2]
-        self.T_c = np.sqrt(self.zc / 9.8)  # set gravity parameter as 9.8
+        self.T_c = np.sqrt(self.zc / 10)  # set gravity parameter as 9.8
         self.C = np.cosh(self.T_sup/self.T_c)
         self.S = np.sinh(self.T_sup/self.T_c)
 
@@ -106,17 +106,13 @@ class LFPC:
         return
 
     def switchSupportLeg(self):
-        x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
+
         xf1, xf2, yf1, yf2 = self.updateLFPC(self.vx_0,self.vy_0)
 
 
         if self.support_leg is 'left_leg':
             print('\n---- switch the support leg to the right leg')
             self.support_leg = 'right_leg'
-            # COM_pos_x = self.x_t + self.left_foot_pos[0]
-            # COM_pos_y = self.y_t + self.left_foot_pos[1]
-            # self.x_0 = COM_pos_x - self.right_foot_pos[0]
-            # self.y_0 = COM_pos_y - self.right_foot_pos[1]
             self.x_0 = -xf1
             self.y_0 = -yf1
         elif self.support_leg is 'right_leg':
@@ -124,11 +120,8 @@ class LFPC:
             self.support_leg = 'left_leg'
             self.x_0 = -xf2
             self.y_0 = -yf2
-            # COM_pos_x = self.x_t + self.right_foot_pos[0]
-            # COM_pos_y = self.y_t + self.right_foot_pos[1]
-            # self.x_0 = COM_pos_x - self.left_foot_pos[0]
-            # self.y_0 = COM_pos_y - self.left_foot_pos[1]
 
+        x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
         self.t = 0
         self.vx_0 = vx_d
         self.vy_0 = vy_d        

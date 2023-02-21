@@ -146,38 +146,32 @@ COM_v0 = [0, 0]
 left_foot_pos = [0, 0, 0]
 right_foot_pos = [0, 0, 0]
 
-delta_t = 0.02
+delta_t = 0.01
 
 al = 0.4
 aw = 0.1
 theta = 0.0
 
-LIPM_model = LIPM3D(dt=delta_t, T_sup=0.5)
-LIPM_model.initializeModel(COM_pos_0, left_foot_pos, right_foot_pos)
 
-LFPC_model = LFPC(dt=delta_t, T_sup=0.5)
+LFPC_model = LFPC(dt=delta_t, T_sup=0.3)
 LFPC_model.initializeModel(COM_pos_0, left_foot_pos, right_foot_pos)
 LFPC_model.SetCtrlParams(al,aw,theta)
 
 LFPC_model.support_leg = 'left_leg' # set the support leg to right leg in next step
 if LFPC_model.support_leg is 'left_leg':
     support_foot_pos = LFPC_model.left_foot_pos
-    LFPC_model.p_x = LFPC_model.left_foot_pos[0]
-    LFPC_model.p_y = LFPC_model.left_foot_pos[1]
 else:
     support_foot_pos = LFPC_model.right_foot_pos
-    LFPC_model.p_x = LFPC_model.right_foot_pos[0]
-    LFPC_model.p_y = LFPC_model.right_foot_pos[1]
+
 
 LFPC_model.x_0 = LFPC_model.COM_pos[0] - support_foot_pos[0]
 LFPC_model.y_0 = LFPC_model.COM_pos[1] - support_foot_pos[1]
 LFPC_model.vx_0 = COM_v0[0]
 LFPC_model.vy_0 = COM_v0[1]
 
-
 step_num = 0
-total_time = 4 # seconds
 global_time = 0
+total_time = 2 # seconds
 
 swing_data_len = int(LFPC_model.T_sup/delta_t)
 swing_foot_pos = np.zeros((swing_data_len, 3))
@@ -201,10 +195,9 @@ for i in range(int(total_time/delta_t)):
 
     # record data
     LFPC_model.COM_pos[0] = LFPC_model.x_t + support_foot_pos[0]
-    COM_pos_x.append(LFPC_model.x_t + support_foot_pos[0])
+    COM_pos_x.append(LFPC_model.COM_pos[0])
     LFPC_model.COM_pos[1] = LFPC_model.y_t + support_foot_pos[1]
-    COM_pos_y.append(LFPC_model.y_t + support_foot_pos[1])
-    print('\ntime:',global_time,'COM_x:',LFPC_model.COM_pos[0],'COM_y:',LFPC_model.COM_pos[1])
+    COM_pos_y.append(LFPC_model.COM_pos[1])
 
     left_foot_pos_x.append(LFPC_model.left_foot_pos[0])
     left_foot_pos_y.append(LFPC_model.left_foot_pos[1])
@@ -216,31 +209,24 @@ for i in range(int(total_time/delta_t)):
 
     # switch the support leg
     if (i > 0) and (i % switch_index == 0):
-
-        j = 0
-
-        LFPC_model.switchSupportLeg() # switch the support leg
-
-        # theta -= 0.04 # set zero for walking forward, set non-zero for turn left and right
-
+        # change contorl param
         step_num += 1
-        # if step_num >= 5: # stop forward after 5 steps
-        #     LFPC_model.SetCtrlParams(al,aw,theta)
+        if step_num >= 5: # stop forward after 5 steps
+            LFPC_model.SetCtrlParams(al,aw,theta)
 
-        # if step_num >= 10:
-        #     LFPC_model.SetCtrlParams(al,aw,theta)
-
+        if step_num >= 10:
+            LFPC_model.SetCtrlParams(al,aw,theta)
 
         # update support_foot_pos
+        j = 0
+        LFPC_model.switchSupportLeg() # switch the support leg
         if LFPC_model.support_leg is 'left_leg':
             support_foot_pos = LFPC_model.left_foot_pos
-            LFPC_model.p_x = LFPC_model.left_foot_pos[0]
-            LFPC_model.p_y = LFPC_model.left_foot_pos[1]
         else:
             support_foot_pos = LFPC_model.right_foot_pos
-            LFPC_model.p_x = LFPC_model.right_foot_pos[0]
-            LFPC_model.p_y = LFPC_model.right_foot_pos[1]
 
+        # calculate the next foots locations
+        LFPC_model.updateNextFootLocation()
         
         # calculate the foot positions for swing phase
         if LFPC_model.support_leg is 'left_leg':
@@ -254,12 +240,6 @@ for i in range(int(total_time/delta_t)):
             swing_foot_pos[:,1] = np.linspace(LFPC_model.left_foot_pos[1], left_foot_target_pos[1], swing_data_len)
             swing_foot_pos[1:swing_data_len-1, 2] = 0.1
 
-        # calculate the next foots locations
-        if (step_num % 2 == 0):
-            LFPC_model.updateNextFootLocation()
-
-        # LIPM_model.calculateFootLocationForNextStep(s_x, s_y, a, b, theta, x_0, vx_0, y_0, vy_0)
-        # # print('p_star=', LIPM_model.p_x_star, LIPM_model.p_y_star)
 
         
 
