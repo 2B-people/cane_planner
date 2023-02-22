@@ -99,7 +99,7 @@ class LFPC:
 
     def updateNextFootLocation(self):
         x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
-        print('---- update foot\n')
+        print('---- update foot------')
         xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d, vy_d)
         self.p_x1 = self.COM_pos[0] + xf1
         self.p_x2 = self.COM_pos[0] + xf2

@@ -184,6 +184,24 @@ LFPC_model.x_0 = LFPC_model.COM_pos[0] - support_foot_pos[0]
 LFPC_model.y_0 = LFPC_model.COM_pos[1] - support_foot_pos[1]
 LFPC_model.vx_0 = COM_v0[0]
 LFPC_model.vy_0 = COM_v0[1]
+LFPC_model.updateNextFootLocation()
+# calculate the foot positions for swing phase
+if LFPC_model.support_leg == 'left_leg':
+    print('[px1 py1]:', LFPC_model.p_x1, LFPC_model.p_y1)
+    right_foot_target_pos = [LFPC_model.p_x1, LFPC_model.p_y1, 0]
+    swing_foot_pos[:, 0] = np.linspace(
+        LFPC_model.right_foot_pos[0], right_foot_target_pos[0], swing_data_len)
+    swing_foot_pos[:, 1] = np.linspace(
+        LFPC_model.right_foot_pos[1], right_foot_target_pos[1], swing_data_len)
+    swing_foot_pos[1:swing_data_len-1, 2] = 0.1
+else:
+    print('[px2 py2]:', LFPC_model.p_x2, LFPC_model.p_y2)
+    left_foot_target_pos = [LFPC_model.p_x2, LFPC_model.p_y2, 0]
+    swing_foot_pos[:, 0] = np.linspace(
+        LFPC_model.left_foot_pos[0], left_foot_target_pos[0], swing_data_len)
+    swing_foot_pos[:, 1] = np.linspace(
+        LFPC_model.left_foot_pos[1], left_foot_target_pos[1], swing_data_len)
+    swing_foot_pos[1:swing_data_len-1, 2] = 0.1
 
 step_num = 0
 global_time = 0
@@ -197,43 +215,15 @@ for i in range(int(total_time/delta_t)):
     # update time
     global_time += delta_t
 
-    # lfpc step
-    LFPC_model.step()
-
-    if step_num >= 1:
-        if LFPC_model.support_leg == 'left_leg':
-            LFPC_model.right_foot_pos = [
-                swing_foot_pos[j, 0], swing_foot_pos[j, 1], swing_foot_pos[j, 2]]
-        else:
-            LFPC_model.left_foot_pos = [
-                swing_foot_pos[j, 0], swing_foot_pos[j, 1], swing_foot_pos[j, 2]]
-        j += 1
-
-    # record data
-    LFPC_model.COM_pos[0] = LFPC_model.x_t + support_foot_pos[0]
-    COM_pos_x.append(LFPC_model.COM_pos[0])
-    LFPC_model.COM_pos[1] = LFPC_model.y_t + support_foot_pos[1]
-    COM_pos_y.append(LFPC_model.COM_pos[1])
-
-    print('\nglobal_time:', global_time, 'x:',
-          LFPC_model.COM_pos[0], 'y:', LFPC_model.COM_pos[1])
-
-    left_foot_pos_x.append(LFPC_model.left_foot_pos[0])
-    left_foot_pos_y.append(LFPC_model.left_foot_pos[1])
-    left_foot_pos_z.append(LFPC_model.left_foot_pos[2])
-    right_foot_pos_x.append(LFPC_model.right_foot_pos[0])
-    right_foot_pos_y.append(LFPC_model.right_foot_pos[1])
-    right_foot_pos_z.append(LFPC_model.right_foot_pos[2])
-
-    # switch the support leg
+       # switch the support leg
     if (i > 0) and (i % switch_index == 0):
         # change contorl param
         step_num += 1
-        if step_num >= 5:  # stop forward after 5 steps
-            LFPC_model.SetCtrlParams(al, aw, theta)
+        # if step_num >= 5:  # stop forward after 5 steps
+        #     LFPC_model.SetCtrlParams(al, aw, theta)
 
-        if step_num >= 10:
-            LFPC_model.SetCtrlParams(al, aw, theta)
+        # if step_num >= 10:
+        #     LFPC_model.SetCtrlParams(al, aw, theta)
 
         # update support_foot_pos
         j = 0
@@ -248,6 +238,7 @@ for i in range(int(total_time/delta_t)):
 
         # calculate the foot positions for swing phase
         if LFPC_model.support_leg == 'left_leg':
+            print('[px1 py1]:', LFPC_model.p_x1, LFPC_model.p_y1, '\n')
             right_foot_target_pos = [LFPC_model.p_x1, LFPC_model.p_y1, 0]
             swing_foot_pos[:, 0] = np.linspace(
                 LFPC_model.right_foot_pos[0], right_foot_target_pos[0], swing_data_len)
@@ -255,12 +246,44 @@ for i in range(int(total_time/delta_t)):
                 LFPC_model.right_foot_pos[1], right_foot_target_pos[1], swing_data_len)
             swing_foot_pos[1:swing_data_len-1, 2] = 0.1
         else:
+            print('[px2 py2]:', LFPC_model.p_x2, LFPC_model.p_y2, '\n')
             left_foot_target_pos = [LFPC_model.p_x2, LFPC_model.p_y2, 0]
             swing_foot_pos[:, 0] = np.linspace(
                 LFPC_model.left_foot_pos[0], left_foot_target_pos[0], swing_data_len)
             swing_foot_pos[:, 1] = np.linspace(
                 LFPC_model.left_foot_pos[1], left_foot_target_pos[1], swing_data_len)
             swing_foot_pos[1:swing_data_len-1, 2] = 0.1
+            
+    # lfpc step
+    LFPC_model.step()
+
+    if step_num >= 0:
+        if LFPC_model.support_leg == 'left_leg':
+            LFPC_model.right_foot_pos = [
+                swing_foot_pos[j, 0], swing_foot_pos[j, 1], swing_foot_pos[j, 2]]
+        else:
+            LFPC_model.left_foot_pos = [
+                swing_foot_pos[j, 0], swing_foot_pos[j, 1], swing_foot_pos[j, 2]]
+        j += 1
+
+    # record data
+    LFPC_model.COM_pos[0] = LFPC_model.x_t + support_foot_pos[0]
+    COM_pos_x.append(LFPC_model.COM_pos[0])
+    LFPC_model.COM_pos[1] = LFPC_model.y_t + support_foot_pos[1]
+    COM_pos_y.append(LFPC_model.COM_pos[1])
+
+    print('global_time:', global_time,
+          'x:', LFPC_model.COM_pos[0], 'y:', LFPC_model.COM_pos[1],
+          '[i j]:',i, j)
+
+    left_foot_pos_x.append(LFPC_model.left_foot_pos[0])
+    left_foot_pos_y.append(LFPC_model.left_foot_pos[1])
+    left_foot_pos_z.append(LFPC_model.left_foot_pos[2])
+    right_foot_pos_x.append(LFPC_model.right_foot_pos[0])
+    right_foot_pos_y.append(LFPC_model.right_foot_pos[1])
+    right_foot_pos_z.append(LFPC_model.right_foot_pos[2])
+
+ 
 
 
 # ------------------------------------------------- animation plot
