@@ -97,6 +97,16 @@ class LFPC:
         x_d, vx_d, y_d, vy_d = self.calculateXtVt(T_sup)
         return x_d, vx_d, y_d, vy_d
 
+    def updateFirstFootLocation(self):
+        x_d, vx_d, y_d, vy_d = self.calculateXtVt(0)
+        print('---- update foot------')
+        xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d, vy_d)
+        self.p_x1 = self.COM_pos[0] + xf1
+        self.p_x2 = self.COM_pos[0] + xf2
+        self.p_y1 = self.COM_pos[1] + yf1
+        self.p_y2 = self.COM_pos[1] + yf2
+        return
+
     def updateNextFootLocation(self):
         x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
         print('---- update foot------')

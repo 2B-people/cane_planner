@@ -152,7 +152,7 @@ right_foot_pos_z = list()
 
 # Initialize the COM position and velocity
 COM_pos_0 = [0, 0, 1.0]
-COM_v0 = [0, 0]
+COM_v0 = [0.1, 0]
 
 # Initialize the foot positions
 left_foot_pos = [0, 0, 0]
@@ -181,10 +181,10 @@ else:
 
 
 LFPC_model.x_0 = LFPC_model.COM_pos[0] - support_foot_pos[0]
-LFPC_model.y_0 = LFPC_model.COM_pos[1] - support_foot_pos[1]
+LFPC_model.y_0 = LFPC_model.COM_pos[1] - support_foot_pos[1] 
 LFPC_model.vx_0 = COM_v0[0]
 LFPC_model.vy_0 = COM_v0[1]
-LFPC_model.updateNextFootLocation()
+LFPC_model.updateFirstFootLocation()
 # calculate the foot positions for swing phase
 if LFPC_model.support_leg == 'left_leg':
     print('[px1 py1]:', LFPC_model.p_x1, LFPC_model.p_y1)
@@ -232,6 +232,7 @@ for i in range(int(total_time/delta_t)):
             support_foot_pos = LFPC_model.left_foot_pos
         else:
             support_foot_pos = LFPC_model.right_foot_pos
+        print('now support_foot_pos is:',support_foot_pos)
 
         # calculate the next foots locations
         LFPC_model.updateNextFootLocation()
@@ -261,9 +262,11 @@ for i in range(int(total_time/delta_t)):
         if LFPC_model.support_leg == 'left_leg':
             LFPC_model.right_foot_pos = [
                 swing_foot_pos[j, 0], swing_foot_pos[j, 1], swing_foot_pos[j, 2]]
+            # print('right_foot_pos',LFPC_model.right_foot_pos)
         else:
             LFPC_model.left_foot_pos = [
                 swing_foot_pos[j, 0], swing_foot_pos[j, 1], swing_foot_pos[j, 2]]
+            # print('left_foot_pos',LFPC_model.left_foot_pos)
         j += 1
 
     # record data
@@ -274,7 +277,7 @@ for i in range(int(total_time/delta_t)):
 
     print('global_time:', global_time,
           'x:', LFPC_model.COM_pos[0], 'y:', LFPC_model.COM_pos[1],
-          '[i j]:',i, j)
+          '[i j]:',i, j,'\n')
 
     left_foot_pos_x.append(LFPC_model.left_foot_pos[0])
     left_foot_pos_y.append(LFPC_model.left_foot_pos[1])
