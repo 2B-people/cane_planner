@@ -56,7 +56,7 @@ class LFPC:
         self.T_c = np.sqrt(self.zc / 10)  # set gravity parameter as 9.8
         self.C = np.cosh(self.T_sup/self.T_c)
         self.S = np.sinh(self.T_sup/self.T_c)
-        print('tc:',self.T_c,'c',self.C,'s',self.S)
+        print('tc:', self.T_c, 'c', self.C, 's', self.S)
 
     def SetCtrlParams(self, al, aw, theta):
         self.al = al
@@ -97,24 +97,14 @@ class LFPC:
         x_d, vx_d, y_d, vy_d = self.calculateXtVt(T_sup)
         return x_d, vx_d, y_d, vy_d
 
-    def updateFirstFootLocation(self):
-        x_d, vx_d, y_d, vy_d = self.calculateXtVt(0)
-        print('---- update foot------')
-        xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d, vy_d)
-        self.p_x1 = self.COM_pos[0] + xf1
-        self.p_x2 = self.COM_pos[0] + xf2
-        self.p_y1 = self.COM_pos[1] + yf1
-        self.p_y2 = self.COM_pos[1] + yf2
-        return
-
     def updateNextFootLocation(self):
         x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
         print('---- update foot------')
         xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d, vy_d)
-        self.p_x1 = self.COM_pos[0] + xf1
-        self.p_x2 = self.COM_pos[0] + xf2
-        self.p_y1 = self.COM_pos[1] + yf1
-        self.p_y2 = self.COM_pos[1] + yf2
+        self.p_x1 = x_d + self.left_foot_pos[0] + xf1
+        self.p_x2 = x_d + self.right_foot_pos[0] + xf2
+        self.p_y1 = y_d + self.left_foot_pos[1] + yf1
+        self.p_y2 = y_d + self.right_foot_pos[1] + yf2
         return
 
     def switchSupportLeg(self):
@@ -135,12 +125,10 @@ class LFPC:
             a1 = -al * np.cos(theta) - aw * np.sin(theta)
             a2 = -al * np.sin(theta) + aw * np.cos(theta)
 
-        self.x_0 = -a1 - b * (self.x_0*self.S/self.T_c +self.vx_0*self.C)
-        self.y_0 = -a2 - b * (self.y_0*self.S/self.T_c +self.vy_0*self.C)
-        print('x_0', self.x_0 ,'y_0',self.y_0)
+        self.x_0 = -a1 - b * (self.x_0*self.S/self.T_c + self.vx_0*self.C)
+        self.y_0 = -a2 - b * (self.y_0*self.S/self.T_c + self.vy_0*self.C)
+        print('x_0', self.x_0, 'y_0', self.y_0)
         self.vx_0 = vx_d
         self.vy_0 = vy_d
-        print('vx_0', self.vx_0 ,'vy_0',self.vy_0)
+        print('vx_0', self.vx_0, 'vy_0', self.vy_0)
         self.t = 0
-
-
