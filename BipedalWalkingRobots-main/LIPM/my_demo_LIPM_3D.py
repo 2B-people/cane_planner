@@ -160,13 +160,13 @@ right_foot_pos = [0, 0, 0]
 
 delta_t = 0.03
 
-al = 0.2
-aw = 0.2
+al = 0.4
+aw = 0.1
 theta = 0
 
 step_num = 0
 global_time = 0
-total_time = 20  # seconds
+total_time = 30  # seconds
 
 
 LFPC_model = LFPC(dt=delta_t, T_sup=0.3)
@@ -239,8 +239,8 @@ for i in range(int(total_time/delta_t)):
         # if step_num >= 10:
         #     theta = 3.14
         #     LFPC_model.SetCtrlParams(al, aw, theta)
-        if step_num % 10 == 0:
-            theta += 90/180*np.pi
+        if step_num % 2 == 0:
+            theta += 10/180*np.pi
             print('change theta', theta)
             LFPC_model.SetCtrlParams(al, aw, theta)
 
@@ -286,8 +286,8 @@ fig = plt.figure(figsize=(8, 10))
 spec = gridspec.GridSpec(nrows=2, ncols=1, height_ratios=[2.5, 1])
 ax = fig.add_subplot(spec[0], projection='3d')
 # ax.set_aspect('equal') # bugs
-ax.set_xlim(-1.0, 10.0)
-ax.set_ylim(-2.0, 10.0)
+ax.set_xlim(-10.0, 10.0)
+ax.set_ylim(-10.0, 10.0)
 ax.set_zlim(-0.01, 2.0)
 ax.set_xlabel('x (m)')
 ax.set_ylabel('y (m)')
@@ -301,8 +301,8 @@ ani_3D = FuncAnimation(fig, ani_3D_update, frames=range(
 # ani_3D.save('./pic/LIPM_3D.gif', writer='imagemagick', fps=30)
 
 bx = fig.add_subplot(spec[1], autoscale_on=False)
-bx.set_xlim(-1, 10.0)
-bx.set_ylim(-1, 10.0)
+bx.set_xlim(-10, 10.0)
+bx.set_ylim(-1, 20.0)
 bx.set_aspect('equal')
 bx.set_xlabel('x (m)')
 bx.set_ylabel('y (m)')
