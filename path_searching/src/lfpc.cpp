@@ -29,6 +29,13 @@ namespace cane_planner
         return step_state;
     }
 
+    Vector4d LFPC::calculateFinalState()
+    {
+        Vector4d final_state;
+        final_state = calculateXtVt(t_sup_);
+        return final_state;
+    }
+
     Vector2d LFPC::calculateLFPC(double vx, double vy)
     {
         Vector2d state_f;
@@ -37,16 +44,15 @@ namespace cane_planner
             state_f(0) = -al_ * cos(theta_) + aw_ * sin(theta_) + b_ * vx;
             state_f(1) = -aw_ * cos(theta_) - aw_ * sin(theta_) + b_ * vx;
         }
-        else if(support_leg_ == RIGHT_LEG)
+        else if (support_leg_ == RIGHT_LEG)
         {
             state_f(2) = -al_ * sin(theta_) - aw_ * cos(theta_) + b_ * vy;
             state_f(3) = -aw_ * sin(theta_) + aw_ * cos(theta_) + b_ * vy;
         }
-        else 
+        else
         {
             // TODO:错误处理
         }
-        
 
         return state_f;
     }
@@ -56,6 +62,48 @@ namespace cane_planner
         al_ = input(0);
         aw_ = input(1);
         theta_ = input(2);
+    }
+
+    void LFPC::updateNextFootLocation()
+    {
+        Vector4d final_state = calculateFinalState();
+        Vector2d lfpc_set = calculateLFPC(final_state(1), final_state(3));
+        if (support_leg_ == LEFT_LEG)
+        {
+            pos_foot_(0) = final_state(0) + left_foot_pos_(0) + lfpc_set(0);
+            pos_foot_(1) = final_state(1) + left_foot_pos_(1) + lfpc_set(1);
+        }
+        else if (support_leg_ == RIGHT_LEG)
+        {
+            pos_foot_(0) = final_state(0) + right_foot_pos_(0) + lfpc_set(0);
+            pos_foot_(1) = final_state(1) + right_foot_pos_(1) + lfpc_set(1);
+        }
+        return;
+    }
+
+    void LFPC::switchSupportLeg()
+    {
+        if (support_leg_ == LEFT_LEG)
+        {
+            support_leg_ = RIGHT_LEG;
+            x_0_ = COM_pos_(0) -  right_foot_pos_(0);
+            y_0_ = COM_pos_(1) -  right_foot_pos_(1);
+
+        }
+        else if (support_leg_ == RIGHT_LEG)
+        {
+            support_leg_ = LEFT_LEG;
+            x_0_ = COM_pos_(0) -  left_foot_pos_(0);
+            y_0_ = COM_pos_(1) -  left_foot_pos_(1);
+        }
+        vx_0_ = vx_t_;
+        vy_0_ = vy_t_;
+        t_ = 0;
+    }
+
+    Vector2d LFPC::getStepFootPosition()
+    {
+        return pos_foot_;
     }
 
 } // namespace cane_planner

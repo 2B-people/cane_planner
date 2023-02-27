@@ -27,13 +27,17 @@ namespace cane_planner
     double t_sup_;
     double h_;
     double t_c_;
-
     // cycle init parames
     double x_0_,vx_0_,y_0_,vy_0_;
     double t_;
-
+    double x_t_,vx_t_,y_t_,vy_t_;
+    // foot location in gobal
+    Vector2d pos_foot_;
     // control params
     double al_,aw_,theta_,b_;
+
+    // 这里的为全局的坐标
+    Vector3d left_foot_pos_,right_foot_pos_,COM_pos_;
 
   public:
     LFPC(double dt,double t_sup,double support_leg);
@@ -41,17 +45,18 @@ namespace cane_planner
 
     Vector2d calculateLFPC(double vx,double vy);
     Vector4d calculateXtVt(double t);
+    Vector4d calculateFinalState();
+
+    void updateNextFootLocation();
+    void switchSupportLeg();
 
     void SetCtrlParams(Vector3d input);
-
+    Vector2d getStepFootPosition();
 
     // TODO 完成以下函数
-    void switchSupportLeg();
     void initializeModel(ros::NodeHandle &nh);
-    void updateNextFootLocation();
     void updateOneStep();
     std::vector<Eigen::Vector2d> getStepCOMPath();
-    Vector2d getStepFootPosition();
 
   };
   

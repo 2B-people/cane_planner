@@ -102,33 +102,26 @@ class LFPC:
         print('---- update foot------')
         xf1, xf2, yf1, yf2 = self.updateLFPC(vx_d, vy_d)
         self.p_x1 = x_d + self.left_foot_pos[0] + xf1
-        self.p_x2 = x_d + self.right_foot_pos[0] + xf2
         self.p_y1 = y_d + self.left_foot_pos[1] + yf1
+
+        self.p_x2 = x_d + self.right_foot_pos[0] + xf2
         self.p_y2 = y_d + self.right_foot_pos[1] + yf2
         return
 
     def switchSupportLeg(self):
-        x_d, vx_d, y_d, vy_d = self.calculateFinalSate()
-        al = self.al
-        aw = self.aw
-        theta = self.theta
-        b = self.b
-
         if self.support_leg is 'left_leg':
             print('\n---- switch the support leg to the right leg')
             self.support_leg = 'right_leg'
-            a1 = -al * np.cos(theta) + aw * np.sin(theta)
-            a2 = -al * np.sin(theta) - aw * np.cos(theta)
+            self.x_0 = self.COM_pos[0] - self.right_foot_pos[0]
+            self.y_0 = self.COM_pos[1] - self.right_foot_pos[1]
         elif self.support_leg is 'right_leg':
             print('\n---- switch the support leg to the left leg')
             self.support_leg = 'left_leg'
-            a1 = -al * np.cos(theta) - aw * np.sin(theta)
-            a2 = -al * np.sin(theta) + aw * np.cos(theta)
+            self.x_0 = self.COM_pos[0] - self.left_foot_pos[0]
+            self.y_0 = self.COM_pos[1] - self.left_foot_pos[1]
 
-        self.x_0 = -a1 - b * (self.x_0*self.S/self.T_c + self.vx_0*self.C)
-        self.y_0 = -a2 - b * (self.y_0*self.S/self.T_c + self.vy_0*self.C)
+        self.vx_0 = self.vx_t
+        self.vy_0 = self.vy_t
         print('x_0', self.x_0, 'y_0', self.y_0)
-        self.vx_0 = vx_d
-        self.vy_0 = vy_d
         print('vx_0', self.vx_0, 'vy_0', self.vy_0)
         self.t = 0

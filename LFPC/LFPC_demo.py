@@ -6,7 +6,6 @@ from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 
 
-from LIPM_3D import LIPM3D
 from LFPC import LFPC
 
 
@@ -239,8 +238,8 @@ for i in range(int(total_time/delta_t)):
         # if step_num >= 10:
         #     theta = 3.14
         #     LFPC_model.SetCtrlParams(al, aw, theta)
-        if step_num % 2 == 0:
-            theta += 10/180*np.pi
+        if step_num % 10 == 0:
+            theta += 90/180*np.pi
             print('change theta', theta)
             LFPC_model.SetCtrlParams(al, aw, theta)
 
