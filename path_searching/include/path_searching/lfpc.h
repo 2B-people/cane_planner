@@ -66,6 +66,8 @@ namespace cane_planner
 
     void initializeModel(ros::NodeHandle &nh);
     void reset(Vector4d init_state,Vector3d COM_init_pos,char support_leg);
+
+    typedef shared_ptr<LFPC> Ptr;
   };
 
 } // namespace cane_planner

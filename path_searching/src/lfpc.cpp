@@ -31,6 +31,8 @@ namespace cane_planner
         right_foot_pos_.Zero();
         COM_pos_.Zero();
         support_leg_pos_.Zero();
+        // 初始高度
+        COM_pos_(2) = h_;
         // step_path.
         step_path_.clear();
     }
@@ -50,7 +52,6 @@ namespace cane_planner
     {
         // in here, step_state  == [x_t,vx_t,y_t,vy_t]'
         Vector4d step_state;
-
         // linear inverted pendulum motion low
         double tau = t / t_c_;
         // x
@@ -61,7 +62,7 @@ namespace cane_planner
         step_state(3) = y_0_ * sinh(tau) / t_c_ + t_c_ * vy_0_ * cosh(tau);
         return step_state;
     }
-
+    
     Vector4d LFPC::calculateFinalState()
     {
         Vector4d final_state;
@@ -180,7 +181,10 @@ namespace cane_planner
         t_ = 0;
         support_leg_ = support_leg;
         // step reinit
-        x_t_, vx_t_, y_t_, vy_t_ = 0.0;
+        x_t_ = 0.0;
+        vx_t_ = 0.0;
+        y_t_=0.0;
+        vy_t_ = 0.0;
         x_0_ = init_state(0);
         vx_0_ = init_state(1);
         y_0_ = init_state(2);

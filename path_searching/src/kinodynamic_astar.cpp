@@ -311,6 +311,12 @@ namespace cane_planner
         this->collision_ = col;
     }
 
+    void KinodynamicAstar::setmodel(const LFPC::Ptr &col)
+    {
+        this->lfpc_model_ = col;
+    }
+
+
     double KinodynamicAstar::getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2)
     {
         double dx = fabs(x1(0) - x2(0));

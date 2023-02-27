@@ -120,7 +120,9 @@ namespace cane_planner
     double resolution_, inv_resolution_;
     double max_sx_,max_sy_,max_pi_;
     Eigen::Vector2d origin_, map_size_2d_;
+
     CollisionDetection::Ptr collision_;
+    LFPC::Ptr lfpc_model_;
 
     // EDTEnvironment::Ptr edt_environment_;
 
@@ -166,6 +168,7 @@ namespace cane_planner
 
     // void setEnvironment(const EDTEnvironment::Ptr &env);
     void setCollision(const CollisionDetection::Ptr &col);
+    void setmodel(const LFPC::Ptr &col);
 
     typedef shared_ptr<KinodynamicAstar> Ptr;
   };
