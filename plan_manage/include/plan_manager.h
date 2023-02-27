@@ -17,6 +17,7 @@
 
 #include <path_searching/astar.h>
 #include <path_searching/kinodynamic_astar.h>
+#include <path_searching/lfpc.h>
 #include <plan_env/collision_detection.h>
 
 namespace cane_planner
@@ -35,6 +36,7 @@ namespace cane_planner
         /*---------- data -----------*/
         fast_planner::SDFMap::Ptr sdf_map_;
         CollisionDetection::Ptr collision_;
+        LFPC::Ptr lfpc_model_;
 
         unique_ptr<Astar> astar_finder_;
         unique_ptr<KinodynamicAstar> kin_finder_;

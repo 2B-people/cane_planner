@@ -22,6 +22,11 @@ namespace cane_planner
         collision_->init(nh);
         collision_->setMap(sdf_map_);
 
+        // init lfpc model
+        lfpc_model_.reset(new LFPC);
+        lfpc_model_->initializeModel(nh);
+
+
         // init planner
 
         ROS_WARN(" Astar planer start");
@@ -34,6 +39,7 @@ namespace cane_planner
         kin_finder_.reset(new KinodynamicAstar);
         kin_finder_->setParam(nh);
         kin_finder_->setCollision(collision_);
+        kin_finder_->setModel(lfpc_model_);
         kin_finder_->init();
 
         // callback

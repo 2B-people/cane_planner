@@ -48,7 +48,7 @@ namespace cane_planner
     std::vector<Eigen::Vector3d> step_path_;
 
   public:
-    LFPC(double dt, double t_sup, char support_leg);
+    LFPC();
     ~LFPC();
 
     Vector2d calculateLFPC(double vx, double vy);

@@ -124,8 +124,6 @@ namespace cane_planner
     CollisionDetection::Ptr collision_;
     LFPC::Ptr lfpc_model_;
 
-    // EDTEnvironment::Ptr edt_environment_;
-
     /* helper */
     Eigen::Vector2i posToIndex(Eigen::Vector2d pt);
     Eigen::Vector2d stateToPos(Eigen::Vector3d state);
@@ -166,9 +164,8 @@ namespace cane_planner
     void init();
     void reset();
 
-    // void setEnvironment(const EDTEnvironment::Ptr &env);
     void setCollision(const CollisionDetection::Ptr &col);
-    void setmodel(const LFPC::Ptr &col);
+    void setModel(const LFPC::Ptr &col);
 
     typedef shared_ptr<KinodynamicAstar> Ptr;
   };

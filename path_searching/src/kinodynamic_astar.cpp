@@ -283,6 +283,10 @@ namespace cane_planner
 
         std::cout << "origin_: " << origin_.transpose() << std::endl;
         std::cout << "map size: " << map_size_2d_.transpose() << std::endl;
+
+        /* ----------lfpc model params ---------- */
+        // lfpc_model_->
+
     }
     void KinodynamicAstar::reset()
     {
@@ -301,17 +305,13 @@ namespace cane_planner
         use_node_num_ = 0;
         iter_num_ = 0;
     }
-    // void KinodynamicAstar::setEnvironment(const EDTEnvironment::Ptr &env)
-    // {
-    //     this->edt_environment_ = env;
-    // }
 
     void KinodynamicAstar::setCollision(const CollisionDetection::Ptr &col)
     {
         this->collision_ = col;
     }
 
-    void KinodynamicAstar::setmodel(const LFPC::Ptr &col)
+    void KinodynamicAstar::setModel(const LFPC::Ptr &col)
     {
         this->lfpc_model_ = col;
     }

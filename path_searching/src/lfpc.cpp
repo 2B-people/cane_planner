@@ -5,13 +5,9 @@ using namespace Eigen;
 
 namespace cane_planner
 {
-    LFPC::LFPC(double dt, double t_sup, char support_leg)
+    LFPC::LFPC()
     {
-        support_leg_ = support_leg;
-        delta_t_ = dt;
-        t_sup_ = t_sup;
-        h_ = 1.0;
-        t_c_ = sqrt(h_ / 10);
+
         // cycle init params
         x_0_ = 0.0;
         vx_0_ = 0.0;
@@ -173,7 +169,12 @@ namespace cane_planner
     // TODO
     void LFPC::initializeModel(ros::NodeHandle &nh)
     {
-
+        support_leg_ = LEFT_LEG;
+        delta_t_ = 0.01;
+        t_sup_ = 0.3;
+        h_ = 1.0;
+        b_ = 0.3;
+        t_c_ = sqrt(h_ / 10);
     }
     void LFPC::reset(Vector4d init_state,Vector3d COM_init_pos,char support_leg)
     {
