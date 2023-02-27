@@ -18,50 +18,56 @@ using namespace Eigen;
 
 namespace cane_planner
 {
-  #define LEFT_LEG 'l'
-  #define RIGHT_LEG 'r'
+#define LEFT_LEG 'l'
+#define RIGHT_LEG 'r'
   class LFPC
   {
   private:
     char support_leg_;
-    double t_sup_;
+    double t_sup_, delta_t_;
     double h_;
     double t_c_;
-    // cycle init parames
-    double x_0_,vx_0_,y_0_,vy_0_;
+    // cycle init params
+    double x_0_, vx_0_, y_0_, vy_0_;
     double t_;
-    double x_t_,vx_t_,y_t_,vy_t_;
-    // foot location in gobal
-    Vector2d pos_foot_;
+    double x_t_, vx_t_, y_t_, vy_t_;
     // control params
-    double al_,aw_,theta_,b_;
+    double al_, aw_, theta_, b_;
+
+    // step number
+    int step_num;
 
     // 这里的为全局的坐标
-    Vector3d left_foot_pos_,right_foot_pos_,COM_pos_;
+    // foot location in gobal
+    Vector3d pos_foot_;
+    // 各个点的坐标
+    Vector3d left_foot_pos_, right_foot_pos_, COM_pos_;
+    Vector3d support_leg_pos_;
+
+    // every step path
+    std::vector<Eigen::Vector3d> step_path_;
 
   public:
-    LFPC(double dt,double t_sup,double support_leg);
+    LFPC(double dt, double t_sup, char support_leg);
     ~LFPC();
 
-    Vector2d calculateLFPC(double vx,double vy);
+    Vector2d calculateLFPC(double vx, double vy);
     Vector4d calculateXtVt(double t);
     Vector4d calculateFinalState();
 
-    void updateNextFootLocation();
     void switchSupportLeg();
+    void updateNextFootLocation();
+    void updateOneDt();
+    void updateOneStep();
 
     void SetCtrlParams(Vector3d input);
-    Vector2d getStepFootPosition();
+    Vector3d getStepFootPosition();
+    std::vector<Eigen::Vector3d> getStepCOMPath();
 
-    // TODO 完成以下函数
     void initializeModel(ros::NodeHandle &nh);
-    void updateOneStep();
-    std::vector<Eigen::Vector2d> getStepCOMPath();
-
+    void reset(Vector4d init_state,Vector3d COM_init_pos,char support_leg);
   };
-  
+
 } // namespace cane_planner
-
-
 
 #endif // LFPC_H_

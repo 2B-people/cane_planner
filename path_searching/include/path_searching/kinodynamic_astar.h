@@ -14,6 +14,7 @@
 
 #include <path_searching/matrix_hash.h>
 #include <plan_env/collision_detection.h>
+#include <path_searching/lfpc.h>
 // #include <plan_env/edt_environment.h>
 
 using namespace std;
