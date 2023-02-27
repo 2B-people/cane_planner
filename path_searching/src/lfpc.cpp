@@ -58,11 +58,13 @@ namespace cane_planner
         step_state(3) = y_0_ * sinh(tau) / t_c_ + t_c_ * vy_0_ * cosh(tau);
         return step_state;
     }
-    
+
     Vector4d LFPC::calculateFinalState()
     {
         Vector4d final_state;
         final_state = calculateXtVt(t_sup_);
+        std::cout << "final_state" << final_state.transpose() << std::endl;
+
         return final_state;
     }
 
@@ -77,9 +79,10 @@ namespace cane_planner
         }
         else if (support_leg_ == RIGHT_LEG)
         {
-            state_f(2) = -al_ * sin(theta_) - aw_ * cos(theta_) + b_ * vy;
-            state_f(3) = -aw_ * sin(theta_) + aw_ * cos(theta_) + b_ * vy;
+            state_f(0) = -al_ * sin(theta_) - aw_ * cos(theta_) + b_ * vy;
+            state_f(1) = -aw_ * sin(theta_) + aw_ * cos(theta_) + b_ * vy;
         }
+        std::cout << "LFPC set:" << state_f.transpose() << std::endl;
         return state_f;
     }
 
@@ -112,6 +115,8 @@ namespace cane_planner
             pos_foot_(1) = final_state(1) + right_foot_pos_(1) + lfpc_set(1);
             left_foot_pos_ = pos_foot_;
         }
+        std::cout << "update foot " << pos_foot_.transpose() << std::endl;
+
         return;
     }
 
@@ -123,6 +128,7 @@ namespace cane_planner
             x_0_ = COM_pos_(0) - right_foot_pos_(0);
             y_0_ = COM_pos_(1) - right_foot_pos_(1);
             support_leg_pos_ = right_foot_pos_;
+            std::cout << "switch right_foot" << 'x0:' << x_0_ << 'y0' << y_0_ << std::endl;
         }
         else if (support_leg_ == RIGHT_LEG)
         {
@@ -130,20 +136,26 @@ namespace cane_planner
             x_0_ = COM_pos_(0) - left_foot_pos_(0);
             y_0_ = COM_pos_(1) - left_foot_pos_(1);
             support_leg_pos_ = left_foot_pos_;
+            std::cout << "switch left_foot" << 'x0:' << x_0_ << 'y0' << y_0_ << std::endl;
         }
         vx_0_ = vx_t_;
         vy_0_ = vy_t_;
+        std::cout << 'vx and vy' << vx_0_ << vy_0_ << std::endl;
         t_ = 0;
+
+        return;
     }
 
     void LFPC::updateOneStep()
     {
         step_path_.clear();
         int swing_data_len = int(t_sup_ / delta_t_);
+        std::cout << "\nthis is step number " << step_num << std::endl;
         if (step_num == 0)
         {
             // first foot don't need switch support leg
             updateNextFootLocation();
+
             // update motion com_pos into step_path_
             for (int i = 0; i < swing_data_len; i++)
             {
@@ -169,14 +181,19 @@ namespace cane_planner
     // TODO
     void LFPC::initializeModel(ros::NodeHandle &nh)
     {
+        std::cout << "\n----------initializeModel----------\n"
+                  << std::endl;
+        nh.param("lfpc/delta_t", delta_t_, 0.01);
+        nh.param("lfpc/t_sup", t_sup_, 0.3);
+        nh.param("lfpc/b_", b_, 0.3);
+        nh.param("lfpc/h_", h_, 1.0);
         support_leg_ = LEFT_LEG;
-        delta_t_ = 0.01;
-        t_sup_ = 0.3;
-        h_ = 1.0;
-        b_ = 0.3;
+        // calculate
+        COM_pos_(2) = h_;
         t_c_ = sqrt(h_ / 10);
+        std::cout << "tc" << t_c_ << std::endl;
     }
-    void LFPC::reset(Vector4d init_state,Vector3d COM_init_pos,char support_leg)
+    void LFPC::reset(Vector4d init_state, Vector3d COM_init_pos, char support_leg)
     {
         step_num = 0;
         t_ = 0;
@@ -184,22 +201,23 @@ namespace cane_planner
         // step reinit
         x_t_ = 0.0;
         vx_t_ = 0.0;
-        y_t_=0.0;
+        y_t_ = 0.0;
         vy_t_ = 0.0;
         x_0_ = init_state(0);
         vx_0_ = init_state(1);
         y_0_ = init_state(2);
         vy_0_ = init_state(3);
+        std::cout << "\ninit state" << init_state.transpose() << std::endl;
         // pos reinit
         COM_pos_ = COM_init_pos;
+        std::cout << "COM POS is" << COM_pos_.transpose() << std::endl;
         // and Others
         left_foot_pos_ = COM_pos_;
         right_foot_pos_ = COM_pos_;
         support_leg_pos_ = COM_pos_;
         pos_foot_ = COM_pos_;
-        //clear path
+        // clear path
         step_path_.clear();
-
     }
     void LFPC::SetCtrlParams(Vector3d input)
     {

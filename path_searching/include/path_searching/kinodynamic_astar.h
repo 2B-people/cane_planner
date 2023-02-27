@@ -118,7 +118,7 @@ namespace cane_planner
     double tie_breaker_;
     bool launch_foot_;
     double resolution_, inv_resolution_;
-    double max_sx_,max_sy_,max_pi_;
+    double max_al_,max_aw_,max_api_;
     Eigen::Vector2d origin_, map_size_2d_;
 
     CollisionDetection::Ptr collision_;

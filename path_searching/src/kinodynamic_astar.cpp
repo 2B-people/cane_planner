@@ -23,14 +23,20 @@ namespace cane_planner
         cur_node->state_variable = start_state;
         cur_node->index = stateToIndex(start_state);
         cur_node->g_score = 0.0;
-        // launch foot,
+        double theta = start_state(2);
+        Vector4d init_state;
+        init_state << 0.0, 0.0, 0.0, 0.0;
+        Vector3d com_pos_init;
+        com_pos_init << start_state(0), start_state(1), 0.0;
+        
+        // init lfpc model
         if (launch_foot_)
         {
-            cur_node->walk_num = 0;
+            lfpc_model_->reset(init_state, com_pos_init, LEFT_LEG);
         }
         else
         {
-            cur_node->walk_num = 1;
+            lfpc_model_->reset(init_state, com_pos_init, RIGHT_LEG);
         }
 
         Eigen::Vector2i end_index;
@@ -56,8 +62,8 @@ namespace cane_planner
             /* ---------- determine termination ---------- */
             bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
                             abs(cur_node->index(1) - end_index(1)) <= 1;
-                            // abs(cur_node->state_variable(2) - end_state(2)) <= 0.1;
-                            // have tourble in here;
+            // abs(cur_node->state_variable(2) - end_state(2)) <= 0.1;
+            // have tourble in here;
 
             if (near_end)
             {
@@ -77,18 +83,24 @@ namespace cane_planner
             /* ---------- param for next gait point ---------- */
             double sx_res = 1 / 1.0, sy_res = 1 / 1.0, pi_res = 1 / 2.0;
             Eigen::Vector3d cur_state = cur_node->state_variable;
-            int walk_n = cur_node->walk_num;
+            // int walk_n = cur_node->walk_num;
             Eigen::Vector3d pur_state;
             vector<KdNodePtr> tmp_expand_nodes;
             vector<Eigen::Vector3d> inputs;
             Eigen::Vector3d um;
 
             /* ----------set input list ---------- */
-            for (double ax = max_sx_ * sx_res; ax < max_sx_ + 1e-3; ax += max_sx_ * sx_res)
-                for (double ay = max_sy_ * sy_res; ay < max_sy_ + 1e-3; ay += max_sy_ * sy_res)
-                    for (double api = -max_pi_; api < max_pi_ + 1e-2; api += max_pi_ * pi_res)
+            for (double al = max_al_ * sx_res; al < max_al_ + 1e-3; al += max_al_ * sx_res)
+                for (double aw = max_aw_ * sy_res; aw < max_aw_ + 1e-3; aw += max_aw_ * sy_res)
+                    for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
                     {
-                        um << ax, ay, api;
+                        theta += api;
+                        if (theta > M_PI)
+                            theta -= M_PI;
+                        else if (theta < -M_PI)
+                            theta += M_PI;
+
+                        um << al, aw, theta;
                         inputs.push_back(um);
                     }
             // std::cout << "new state explore,size: " << inputs.size() << std::endl;
@@ -98,8 +110,14 @@ namespace cane_planner
 
                 // state transit,explore the next gait point.
                 um = inputs[i];
-                // std::cout << "input:sx,sy,yaw" << um.transpose() << std::endl;
-                stateTransit(cur_state, pur_state, um, walk_n);
+                std::cout << "input:sx,sy,yaw" << um.transpose() << std::endl;
+                // TODO change here
+                // stateTransit(cur_state, pur_state, um, walk_n);
+
+                lfpc_model_->SetCtrlParams(um);
+                lfpc_model_->updateOneStep();
+                pur_state = lfpc_model_->getStepFootPosition();
+                std::cout << "pur_state:" << pur_state.transpose() << std::endl;
                 Eigen::Vector2i pro_id = stateToIndex(pur_state);
 
                 // check if in feasible space
@@ -180,7 +198,7 @@ namespace cane_planner
     }
 
     void KinodynamicAstar::stateTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
-                                       Eigen::Vector3d input, int n)
+                                        Eigen::Vector3d input, int n)
     {
         double yaw_new = state1(2) + input(2);
         if (yaw_new > M_PI)
@@ -196,8 +214,8 @@ namespace cane_planner
         state2(1) = state1(1) + sin(yaw_new) * input(0) - pow(-1, n) * cos(yaw_new) * input(1);
         state2(2) = yaw_new;
 
-        //TODO using LFPC to next step location
-        
+        // TODO using LFPC to next step location
+
         // std::cout << "new px:" << state2(0) << std::endl;
         // std::cout << "new py:" << state2(1) << std::endl;
         // std::cout << "new yaw:" << state2(2) << std::endl;
@@ -256,9 +274,9 @@ namespace cane_planner
         // 启动的脚，左脚为1，右脚为0,
         nh.param("kinastar/launch_foot", launch_foot_, false);
         // 人体动力学限制参数
-        nh.param("kinastar/max_sx", max_sx_, -1.0);
-        nh.param("kinastar/max_sy", max_sy_, -1.0);
-        nh.param("kinastar/max_pi", max_pi_, -1.0);
+        nh.param("kinastar/max_al", max_al_, -1.0);
+        nh.param("kinastar/max_aw", max_aw_, -1.0);
+        nh.param("kinastar/max_theta", max_api_, -1.0);
 
         tie_breaker_ = 1.0 + 1.0 / 10000;
     }
@@ -286,7 +304,6 @@ namespace cane_planner
 
         /* ----------lfpc model params ---------- */
         // lfpc_model_->
-
     }
     void KinodynamicAstar::reset()
     {
@@ -315,7 +332,6 @@ namespace cane_planner
     {
         this->lfpc_model_ = col;
     }
-
 
     double KinodynamicAstar::getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2)
     {
