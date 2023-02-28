@@ -28,7 +28,7 @@ namespace cane_planner
         init_state << 0.0, 0.0, 0.0, 0.0;
         Vector3d com_pos_init;
         com_pos_init << start_state(0), start_state(1), 0.0;
-        
+
         // init lfpc model
         if (launch_foot_)
         {
@@ -90,8 +90,8 @@ namespace cane_planner
             Eigen::Vector3d um;
 
             /* ----------set input list ---------- */
-            for (double al = max_al_ * sx_res; al < max_al_ + 1e-3; al += max_al_ * sx_res)
-                for (double aw = max_aw_ * sy_res; aw < max_aw_ + 1e-3; aw += max_aw_ * sy_res)
+            for (double al = max_al_ * sx_res; al < max_al_ + 1e-3; al -= max_al_ * sx_res)
+                for (double aw = max_aw_ * sy_res; aw < max_aw_ + 1e-3; aw -= max_aw_ * sy_res)
                     for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
                     {
                         theta += api;
@@ -111,7 +111,7 @@ namespace cane_planner
                 // state transit,explore the next gait point.
                 um = inputs[i];
                 std::cout << "input:sx,sy,yaw" << um.transpose() << std::endl;
-                // TODO change here
+                // TODO change here，这里需要把相应的暴露出来；
                 // stateTransit(cur_state, pur_state, um, walk_n);
 
                 lfpc_model_->SetCtrlParams(um);
