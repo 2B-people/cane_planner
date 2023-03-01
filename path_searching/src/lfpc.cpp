@@ -63,7 +63,7 @@ namespace cane_planner
     {
         Vector4d final_state;
         final_state = calculateXtVt(t_sup_);
-        std::cout << "final_state " << final_state.transpose() << std::endl;
+        // std::cout << "final_state " << final_state.transpose() << std::endl;
 
         return final_state;
     }
@@ -82,7 +82,7 @@ namespace cane_planner
             state_f(0) = -al_ * cos(theta_) - aw_ * sin(theta_) + b_ * vx;
             state_f(1) = -al_ * sin(theta_) + aw_ * cos(theta_) + b_ * vy;
         }
-        std::cout << "LFPC set:" << state_f.transpose() << std::endl;
+        // std::cout << "LFPC set:" << state_f.transpose() << std::endl;
         return state_f;
     }
 
@@ -115,7 +115,7 @@ namespace cane_planner
             pos_foot_(1) = final_state(2) + right_foot_pos_(1) + lfpc_set(1);
             left_foot_pos_ = pos_foot_;
         }
-        std::cout << "update foot " << pos_foot_.transpose() << std::endl;
+        // std::cout << "update foot " << pos_foot_.transpose() << std::endl;
 
         return;
     }
@@ -128,8 +128,8 @@ namespace cane_planner
             x_0_ = COM_pos_(0) - pos_foot_(0);
             y_0_ = COM_pos_(1) - pos_foot_(1);
             support_leg_pos_ = pos_foot_;
-            std::cout << "switch right_foot "
-                      << " x0: " << x_0_ << " y0: " << y_0_ << std::endl;
+            // std::cout << "switch right_foot "
+            //           << " x0: " << x_0_ << " y0: " << y_0_ << std::endl;
         }
         else if (support_leg_ == RIGHT_LEG)
         {
@@ -137,12 +137,12 @@ namespace cane_planner
             x_0_ = COM_pos_(0) - pos_foot_(0);
             y_0_ = COM_pos_(1) - pos_foot_(1);
             support_leg_pos_ = pos_foot_;
-            std::cout << "switch left_foot "
-                      << " x0: " << x_0_ << " y0: " << y_0_ << std::endl;
+            //     std::cout << "switch left_foot "
+            //               << " x0: " << x_0_ << " y0: " << y_0_ << std::endl;
         }
         vx_0_ = vx_t_;
         vy_0_ = vy_t_;
-        std::cout << "vx and vy is: " << vx_0_ <<" and "<< vy_0_ << std::endl;
+        // std::cout << "vx and vy is: " << vx_0_ <<" and "<< vy_0_ << std::endl;
         t_ = 0;
 
         return;
@@ -152,7 +152,7 @@ namespace cane_planner
     {
         step_path_.clear();
         int swing_data_len = int(t_sup_ / delta_t_);
-        std::cout << "this is step number " << step_num_ << std::endl;
+        // std::cout << "this is step number " << step_num_ << std::endl;
         if (step_num_ == 0)
         {
             // first foot don"t need switch support leg
@@ -190,7 +190,7 @@ namespace cane_planner
         // calculate
         COM_pos_(2) = h_;
         t_c_ = sqrt(h_ / 10);
-        std::cout << "tc" << t_c_ << std::endl;
+        std::cout << "tc is: " << t_c_ << std::endl;
     }
     void LFPC::reset(Vector4d init_state, Vector3d COM_init_pos,
                      Vector2d support_pos, char support_leg, int step_num)
@@ -208,13 +208,13 @@ namespace cane_planner
         vx_0_ = init_state(1);
         y_0_ = init_state(2);
         vy_0_ = init_state(3);
-        std::cout << "init state " << init_state.transpose() << std::endl;
+        // std::cout << "init state " << init_state.transpose() << std::endl;
         // pos reinit
         COM_pos_(0) = COM_init_pos(0);
         COM_pos_(1) = COM_init_pos(1);
         COM_pos_(2) = h_;
 
-        std::cout << "COM POS is " << COM_pos_.transpose() << std::endl;
+        // std::cout << "COM POS is " << COM_pos_.transpose() << std::endl;
         // and Others
         support_leg_pos_ << support_pos(0), support_pos(1), 0.0;
         if (support_leg_ == LEFT_LEG)
@@ -226,12 +226,16 @@ namespace cane_planner
         // clear path
         step_path_.clear();
     }
-    void LFPC::SetCtrlParams(Vector3d input)
+    void LFPC::SetCtrlParams(Vector3d input, double cur_theta)
     {
         al_ = input(0);
         aw_ = input(1);
-        theta_ = input(2);
-        std::cout << "al " << al_ << " aw_ " << aw_ << " theta_ " << theta_ << std::endl;
+        theta_ = cur_theta + input(2);
+        if (theta_ > M_PI)
+            theta_ -= M_PI;
+        else if (theta_ < -M_PI)
+            theta_ += M_PI;
+        // std::cout << "al " << al_ << " aw_ " << aw_ << " theta_ " << theta_ << std::endl;
     }
     // 注意：updateOneStep()方法可以刷新path和pos_foot_，
     // 在updateOneStep后应该立即获取该轨迹和放置点

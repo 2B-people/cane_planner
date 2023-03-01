@@ -60,15 +60,14 @@ namespace cane_planner
     void updateOneDt();
     void updateOneStep();
 
-    void SetCtrlParams(Vector3d input);
+    void SetCtrlParams(Vector3d input, double cur_theta);
+    std::vector<Eigen::Vector3d> getStepCOMPath();
     Vector2d getStepFootPosition();
     Vector3d getCOMPos();
     Vector4d getNextIterState();
     char getSupportFeet();
     int getStepNum();
     double getTheta();
-
-    std::vector<Eigen::Vector3d> getStepCOMPath();
 
     void initializeModel(ros::NodeHandle &nh);
     void reset(Vector4d init_state, Vector3d COM_init_pos, Vector2d support_pos,

@@ -92,7 +92,7 @@ Visualization Manager:
       Channel Name: z
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: FlatColor
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -115,7 +115,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/astar
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -123,7 +123,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_astar
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Image
@@ -198,17 +198,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.7422354221343994
-        Y: 3.4629039764404297
-        Z: -0.7081906199455261
+        X: 0.82265305519104
+        Y: 0.6247784495353699
+        Z: -0.3242897391319275
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4947962760925293
+      Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 5.911771774291992
+      Yaw: 0.008587837219238281
     Saved: ~
 Window Geometry:
   Displays:
@@ -229,4 +229,4 @@ Window Geometry:
     collapsed: false
   Width: 2548
   X: -32
-  Y: 11
+  Y: -14

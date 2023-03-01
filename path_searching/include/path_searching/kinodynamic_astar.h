@@ -39,6 +39,7 @@ namespace cane_planner
     //  iter_state variable: x0,vx0,y0,vy0
     Eigen::Vector4d  iter_state;
     Eigen::Vector2d support_pos;
+    std::vector<Eigen::Vector3d> com_path;
     char support_feet;
     int step_num;
     double theta;
@@ -165,6 +166,8 @@ namespace cane_planner
     int search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
                Eigen::Vector3d end_pos);
     std::vector<Eigen::Vector3d> getPath();
+    std::vector<Eigen::Vector3d> getFeetPos();
+
 
     void setParam(ros::NodeHandle &nh);
     void init();

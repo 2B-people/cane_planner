@@ -53,14 +53,16 @@ namespace cane_planner
         while (!open_set_.empty())
         {
             cur_node = open_set_.top();
-            std::cout << "Explore while is " << use_node_num_ << std::endl;
-            std::cout << "----------------------------" << std::endl;
+            // std::cout << "Explore while is " << use_node_num_ << std::endl;
+            // std::cout << "----------------------------" << std::endl;
 
             /* ---------- determine termination ---------- */
-            bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
-                            abs(cur_node->index(1) - end_index(1)) <= 1;
+            // bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
+            //                 abs(cur_node->index(1) - end_index(1)) <= 1;
             // abs(cur_node->state_variable(2) - end_pos(2)) <= 0.1;
             // have tourble in here;
+            bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 0.5 &&
+                            abs(cur_node->com_pos(1) - end_pos(1)) <= 0.5;
 
             if (near_end)
             {
@@ -77,55 +79,46 @@ namespace cane_planner
             cur_node->kdnode_state = IN_CLOSE_SET;
             iter_num_ += 1;
 
-            /* ---------- param for next gait point ---------- */
-            double sx_res = 1 / 1.0, sy_res = 1 / 1.0, pi_res = 1 / 1.0;
-
-            // todo
             KdNode pur_state;
             vector<KdNodePtr> tmp_expand_nodes;
             vector<Eigen::Vector3d> inputs;
             Eigen::Vector3d um;
 
+            /* ---------- param for next gait point ---------- */
+            double sx_res = 1 / 1.0, sy_res = 1 / 1.0, pi_res = 1 / 10.0;
             /* ----------set input list ---------- */
-            std::cout << "set input list" << std::endl;
+            // std::cout << "set input list" << std::endl;
             for (double al = max_al_ * sx_res; al < max_al_ + 1e-3; al += max_al_ * sx_res)
                 for (double aw = max_aw_ * sy_res; aw < max_aw_ + 1e-3; aw += max_aw_ * sy_res)
                     for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
                     {
-                        double set_theta = cur_node->theta + api;
-                        if (set_theta > M_PI)
-                            set_theta -= M_PI;
-                        else if (set_theta < -M_PI)
-                            set_theta += M_PI;
-
-                        um << al, aw, set_theta;
+                        um << al, aw, api;
                         inputs.push_back(um);
                     }
-            std::cout << "new state explore,size: " << inputs.size() << std::endl;
+            // std::cout << "new state explore,size: " << inputs.size() << std::endl;
             /* ----------Explore the next gait point ---------- */
             for (size_t i = 0; i < inputs.size(); i++)
             {
                 // state transit,explore the next gait point.
                 um = inputs[i];
-                std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
-                // TODO change here，这里需要把相应的暴露出来；
+                // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
                                    cur_node->support_pos, cur_node->support_feet,
                                    cur_node->step_num);
-                lfpc_model_->SetCtrlParams(um);
+                lfpc_model_->SetCtrlParams(um, cur_node->theta);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
                 pur_state.support_pos = lfpc_model_->getStepFootPosition();
-                std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
+                // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
-                pro_state << pur_state.support_pos(0),pur_state.support_pos(1),0.0;
+                pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
 
                 // check if in feasible space
                 if (pur_state.support_pos(0) <= origin_(0) || pur_state.support_pos(0) >= map_size_2d_(0) || pur_state.support_pos(1) <= origin_(1) || pur_state.support_pos(1) >= map_size_2d_(1))
                 {
-                    std::cout << "outside map" << std::endl;
+                    // std::cout << "outside map" << std::endl;
                     continue;
                 }
 
@@ -133,7 +126,7 @@ namespace cane_planner
                 KdNodePtr pro_node = expanded_nodes_.find(pro_id);
                 if (pro_node != NULL && pro_node->kdnode_state == IN_CLOSE_SET)
                 {
-                    std::cout << "in close" << std::endl;
+                    // std::cout << "in close" << std::endl;
                     continue;
                 }
 
@@ -141,23 +134,19 @@ namespace cane_planner
                 // TODO 这里先用着这个astar的chheck方法，看看有啥问题
                 /* collision free */
                 Eigen::Vector2d pro_pos;
-                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
+                pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
                 if (!collision_->isTraversable(pro_pos))
                 {
-                    std::cout << "can't Traversable" << std::endl;
+                    // std::cout << "can't Traversable" << std::endl;
                     continue;
                 }
-                // TODO(1): estimateHeuristic需要用能够处理UM输入函数
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
                 double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state.com_pos, end_pos);
-
                 if (pro_node == NULL)
                 {
-                    std::cout << "find new pro_node" << std::endl;
+                    // std::cout << "find new pro_node" << std::endl;
                     pro_node = path_node_pool_[use_node_num_];
                     pro_node->index = pro_id;
-                    // pro_node->state_variable = pur_state;
-                    // pro_node->walk_num = cur_node->walk_num + 1;
                     pro_node->f_score = tmp_f_score;
                     pro_node->g_score = tmp_g_score;
                     pro_node->parent = cur_node;
@@ -169,7 +158,7 @@ namespace cane_planner
                     pro_node->support_pos = lfpc_model_->getStepFootPosition();
                     pro_node->step_num = lfpc_model_->getStepNum();
                     pro_node->theta = lfpc_model_->getTheta();
-
+                    pro_node->com_path = lfpc_model_->getStepCOMPath();
                     // push in set
                     open_set_.push(pro_node);
                     expanded_nodes_.insert(pro_id, pro_node);
@@ -185,9 +174,7 @@ namespace cane_planner
                 {
                     if (tmp_g_score < pro_node->g_score)
                     {
-                        std::cout << "update new_node" << std::endl;
-                        // pro_node->state_variable = pur_state;
-                        // pro_node->walk_num = cur_node->walk_num + 1;
+                        // std::cout << "update new_node" << std::endl;
 
                         lfpc_model_->switchSupportLeg();
                         pro_node->iter_state = lfpc_model_->getNextIterState();
@@ -196,6 +183,7 @@ namespace cane_planner
                         pro_node->support_pos = lfpc_model_->getStepFootPosition();
                         pro_node->step_num = lfpc_model_->getStepNum();
                         pro_node->theta = lfpc_model_->getTheta();
+                        pro_node->com_path = lfpc_model_->getStepCOMPath();
 
                         // update score
                         pro_node->f_score = tmp_f_score;
@@ -211,6 +199,7 @@ namespace cane_planner
         }
 
         /* ---------- open set empty, no path ---------- */
+        std::cout << "[Kin-Astar]:---------------------- " << std::endl;
         std::cout << "open set empty, no path!" << std::endl;
         std::cout << "use node num: " << use_node_num_ << std::endl;
         std::cout << "iter num: " << iter_num_ << std::endl;
@@ -277,11 +266,24 @@ namespace cane_planner
         vector<Eigen::Vector3d> path;
         for (size_t i = 0; i < path_nodes_.size(); i++)
         {
-            // TODO
-            path.push_back(path_nodes_[i]->com_pos);
+            for (size_t j = 0; j < path_nodes_[i]->com_path.size(); j++)
+            {
+                path.push_back(path_nodes_[i]->com_path[j]);
+            }
         }
         return path;
     }
+     std::vector<Eigen::Vector3d> KinodynamicAstar::getFeetPos()
+     {
+        vector<Eigen::Vector3d> path;
+        for (size_t i = 0; i < path_nodes_.size(); i++)
+        {
+            Eigen::Vector3d pos;
+            pos << path_nodes_[i]->support_pos,0.0;
+            path.push_back(pos);
+        }
+        return path;
+     }
 
     void KinodynamicAstar::setParam(ros::NodeHandle &nh)
     {
@@ -383,7 +385,8 @@ namespace cane_planner
     {
         Eigen::Vector2d acc_x_y;
         acc_x_y << input(0), input(1);
-        double heu = acc_x_y.norm() + input(2);
+        // double heu = acc_x_y.norm() + input(2);
+        double heu = acc_x_y.norm() + abs(input(2));
         // std::cout << "this heu is " << heu << endl;
         return heu;
     }
