@@ -46,17 +46,17 @@ namespace cane_planner
 
     Vector4d LFPC::calculateXtVt(double t)
     {
-        // in here, step_state  == [x_t,vx_t,y_t,vy_t]'
-        Vector4d step_state;
+        // in here,  iter_state  == [x_t,vx_t,y_t,vy_t]'
+        Vector4d iter_state;
         // linear inverted pendulum motion low
         double tau = t / t_c_;
         // x
-        step_state(0) = x_0_ * cosh(tau) + t_c_ * vx_0_ * sinh(tau);
-        step_state(1) = x_0_ * sinh(tau) / t_c_ + t_c_ * vx_0_ * cosh(tau);
+        iter_state(0) = x_0_ * cosh(tau) + t_c_ * vx_0_ * sinh(tau);
+        iter_state(1) = x_0_ * sinh(tau) / t_c_ + t_c_ * vx_0_ * cosh(tau);
         // y
-        step_state(2) = y_0_ * cosh(tau) + t_c_ * vy_0_ * sinh(tau);
-        step_state(3) = y_0_ * sinh(tau) / t_c_ + t_c_ * vy_0_ * cosh(tau);
-        return step_state;
+        iter_state(2) = y_0_ * cosh(tau) + t_c_ * vy_0_ * sinh(tau);
+        iter_state(3) = y_0_ * sinh(tau) / t_c_ + t_c_ * vy_0_ * cosh(tau);
+        return iter_state;
     }
 
     Vector4d LFPC::calculateFinalState()
@@ -89,11 +89,11 @@ namespace cane_planner
     void LFPC::updateOneDt()
     {
         t_ += delta_t_;
-        Vector4d step_state = calculateXtVt(t_);
-        x_t_ = step_state(0);
-        vx_t_ = step_state(1);
-        y_t_ = step_state(2);
-        vy_t_ = step_state(3);
+        Vector4d iter_state = calculateXtVt(t_);
+        x_t_ = iter_state(0);
+        vx_t_ = iter_state(1);
+        y_t_ = iter_state(2);
+        vy_t_ = iter_state(3);
 
         COM_pos_(0) = x_t_ + support_leg_pos_(0);
         COM_pos_(1) = y_t_ + support_leg_pos_(1);
@@ -178,7 +178,6 @@ namespace cane_planner
         }
         step_num += 1;
     }
-    // TODO
     void LFPC::initializeModel(ros::NodeHandle &nh)
     {
         std::cout << "\n----------initializeModel----------\n"
@@ -193,7 +192,7 @@ namespace cane_planner
         t_c_ = sqrt(h_ / 10);
         std::cout << "tc" << t_c_ << std::endl;
     }
-    void LFPC::reset(Vector4d init_state, Vector3d COM_init_pos, char support_leg)
+    void LFPC::reset(Vector4d init_state, Vector3d COM_init_pos, Vector2d support_pos, char support_leg)
     {
         step_num = 0;
         t_ = 0;
@@ -203,6 +202,7 @@ namespace cane_planner
         vx_t_ = 0.0;
         y_t_ = 0.0;
         vy_t_ = 0.0;
+        // iter init
         x_0_ = init_state(0);
         vx_0_ = init_state(1);
         y_0_ = init_state(2);
@@ -212,10 +212,13 @@ namespace cane_planner
         COM_pos_ = COM_init_pos;
         std::cout << "COM POS is" << COM_pos_.transpose() << std::endl;
         // and Others
-        left_foot_pos_ = COM_pos_;
-        right_foot_pos_ = COM_pos_;
-        support_leg_pos_ = COM_pos_;
-        pos_foot_ = COM_pos_;
+        support_leg_pos_ << support_pos(0), support_pos(1), 0.0;
+        if (support_leg_ == LEFT_LEG)
+            left_foot_pos_ = support_leg_pos_;
+        else if (support_leg_ == RIGHT_LEG)
+            right_foot_pos_ = support_leg_pos_;
+
+        pos_foot_ = support_leg_pos_;
         // clear path
         step_path_.clear();
     }

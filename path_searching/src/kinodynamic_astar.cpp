@@ -14,35 +14,27 @@ namespace cane_planner
         }
     }
 
-    int KinodynamicAstar::search(Eigen::Vector3d start_state, Eigen::Vector3d start_input,
-                                 Eigen::Vector3d end_state, Eigen::Vector3d end_input)
+    int KinodynamicAstar::search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
+                                 Eigen::Vector3d end_pos)
     {
         /* ---------- initialize --------*/
         KdNodePtr cur_node = path_node_pool_[0];
         cur_node->parent = NULL;
-        cur_node->state_variable = start_state;
-        cur_node->index = stateToIndex(start_state);
-        cur_node->g_score = 0.0;
-        double theta = start_state(2);
-        Vector4d init_state;
-        init_state << 0.0, 0.0, 0.0, 0.0;
-        Vector3d com_pos_init;
-        com_pos_init << start_state(0), start_state(1), 0.0;
+        // todo
+        // lfpc iter parameters
+        cur_node-> iter_state = start_state;
+        cur_node->support_feet = LEFT_LEG;
+        cur_node->support_pos << start_pos(0), start_pos(1);
 
-        // init lfpc model
-        if (launch_foot_)
-        {
-            lfpc_model_->reset(init_state, com_pos_init, LEFT_LEG);
-        }
-        else
-        {
-            lfpc_model_->reset(init_state, com_pos_init, RIGHT_LEG);
-        }
+        cur_node->com_pos = start_pos;
+        cur_node->index = stateToIndex(start_pos);
+        cur_node->g_score = 0.0;
+        double theta = start_pos(2);
 
         Eigen::Vector2i end_index;
-        end_index = stateToIndex(end_state);
-        // TODO: Heuristic compute
-        cur_node->f_score = lambda_heu_ * getEuclHeu(start_state, end_state);
+        end_index = stateToIndex(end_pos);
+        // TODO(1): Heuristic compute
+        cur_node->f_score = lambda_heu_ * getEuclHeu(start_pos, end_pos);
         cur_node->kdnode_state = IN_OPEN_SET;
 
         open_set_.push(cur_node);
@@ -62,7 +54,7 @@ namespace cane_planner
             /* ---------- determine termination ---------- */
             bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
                             abs(cur_node->index(1) - end_index(1)) <= 1;
-            // abs(cur_node->state_variable(2) - end_state(2)) <= 0.1;
+            // abs(cur_node->state_variable(2) - end_pos(2)) <= 0.1;
             // have tourble in here;
 
             if (near_end)
@@ -82,8 +74,8 @@ namespace cane_planner
 
             /* ---------- param for next gait point ---------- */
             double sx_res = 1 / 1.0, sy_res = 1 / 1.0, pi_res = 1 / 2.0;
-            Eigen::Vector3d cur_state = cur_node->state_variable;
-            // int walk_n = cur_node->walk_num;
+
+            // todo
             Eigen::Vector3d pur_state;
             vector<KdNodePtr> tmp_expand_nodes;
             vector<Eigen::Vector3d> inputs;
@@ -113,9 +105,9 @@ namespace cane_planner
                 std::cout << "input:sx,sy,yaw" << um.transpose() << std::endl;
                 // TODO change here，这里需要把相应的暴露出来；
                 // stateTransit(cur_state, pur_state, um, walk_n);
-
                 lfpc_model_->SetCtrlParams(um);
-                lfpc_model_->updateOneStep();
+
+                // lfpc_model_->updateOneStep();
                 pur_state = lfpc_model_->getStepFootPosition();
                 std::cout << "pur_state:" << pur_state.transpose() << std::endl;
                 Eigen::Vector2i pro_id = stateToIndex(pur_state);
@@ -145,17 +137,17 @@ namespace cane_planner
                     // std::cout << "can't Traversable" << std::endl;
                     continue;
                 }
-                // TODO
+                // TODO(1): estimateHeuristic需要用能够处理UM输入函数
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
-                double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state, end_state);
+                double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state, end_pos);
 
                 if (pro_node == NULL)
                 {
                     // std::cout << "find new pro_node" << std::endl;
                     pro_node = path_node_pool_[use_node_num_];
                     pro_node->index = pro_id;
-                    pro_node->state_variable = pur_state;
-                    pro_node->walk_num = cur_node->walk_num + 1;
+                    // pro_node->state_variable = pur_state;
+                    // pro_node->walk_num = cur_node->walk_num + 1;
                     pro_node->f_score = tmp_f_score;
                     pro_node->g_score = tmp_g_score;
                     pro_node->parent = cur_node;
@@ -176,8 +168,8 @@ namespace cane_planner
                     if (tmp_g_score < pro_node->g_score)
                     {
                         // std::cout << "update new_node" << std::endl;
-                        pro_node->state_variable = pur_state;
-                        pro_node->walk_num = cur_node->walk_num + 1;
+                        // pro_node->state_variable = pur_state;
+                        // pro_node->walk_num = cur_node->walk_num + 1;
                         pro_node->f_score = tmp_f_score;
                         pro_node->g_score = tmp_g_score;
                         pro_node->parent = cur_node;
@@ -257,7 +249,8 @@ namespace cane_planner
         vector<Eigen::Vector3d> path;
         for (size_t i = 0; i < path_nodes_.size(); i++)
         {
-            path.push_back(path_nodes_[i]->state_variable);
+            // TODO
+            // path.push_back(path_nodes_[i]->state_variable);
         }
         return path;
     }

@@ -189,9 +189,9 @@ namespace cane_planner
     {
         kin_finder_->reset();
         // todo
-        Eigen::Vector3d input;
-        input << 0.0, 0.0, 0.0;
-        bool plan_success = kin_finder_->search(start_state_, input, end_state_, input);
+        Eigen::Vector4d input;
+        input << 0.0, 0.0, 0.0 , 0.0;
+        bool plan_success = kin_finder_->search(start_state_, input, end_state_);
         return plan_success;
     }
 

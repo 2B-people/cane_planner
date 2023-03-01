@@ -65,7 +65,8 @@ namespace cane_planner
     std::vector<Eigen::Vector3d> getStepCOMPath();
 
     void initializeModel(ros::NodeHandle &nh);
-    void reset(Vector4d init_state,Vector3d COM_init_pos,char support_leg);
+    void reset(Vector4d init_state, Vector3d COM_init_pos, Vector2d support_pos, char support_leg);
+
 
     typedef shared_ptr<LFPC> Ptr;
   };

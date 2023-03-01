@@ -261,7 +261,6 @@ namespace cane_planner
     /* ---------- map params ---------- */
     this->inv_resolution_ = 1.0 / resolution_;
     inv_time_resolution_ = 1.0 / time_resolution_;
-    // TODO: edt_evironment is change
     Eigen::Vector3d ori, map_size_3d;
     collision_->getMapRegion(ori, map_size_3d);
     origin_ << ori(0), ori(1);

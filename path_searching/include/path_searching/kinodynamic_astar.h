@@ -34,9 +34,13 @@ namespace cane_planner
     /* -------------------- */
     // node's index(from px,py)
     Eigen::Vector2i index;
-    // state variable: px,py,yaw
-    Eigen::Vector3d state_variable;
-    int walk_num;
+    // lfpc iter param
+    Eigen::Vector3d com_pos;
+    //  iter_state variable: x0,vx0,y0,vy0
+    Eigen::Vector4d  iter_state;
+    Eigen::Vector2d support_pos;
+    char support_feet;
+    // astar param
     double g_score, f_score;
     KdNode *parent;
     char kdnode_state;
@@ -60,7 +64,7 @@ namespace cane_planner
     }
   };
 
-  //用hash表来存Open_set,再塞入std的priority_queue中
+  // 用hash表来存Open_set,再塞入std的priority_queue中
   class KdNodeHashTable
   {
   private:
@@ -118,7 +122,7 @@ namespace cane_planner
     double tie_breaker_;
     bool launch_foot_;
     double resolution_, inv_resolution_;
-    double max_al_,max_aw_,max_api_;
+    double max_al_, max_aw_, max_api_;
     Eigen::Vector2d origin_, map_size_2d_;
 
     CollisionDetection::Ptr collision_;
@@ -142,7 +146,7 @@ namespace cane_planner
 
     /* state propagation */
     void stateTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,
-                     Eigen::Vector3d input, int n);
+                      Eigen::Vector3d input, int n);
 
   public:
     KinodynamicAstar(){};
@@ -156,8 +160,8 @@ namespace cane_planner
     };
 
     /* main API */
-    int search(Eigen::Vector3d start_state, Eigen::Vector3d start_input,
-               Eigen::Vector3d end_state, Eigen::Vector3d end_input);
+    int search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
+               Eigen::Vector3d end_pos);
     std::vector<Eigen::Vector3d> getPath();
 
     void setParam(ros::NodeHandle &nh);
