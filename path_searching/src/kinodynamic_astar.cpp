@@ -61,8 +61,8 @@ namespace cane_planner
             //                 abs(cur_node->index(1) - end_index(1)) <= 1;
             // abs(cur_node->state_variable(2) - end_pos(2)) <= 0.1;
             // have tourble in here;
-            bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 0.5 &&
-                            abs(cur_node->com_pos(1) - end_pos(1)) <= 0.5;
+            bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 1 &&
+                            abs(cur_node->com_pos(1) - end_pos(1)) <= 1;
 
             if (near_end)
             {

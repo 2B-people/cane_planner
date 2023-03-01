@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /Status1
         - /PointCloud21
-        - /PointCloud22
       Splitter Ratio: 0.5
     Tree Height: 700
   - Class: rviz/Selection
@@ -66,7 +65,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -77,11 +76,11 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.10000000149011612
       Style: Flat Squares
-      Topic: /sdf_map/depth_cloud
+      Topic: /sdf_map/esdf
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -115,7 +114,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/astar
       Name: Marker
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -123,7 +122,15 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_astar
       Name: Marker
       Namespaces:
-        {}
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /planning_vis/kin_foot
+      Name: Marker
+      Namespaces:
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Image
@@ -190,7 +197,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 31.219532012939453
+      Distance: 27.702272415161133
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -206,9 +213,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 1.424796462059021
       Target Frame: <Fixed Frame>
-      Yaw: 0.008587837219238281
+      Yaw: 0.17358867824077606
     Saved: ~
 Window Geometry:
   Displays:
@@ -229,4 +236,4 @@ Window Geometry:
     collapsed: false
   Width: 2548
   X: -32
-  Y: -14
+  Y: -18

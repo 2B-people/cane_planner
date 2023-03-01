@@ -59,7 +59,8 @@ namespace cane_planner
 
         // visial
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
-        kin_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
+        kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
+        kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
     }
 
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
@@ -264,8 +265,23 @@ namespace cane_planner
             pt.z = 1.2;
             mk.points.push_back(pt);
         }
+        kin_path_pub_.publish(mk);
+        
+        mk.points.clear();
+        mk.color.r = 0.0;
+        mk.color.g = 1.0;
+        mk.color.b = 0.0;
+        list.clear();
+        list = kin_finder_->getFeetPos();
+        for (int i = 0; i < int(list.size()); i++)
+        {
+            pt.x = list[i](0);
+            pt.y = list[i](1);
+            pt.z = 1.2;
+            mk.points.push_back(pt);
+        }
+        kin_foot_pub_.publish(mk);
 
-        kin_pub_.publish(mk);
         ros::Duration(0.001).sleep();
     }
 
