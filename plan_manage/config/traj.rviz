@@ -85,14 +85,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 2.4000000953674316
-        Min Value: -0.5
+        Max Value: 2.450000047683716
+        Min Value: -0.44999998807907104
         Value: true
       Axis: Z
       Channel Name: z
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -115,7 +115,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/astar
       Name: Marker
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -123,7 +123,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_astar
       Name: Marker
       Namespaces:
-        {}
+        "": true
       Queue Size: 100
       Value: true
     - Class: rviz/Image
@@ -190,7 +190,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 48.222251892089844
+      Distance: 31.219532012939453
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -198,17 +198,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.7422354221343994
+        Y: 3.4629039764404297
+        Z: -0.7081906199455261
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7997963428497314
+      Pitch: 1.4947962760925293
       Target Frame: <Fixed Frame>
-      Yaw: 1.3285863399505615
+      Yaw: 5.911771774291992
     Saved: ~
 Window Geometry:
   Displays:
@@ -229,4 +229,4 @@ Window Geometry:
     collapsed: false
   Width: 2548
   X: -32
-  Y: 1
+  Y: 11

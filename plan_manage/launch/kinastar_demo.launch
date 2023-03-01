@@ -58,7 +58,7 @@
     <param name="kinastar/allocate_num" value="1000000"/>
     <param name="kinastar/max_al" value="0.4"/>
     <param name="kinastar/max_aw" value="0.1"/>
-    <param name="kinastar/max_theta" value="1.04"/>
+    <param name="kinastar/max_theta" value="0"/>
 
     <param name="astar/resolution_astar" value="0.1"/>
     <param name="astar/time_resolution" value="0"/>

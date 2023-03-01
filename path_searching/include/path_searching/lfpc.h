@@ -35,7 +35,7 @@ namespace cane_planner
     double al_, aw_, theta_, b_;
 
     // step number
-    int step_num;
+    int step_num_;
 
     // 这里的为全局的坐标
     // foot location in gobal
@@ -61,12 +61,18 @@ namespace cane_planner
     void updateOneStep();
 
     void SetCtrlParams(Vector3d input);
-    Vector3d getStepFootPosition();
+    Vector2d getStepFootPosition();
+    Vector3d getCOMPos();
+    Vector4d getNextIterState();
+    char getSupportFeet();
+    int getStepNum();
+    double getTheta();
+
     std::vector<Eigen::Vector3d> getStepCOMPath();
 
     void initializeModel(ros::NodeHandle &nh);
-    void reset(Vector4d init_state, Vector3d COM_init_pos, Vector2d support_pos, char support_leg);
-
+    void reset(Vector4d init_state, Vector3d COM_init_pos, Vector2d support_pos,
+               char support_leg, int step_num);
 
     typedef shared_ptr<LFPC> Ptr;
   };

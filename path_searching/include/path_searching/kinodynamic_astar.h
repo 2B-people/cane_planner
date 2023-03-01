@@ -40,6 +40,8 @@ namespace cane_planner
     Eigen::Vector4d  iter_state;
     Eigen::Vector2d support_pos;
     char support_feet;
+    int step_num;
+    double theta;
     // astar param
     double g_score, f_score;
     KdNode *parent;
