@@ -60,6 +60,8 @@ namespace cane_planner
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
         kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
         kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
+        path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
+        test_odom_pub_ = nh.advertise<nav_msgs::Odometry>("/kin_astar/test_odom", 20);
     }
 
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
@@ -87,6 +89,13 @@ namespace cane_planner
         double yaw = QuatenionToYaw(start->pose.pose.orientation);
         start_state_(2) = yaw;
         cout << "yaw:" << yaw << endl;
+        // test sim odom
+        nav_msgs::Odometry odom;
+        odom.header.frame_id = "world";
+        odom.header.stamp = ros::Time::now();
+        odom.pose = start->pose;
+        test_odom_pub_.publish(odom);
+
         have_odom_ = true;
     }
 
@@ -170,6 +179,9 @@ namespace cane_planner
             displayAstar();
             displayKinastar();
 
+            // publish
+            publishAstarPath();
+
             have_target_ = false;
             changeFSMExecState(WAIT_TARGET);
             break;
@@ -193,6 +205,35 @@ namespace cane_planner
         input << 0.0, 0.0, 0.0, 0.0;
         bool plan_success = kin_finder_->search(start_state_, input, end_state_);
         return plan_success;
+    }
+
+    void PlannerManager::publishAstarPath()
+    {
+        vector<Eigen::Vector3d> list;
+        list = kin_finder_->getPath();
+        nav_msgs::Path path;
+        path.header.frame_id = "world";
+        path.header.stamp = ros::Time::now();
+        for (size_t i = 0; i < list.size(); i++)
+        {
+            geometry_msgs::PoseStamped this_pose_stamped;
+
+            this_pose_stamped.pose.position.x = list[i](0);
+            this_pose_stamped.pose.position.y = list[i](1);
+            this_pose_stamped.pose.position.z = 0;
+
+            this_pose_stamped.pose.orientation.x = 0.0;
+            this_pose_stamped.pose.orientation.y = 0.0;
+            this_pose_stamped.pose.orientation.z = 0.0;
+            this_pose_stamped.pose.orientation.w = 1.0;
+
+            this_pose_stamped.header.frame_id ="world";
+            this_pose_stamped.header.stamp = ros::Time::now();
+
+            path.poses.push_back(this_pose_stamped);
+        }
+
+        path_pub_.publish(path);
     }
 
     void PlannerManager::displayAstar()

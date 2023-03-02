@@ -78,7 +78,7 @@
       <param name="baseAngle" value="90.0"/> <!-- the middle pos of servo, for tt02: 87, for hsp: ? -->
       <param name="AngleGain" value="-3.5"/> <!-- for tt02: >0, for hsp: <0 -->		
 
-      <!-- remap from="/odometry/filtered" to="odom" / --> 
+      <remap from="/odometry/filtered" to="/kin_astar/test_odom" />
       <!-- <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" />  -->
   </node>
 

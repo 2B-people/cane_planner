@@ -53,7 +53,6 @@
     <param name="map_ros/frame_id"      value="world"/>
 
     <param name="kinastar/resolution_astar" value="0.2"/>
-    <param name="kinastar/launch_foot" value="false"/>
     <param name="kinastar/lambda_heu" value="0.01"/>
     <param name="kinastar/allocate_num" value="1000000"/>
     <param name="kinastar/max_al" value="0.4"/>
@@ -68,6 +67,20 @@
     <param name="Collision/margin" value="0.4"/>
     <param name="Collision/SliceHeight" value="1.0"/>
     
+  </node>
+
+    <!-- L1 controller -->  
+  <node pkg="hypha_racecar" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">       
+      <!-- L1 -->
+      <param name="Vcmd" value="1.0" /> <!-- speed of car m/s -->        
+      <!-- ESC -->
+      <param name="baseSpeed" value="1425"/> <!-- pwm for motor constant speed, 1480: stop, 1440: ~0.5m/s, 1430: ~1.5m/s --> 
+      <!-- Servo -->
+      <param name="baseAngle" value="90.0"/> <!-- the middle pos of servo, for tt02: 87, for hsp: ? -->
+      <param name="AngleGain" value="-3.5"/> <!-- for tt02: >0, for hsp: <0 -->		
+
+      <remap from="/odometry/filtered" to="$(arg odometry_topic)" /> 
+      <!-- <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" />  -->
   </node>
 
   <!-- visualisation -->
