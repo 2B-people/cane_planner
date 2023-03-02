@@ -49,8 +49,11 @@ namespace cane_planner
 
         KdNodePtr terminate_node = NULL;
 
-        /* ---------- search loop ---------- */
-        while (!open_set_.empty())
+        // num of can't find path
+        int num_feasible = 0, num_close = 0,num_collision = 0;
+
+               /* ---------- search loop ---------- */
+            while (!open_set_.empty())
         {
             cur_node = open_set_.top();
             // std::cout << "Explore while is " << use_node_num_ << std::endl;
@@ -85,11 +88,11 @@ namespace cane_planner
             Eigen::Vector3d um;
 
             /* ---------- param for next gait point ---------- */
-            double sx_res = 1 / 1.0, sy_res = 1 / 1.0, pi_res = 1 / 10.0;
+            double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 5.0;
             /* ----------set input list ---------- */
             // std::cout << "set input list" << std::endl;
-            for (double al = max_al_ * sx_res; al < max_al_ + 1e-3; al += max_al_ * sx_res)
-                for (double aw = max_aw_ * sy_res; aw < max_aw_ + 1e-3; aw += max_aw_ * sy_res)
+            for (double al = max_al_ * al_res; al < max_al_ + 1e-3; al += max_al_ * al_res)
+                for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
                     for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
                     {
                         um << al, aw, api;
@@ -112,13 +115,14 @@ namespace cane_planner
                 // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
-                pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
+                pro_state << pur_state.com_pos(0), pur_state.com_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
 
                 // check if in feasible space
                 if (pur_state.support_pos(0) <= origin_(0) || pur_state.support_pos(0) >= map_size_2d_(0) || pur_state.support_pos(1) <= origin_(1) || pur_state.support_pos(1) >= map_size_2d_(1))
                 {
                     // std::cout << "outside map" << std::endl;
+                    num_feasible++;
                     continue;
                 }
 
@@ -127,6 +131,7 @@ namespace cane_planner
                 if (pro_node != NULL && pro_node->kdnode_state == IN_CLOSE_SET)
                 {
                     // std::cout << "in close" << std::endl;
+                    num_close++;
                     continue;
                 }
 
@@ -138,6 +143,7 @@ namespace cane_planner
                 if (!collision_->isTraversable(pro_pos))
                 {
                     // std::cout << "can't Traversable" << std::endl;
+                    num_collision++;
                     continue;
                 }
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
@@ -203,6 +209,10 @@ namespace cane_planner
         std::cout << "open set empty, no path!" << std::endl;
         std::cout << "use node num: " << use_node_num_ << std::endl;
         std::cout << "iter num: " << iter_num_ << std::endl;
+        std::cout << "feasible num: " << num_feasible <<std::endl;
+        std::cout << "close num: " << num_close <<std::endl;
+        std::cout << "collision num: " << num_collision <<std::endl;
+
         return NO_PATH;
     }
 
@@ -273,17 +283,17 @@ namespace cane_planner
         }
         return path;
     }
-     std::vector<Eigen::Vector3d> KinodynamicAstar::getFeetPos()
-     {
+    std::vector<Eigen::Vector3d> KinodynamicAstar::getFeetPos()
+    {
         vector<Eigen::Vector3d> path;
         for (size_t i = 0; i < path_nodes_.size(); i++)
         {
             Eigen::Vector3d pos;
-            pos << path_nodes_[i]->support_pos,0.0;
+            pos << path_nodes_[i]->support_pos, 0.0;
             path.push_back(pos);
         }
         return path;
-     }
+    }
 
     void KinodynamicAstar::setParam(ros::NodeHandle &nh)
     {
@@ -294,8 +304,6 @@ namespace cane_planner
         inv_resolution_ = ceil(1 / resolution_);
         // 分配的最大可以搜索的数量；
         nh.param("kinastar/allocate_num", allocate_num_, -1);
-        // 启动的脚，左脚为1，右脚为0,
-        nh.param("kinastar/launch_foot", launch_foot_, false);
         // 人体动力学限制参数
         nh.param("kinastar/max_al", max_al_, -1.0);
         nh.param("kinastar/max_aw", max_aw_, -1.0);

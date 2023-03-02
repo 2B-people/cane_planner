@@ -157,7 +157,7 @@ COM_v0 = [0, 0]
 left_foot_pos = [0, 0, 0]
 right_foot_pos = [0, 0, 0]
 
-delta_t = 0.03
+delta_t = 0.01
 
 al = 0.4
 aw = 0.1
@@ -238,10 +238,10 @@ for i in range(int(total_time/delta_t)):
         # if step_num >= 10:
         #     theta = 3.14
         #     LFPC_model.SetCtrlParams(al, aw, theta)
-        # if step_num % 10 == 0:
-        #     theta += 90/180*np.pi
-        #     print('change theta', theta)
-        #     LFPC_model.SetCtrlParams(al, aw, theta)
+        if step_num % 3 == 0:
+            theta += 120/180*np.pi
+            print('change theta', theta)
+            LFPC_model.SetCtrlParams(al, aw, theta)
 
             # update support_foot_pos
         j = 0

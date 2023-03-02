@@ -182,7 +182,7 @@ namespace cane_planner
     {
         std::cout << "\n----------initializeModel----------\n"
                   << std::endl;
-        nh.param("lfpc/delta_t", delta_t_, 0.01);
+        nh.param("lfpc/delta_t", delta_t_, 0.05);
         nh.param("lfpc/t_sup", t_sup_, 0.3);
         nh.param("lfpc/b_", b_, 0.3);
         nh.param("lfpc/h_", h_, 1.0);

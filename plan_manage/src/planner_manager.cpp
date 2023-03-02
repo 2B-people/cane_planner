@@ -26,7 +26,6 @@ namespace cane_planner
         lfpc_model_.reset(new LFPC);
         lfpc_model_->initializeModel(nh);
 
-
         // init planner
 
         ROS_WARN(" Astar planer start");
@@ -46,9 +45,9 @@ namespace cane_planner
         if (simulation_)
         {
             goal_sub_ =
-                nh.subscribe("/move_base_simple/goal", 1, &PlannerManager::goalCallback, this); //接收目标的topic
+                nh.subscribe("/move_base_simple/goal", 1, &PlannerManager::goalCallback, this); // 接收目标的topic
             start_sub_ =
-                nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); //接收始点的topic
+                nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
         }
         exec_timer_ =
             nh.createTimer(ros::Duration(0.01), &PlannerManager::execFSMCallback, this);
@@ -191,7 +190,7 @@ namespace cane_planner
         kin_finder_->reset();
         // todo
         Eigen::Vector4d input;
-        input << 0.0, 0.0, 0.0 , 0.0;
+        input << 0.0, 0.0, 0.0, 0.0;
         bool plan_success = kin_finder_->search(start_state_, input, end_state_);
         return plan_success;
     }
@@ -266,7 +265,7 @@ namespace cane_planner
             mk.points.push_back(pt);
         }
         kin_path_pub_.publish(mk);
-        
+
         mk.points.clear();
         mk.color.r = 0.0;
         mk.color.g = 1.0;
