@@ -115,7 +115,7 @@ namespace cane_planner
                 // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
-                pro_state << pur_state.com_pos(0), pur_state.com_pos(1), 0.0;
+                pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
 
                 // check if in feasible space
