@@ -157,11 +157,11 @@ COM_v0 = [0, 0]
 left_foot_pos = [0, 0, 0]
 right_foot_pos = [0, 0, 0]
 
-delta_t = 0.01
+delta_t = 0.03
 
 al = 0.4
 aw = 0.1
-theta = 2.24
+theta = 0
 
 step_num = 0
 global_time = 0
@@ -231,6 +231,7 @@ for i in range(int(total_time/delta_t)):
         # change contorl param
         step_num += 1
         print('\n-----step number:', step_num, '----')
+        # 90°转向
         # if step_num >= 5:  # stop forward after 5 steps
         #     theta = 1.57
         #     print('change theta',theta)
@@ -238,12 +239,13 @@ for i in range(int(total_time/delta_t)):
         # if step_num >= 10:
         #     theta = 3.14
         #     LFPC_model.SetCtrlParams(al, aw, theta)
-        if step_num % 3 == 0:
-            theta += 120/180*np.pi
+        # 圆
+        if step_num % 2 == 0:
+            theta += 10/180*np.pi
             print('change theta', theta)
             LFPC_model.SetCtrlParams(al, aw, theta)
 
-            # update support_foot_pos
+        # update support_foot_pos
         j = 0
         LFPC_model.switchSupportLeg()  # switch the support leg
         if LFPC_model.support_leg == 'left_leg':
@@ -274,8 +276,6 @@ for i in range(int(total_time/delta_t)):
             swing_foot_pos[:, 1] = np.linspace(
                 LFPC_model.left_foot_pos[1], left_foot_target_pos[1], swing_data_len)
             swing_foot_pos[1:swing_data_len-1, 2] = 0.1
-
-
 
 
 # ------------------------------------------------- animation plot
