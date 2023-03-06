@@ -50,6 +50,7 @@ add_library( plan_env
 target_link_libraries( plan_env
     ${catkin_LIBRARIES} 
     ${PCL_LIBRARIES}
+    ${OpenCV_LIBRARIES}
     )  
 
 add_executable(obj_generator
@@ -70,4 +71,5 @@ add_executable(esdf_test_node
 target_link_libraries(esdf_test_node
     ${catkin_LIBRARIES}
     ${PCL_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )
