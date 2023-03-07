@@ -413,7 +413,6 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
         ROS_INFO_STREAM("Reading from serial port\n");
         // 保存串口数据至数值 recv_data[200]
         ser_.read(recv_data, ser_.available());
-        // 编写函数解析串口数据  【后文内容重点】
     }
 }
 
@@ -438,19 +437,17 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
                 // double u = getGasInput(carVel.linear.x);
                 // cmd_vel.linear.x = baseSpeed - u;
                 cmd_vel.linear.x = baseSpeed;
-                ROS_INFO("\nGas = %.2f\nSteering angle = %.2f", cmd_vel.linear.x, cmd_vel.angular.z);
+                // ROS_INFO("\nSteering angle = %.2f", cmd_vel.angular.z);
             }
         }
     }
-    std::string send_data = "TEST:z: " + std::to_string(cmd_vel.angular.z) + "x " + std::to_string(cmd_vel.linear.x);
-    
-    u_char send_data_char[200];
+    std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z-baseAngle)*100)) + "\n";
+
+    u_char send_data_char[send_data.size()];
     for (size_t i = 0; i < send_data.size(); i++)
-    {
         send_data_char[i] = send_data.c_str()[i];
-    }
-    
-    ser_.write(send_data_char, 100);
+    ROS_WARN("%s",send_data_char);
+    ser_.write(send_data_char, send_data.size());
     pub_.publish(cmd_vel);
 }
 

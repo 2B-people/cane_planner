@@ -72,8 +72,8 @@
   </node>
 
   <!-- L1 controller -->  
-  <node pkg="hypha_racecar" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">       
-  <!-- <node pkg="hypha_racecar" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
+  <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">       
+  <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
       <!-- L1 -->
       <param name="Vcmd" value="1.0" /> <!-- speed of car m/s -->        
       <!-- ESC -->
