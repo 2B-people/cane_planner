@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   roscpp
   rospy
+  serial
   std_msgs
   visualization_msgs
 )

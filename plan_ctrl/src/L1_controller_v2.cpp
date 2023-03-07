@@ -20,14 +20,17 @@ along with hypha_racecar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <iostream>
+#include <string>
+
 #include "ros/ros.h"
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_datatypes.h>
-#include "nav_msgs/Path.h"
+#include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
 #include <visualization_msgs/Marker.h>
+#include <serial/serial.h>
 
 #define PI 3.14159265358979
 
@@ -62,6 +65,10 @@ private:
     nav_msgs::Odometry odom;
     nav_msgs::Path map_path, odom_path;
 
+    // serial
+    serial::Serial ser;
+    bool use_ser;
+
     double L, Lfw, Lrv, Vcmd, lfw, lrv, steering, u, v;
     double Gas_gain, baseAngle, Angle_gain, goalRadius;
     int controller_freq, baseSpeed;
@@ -93,6 +100,7 @@ L1Controller::L1Controller()
     pn.param("GasGain", Gas_gain, 1.0);
     pn.param("baseSpeed", baseSpeed, 1470);
     pn.param("baseAngle", baseAngle, 90.0);
+    pn.param("SerialUsing", use_ser, true);
 
     // Publishers and Subscribers
     odom_sub = n_.subscribe("/odometry/filtered", 1, &L1Controller::odomCB, this);
@@ -105,6 +113,22 @@ L1Controller::L1Controller()
     // Timer
     timer1 = n_.createTimer(ros::Duration((1.0) / controller_freq), &L1Controller::controlLoopCB, this);  // Duration(0.05) -> 20Hz
     timer2 = n_.createTimer(ros::Duration((0.5) / controller_freq), &L1Controller::goalReachingCB, this); // Duration(0.05) -> 20Hz
+
+    std::string port("/dev/ttyUSB0");
+    int baudrate = 115200;
+
+    pn.param("port", port, port);
+    pn.param("baudrate", baudrate, baudrate);
+
+    // Serial
+    if (use_ser)
+    {
+        ser.setPort(port);
+        ser.setBaudrate(baudrate);
+        serial::Timeout to = serial::Timeout::simpleTimeout(1000);
+        ser.setTimeout(to);
+        ROS_INFO("[param] serial set:%s, baudrate set:%d",port.c_str(),baudrate);
+    }
 
     // Init variables
     Lfw = goalRadius = getL1Distance(Vcmd);
