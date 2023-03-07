@@ -6,7 +6,6 @@
                 "limitSymbolsToIncludedHeaders": false
             },
             "includePath": [
-                "/home/nqq/catkin_ws/devel/include/**",
                 "/opt/ros/noetic/include/**",
                 "/usr/include/**",
                 "${workspaceFolder}",
@@ -15,7 +14,10 @@
                 "${workspaceFolder}/path_searching/include",
                 "${workspaceFolder}/plan_env/include",
                 "${workspaceFolder}/plan_manage/include",
-                "/usr/include/pcl-1.10"
+                "/usr/include/pcl-1.10",
+                // nx 的配置
+                "/opt/ros/melodic/include",
+                "/opt/ros/melodic/include/**"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

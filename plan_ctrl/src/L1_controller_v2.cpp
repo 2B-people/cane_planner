@@ -66,7 +66,7 @@ private:
     nav_msgs::Path map_path, odom_path;
 
     // serial
-    serial::Serial ser;
+    serial::Serial ser_;
     bool use_ser;
 
     double L, Lfw, Lrv, Vcmd, lfw, lrv, steering, u, v;
@@ -123,11 +123,31 @@ L1Controller::L1Controller()
     // Serial
     if (use_ser)
     {
-        ser.setPort(port);
-        ser.setBaudrate(baudrate);
+        ser_.setPort(port);
+        ser_.setBaudrate(baudrate);
         serial::Timeout to = serial::Timeout::simpleTimeout(1000);
-        ser.setTimeout(to);
-        ROS_INFO("[param] serial set:%s, baudrate set:%d",port.c_str(),baudrate);
+        ser_.setTimeout(to);
+        ROS_WARN("---[param] serial set:%s, baudrate set:%d----", port.c_str(), baudrate);
+        try
+        {
+            ser_.open();
+        }
+        catch (serial::IOException &e)
+        {
+            ROS_ERROR_STREAM("Unable to open port ");
+        }
+        if (ser_.isOpen())
+        {
+            ROS_INFO_STREAM("Serial Port initialized");
+        }
+        else
+        {
+            ROS_ERROR_STREAM("Serial Port fail");
+        }
+    }
+    else
+    {
+        ROS_WARN("-----NO Serial!------ ");
     }
 
     // Init variables
@@ -387,6 +407,14 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
             ROS_INFO("Goal Reached !");
         }
     }
+    u_char recv_data[200];
+    if (ser_.available())
+    {
+        ROS_INFO_STREAM("Reading from serial port\n");
+        // 保存串口数据至数值 recv_data[200]
+        ser_.read(recv_data, ser_.available());
+        // 编写函数解析串口数据  【后文内容重点】
+    }
 }
 
 void L1Controller::controlLoopCB(const ros::TimerEvent &)
@@ -414,6 +442,15 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
             }
         }
     }
+    std::string send_data = "TEST:z: " + std::to_string(cmd_vel.angular.z) + "x " + std::to_string(cmd_vel.linear.x);
+    
+    u_char send_data_char[200];
+    for (size_t i = 0; i < send_data.size(); i++)
+    {
+        send_data_char[i] = send_data.c_str()[i];
+    }
+    
+    ser_.write(send_data_char, 100);
     pub_.publish(cmd_vel);
 }
 

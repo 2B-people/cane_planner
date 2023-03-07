@@ -9,7 +9,6 @@ project(hypha_racecar)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  move_base
   tf
   roscpp
   rospy
