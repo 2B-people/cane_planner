@@ -8,6 +8,11 @@
   <arg name="cloud_topic" value="/map_generator/global_cloud"/>
   <arg name="sensor_pose_topic" value="/map_generator/pose"/>
 
+  <node pkg="tf" type="static_transform_publisher" name="tf_pub" args="0 0 0 0 0 0 1 camera camera_link 100"/>
+
+  <include file="$(find realsense2_camera)/launch/my_camera.launch">
+  </include>
+
   <node pkg="plan_manage" name="cane_planner_node" type="cane_planner_node" output="screen">
     <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
     <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
@@ -20,7 +25,7 @@
     <param name="sdf_map/resolution"             value="0.1" /> 
     <param name="sdf_map/obstacles_inflation"    value="0.099" /> 
     <param name="sdf_map/local_bound_inflate"    value="0.5"/>
-    <param name="sdf_map/local_map_margin"       value="20"/>
+    <param name="sdf_map/local_map_margin"       value="10"/>
     <param name="sdf_map/ground_height"          value="-1.0"/>
     <param name="sdf_map/default_dist"           value="5.0"/>
 
@@ -69,8 +74,9 @@
     
   </node>
 
-    <!-- L1 controller -->  
-  <node pkg="hypha_racecar" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">       
+  <!-- L1 controller -->  
+  <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">        -->
+  <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">       
       <!-- L1 -->
       <param name="Vcmd" value="1.0" /> <!-- speed of car m/s -->        
       <!-- ESC -->
@@ -79,10 +85,13 @@
       <param name="baseAngle" value="90.0"/> <!-- the middle pos of servo, for tt02: 87, for hsp: ? -->
       <param name="AngleGain" value="-3.5"/> <!-- for tt02: >0, for hsp: <0 -->		
 
-      <remap from="/odometry/filtered" to="$(arg odometry_topic)" /> 
-      <!-- <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" />  -->
+      <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
   </node>
 
+  <!-- vins -->
+  <node name="vins_node" pkg="vins" type="vins_node" args=" /home/nx/ros_ws/vins_ws/src/VINS-Fusion-gpu/config/realsense_d455/d455_mono_imu_config.yaml"/>
+
+
   <!-- visualisation -->
-  <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />
+  <!-- <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" /> -->
 </launch>
