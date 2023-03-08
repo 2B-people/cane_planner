@@ -88,9 +88,12 @@
       <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
   </node>
 
-  <!-- vins -->
-  <node name="vins_node" pkg="vins" type="vins_node" args=" /home/nx/ros_ws/vins_ws/src/VINS-Fusion-gpu/config/realsense_d455/d455_mono_imu_config.yaml"/>
-
+  <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+    <remap from="~odom" to="$(arg odometry_topic)"/>        
+    <remap from="~goal" to="/move_base_simple/goal"/>
+    <remap from="~traj_start_trigger" to="/traj_start_trigger" />
+    <param name="waypoint_type" value="manual-lonely-waypoint"/>    
+  </node>
 
   <!-- visualisation -->
   <!-- <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" /> -->

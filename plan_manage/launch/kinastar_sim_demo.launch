@@ -2,11 +2,11 @@
 
   <!-- using Image and odom -->
   <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
-  <arg name="odometry_topic" value="/vins_estimator/camera_pose" />
+  <arg name="odometry_topic" value="/map_generator/odom" />
   
   <!-- using PointCloud2 and PoseStamped -->
   <arg name="cloud_topic" value="/map_generator/global_cloud"/>
-  <arg name="sensor_pose_topic" value="/map_generator/pose"/>
+  <!-- <arg name="sensor_pose_topic" value="/map_generator/pose"/> -->
 
 <!-- publish static tf -->
   <node pkg="tf" type="static_transform_publisher" name="tf_pub" args="0 0 0 0 0 0 1 world base_link 20" />
@@ -15,7 +15,7 @@
     <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
     <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
     <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
-    <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/> 
+    <!-- <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
 
     <param name="sdf_map/map_size_x"   value="20.0" /> 
     <param name="sdf_map/map_size_y"   value="50.0" /> 
@@ -84,6 +84,13 @@
 
       <remap from="/odometry/filtered" to="/kin_astar/test_odom" />
       <!-- <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" />  -->
+  </node>
+
+  <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+    <remap from="~odom" to="$(arg odometry_topic)"/>        
+    <remap from="~goal" to="/move_base_simple/goal"/>
+    <remap from="~traj_start_trigger" to="/traj_start_trigger" />
+    <param name="waypoint_type" value="manual-lonely-waypoint"/>    
   </node>
 
 

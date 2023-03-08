@@ -65,8 +65,9 @@ namespace cane_planner
         bool callKinodynamicAstarPlan();
         void displayAstar();
         void displayKinastar();
+
         // publish a star path;
-        void publishAstarPath();
+        void publishKinodynamicAstarPath();
 
         void changeFSMExecState(FSM_STATE new_state);
         double QuatenionToYaw(geometry_msgs::Quaternion ori);

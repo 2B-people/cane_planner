@@ -180,7 +180,7 @@ namespace cane_planner
             displayKinastar();
 
             // publish
-            publishAstarPath();
+            publishKinodynamicAstarPath();
 
             have_target_ = false;
             changeFSMExecState(WAIT_TARGET);
@@ -207,7 +207,7 @@ namespace cane_planner
         return plan_success;
     }
 
-    void PlannerManager::publishAstarPath()
+    void PlannerManager::publishKinodynamicAstarPath()
     {
         vector<Eigen::Vector3d> list;
         list = kin_finder_->getPath();

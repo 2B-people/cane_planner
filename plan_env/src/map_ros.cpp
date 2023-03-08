@@ -91,6 +91,10 @@ void MapROS::init() {
   sync_cloud_pose_.reset(new message_filters::Synchronizer<MapROS::SyncPolicyCloudPose>(
       MapROS::SyncPolicyCloudPose(100), *cloud_sub_, *pose_sub_));
   sync_cloud_pose_->registerCallback(boost::bind(&MapROS::cloudPoseCallback, this, _1, _2));
+  // cloud+odom
+  sync_cloud_odom_.reset(new message_filters::Synchronizer<MapROS::SyncPolicyCloudOdom>(
+      MapROS::SyncPolicyCloudOdom(100), *cloud_sub_, *odom_sub_));
+  sync_cloud_odom_->registerCallback(boost::bind(&MapROS::cloudOdomCallback, this, _1, _2));
 
   map_start_time_ = ros::Time::now();
 }
@@ -213,6 +217,30 @@ void MapROS::cloudPoseCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
 
 // 使用独立的一个方法来解决建图中过程点云的问题；
   map_->BuildsimulationMap(cloud, num, camera_pos_);
+
+  if (local_updated_) {
+    map_->clearAndInflateLocalMap();
+    esdf_need_update_ = true;
+    local_updated_ = false;
+  }
+}
+
+void MapROS::cloudOdomCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
+                               const nav_msgs::OdometryConstPtr& odom) {
+  camera_pos_(0) =  odom->pose.pose.position.x;
+  camera_pos_(1) =  odom->pose.pose.position.y;
+  camera_pos_(2) =  odom->pose.pose.position.z;
+  if (!map_->isInMap(camera_pos_))  // exceed mapped region
+    return;
+  camera_q_ = Eigen::Quaterniond(odom->pose.pose.orientation.w,
+                                odom->pose.pose.orientation.x,
+                                odom->pose.pose.orientation.y,
+                                odom->pose.pose.orientation.z);
+  pcl::PointCloud<pcl::PointXYZ> cloud;
+  pcl::fromROSMsg(*msg, cloud);
+  int num = cloud.points.size();
+  
+  map_->inputPointCloud(cloud,num,camera_pos_);
 
   if (local_updated_) {
     map_->clearAndInflateLocalMap();

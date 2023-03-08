@@ -36,7 +36,9 @@ private:
   void cloudPoseCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
                          const geometry_msgs::PoseStampedConstPtr& pose);
   void depthOdomCallback(const sensor_msgs::ImageConstPtr& img,
-                         const nav_msgs::OdometryConstPtr& odom);                       
+                         const nav_msgs::OdometryConstPtr& odom);  
+  void cloudOdomCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
+                          const nav_msgs::OdometryConstPtr& odom);                  
   void updateESDFCallback(const ros::TimerEvent& /*event*/);
   void visCallback(const ros::TimerEvent& /*event*/);
 
@@ -62,6 +64,9 @@ private:
   typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, nav_msgs::Odometry>
       SyncPolicyImageOdom;
   typedef shared_ptr<message_filters::Synchronizer<SyncPolicyImageOdom>> synchronizedImageOdom;
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::PointCloud2, nav_msgs::Odometry>
+      SyncPolicyCloudOdom;
+  typedef shared_ptr<message_filters::Synchronizer<SyncPolicyCloudOdom>> synchronizedCloudOdom;
 
 
   ros::NodeHandle node_;
@@ -72,6 +77,7 @@ private:
   SynchronizerImagePose sync_image_pose_;
   SynchronizerCloudPose sync_cloud_pose_;
   synchronizedImageOdom sync_image_odom_;
+  synchronizedCloudOdom sync_cloud_odom_;
 
   ros::Publisher map_local_pub_, map_local_inflate_pub_, esdf_pub_, map_all_pub_, unknown_pub_,
       update_range_pub_, depth_pub_;
