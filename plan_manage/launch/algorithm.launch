@@ -1,0 +1,67 @@
+<launch>
+    <arg name="odometry_topic"/>
+    <arg name="cloud_topic"/>
+    <arg name="depth_topic"/>
+    <arg name="sensor_pose_topic"/>
+
+    <node pkg="plan_manage" name="cane_planner_node" type="cane_planner_node" output="screen">
+        <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
+        <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
+        <!-- <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/> -->
+        <!-- <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
+
+        <param name="sdf_map/map_size_x"   value="20.0" /> 
+        <param name="sdf_map/map_size_y"   value="50.0" /> 
+        <param name="sdf_map/map_size_z"   value="10.0" /> 
+        <param name="sdf_map/resolution"             value="0.1" /> 
+        <param name="sdf_map/obstacles_inflation"    value="0.099" /> 
+        <param name="sdf_map/local_bound_inflate"    value="0.5"/>
+        <param name="sdf_map/local_map_margin"       value="20"/>
+        <param name="sdf_map/ground_height"          value="-1.0"/>
+        <param name="sdf_map/default_dist"           value="5.0"/>
+
+        <param name="sdf_map/p_hit"  value="0.65"/>
+        <param name="sdf_map/p_miss" value="0.43"/>
+        <param name="sdf_map/p_min"  value="0.12"/>
+        <param name="sdf_map/p_max"  value="0.90"/>
+        <param name="sdf_map/p_occ"  value="0.80"/>
+        <param name="sdf_map/min_ray_length" value="0.5"/>
+        <param name="sdf_map/max_ray_length" value="5.0"/>
+        <param name="sdf_map/virtual_ceil_height"   value="3.2"/>
+        <param name="sdf_map/optimistic" value="true" type="bool"/>
+        <param name="sdf_map/signed_dist" value="true" type="bool"/>
+
+        <param name="map_ros/cx" value="321.04638671875"/>
+        <param name="map_ros/cy" value="243.44969177246094"/>
+        <param name="map_ros/fx" value="387.229248046875"/>
+        <param name="map_ros/fy" value="387.229248046875"/>
+        <param name="map_ros/depth_filter_maxdist"   value="5.0"/>
+        <param name="map_ros/depth_filter_mindist"   value="0.2"/>
+        <param name="map_ros/depth_filter_margin"    value="2"/>
+        <param name="map_ros/k_depth_scaling_factor" value="1000.0"/>
+        <param name="map_ros/skip_pixel" value="2"/>
+        <param name="map_ros/esdf_slice_height" value="1.0"/>
+        <param name="map_ros/visualization_truncate_height"   value="3.09"/>
+        <param name="map_ros/visualization_truncate_low"   value="-2.0"/>
+        <param name="map_ros/show_occ_time"  value="true"/>
+        <param name="map_ros/show_esdf_time" value="false"/>
+        <param name="map_ros/show_all_map" value="true"/>
+        <param name="map_ros/frame_id"      value="world"/>
+
+        <param name="kinastar/resolution_astar" value="0.2"/>
+        <param name="kinastar/lambda_heu" value="0.01"/>
+        <param name="kinastar/allocate_num" value="1000000"/>
+        <param name="kinastar/max_al" value="0.4"/>
+        <param name="kinastar/max_aw" value="0.1"/>
+        <param name="kinastar/max_theta" value="2"/>
+
+        <param name="astar/resolution_astar" value="0.1"/>
+        <param name="astar/time_resolution" value="0"/>
+        <param name="astar/lambda_heu" value="0.01"/>
+        <param name="astar/allocate_num" value="1000000"/>
+
+        <param name="Collision/margin" value="0.4"/>
+        <param name="Collision/SliceHeight" value="1.0"/>
+    </node>
+
+</launch>

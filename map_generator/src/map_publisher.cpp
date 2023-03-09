@@ -57,8 +57,12 @@ int main(int argc, char** argv) {
 
   // cout << "Publishing map..." << endl;
 
+  // cloud
   sensor_msgs::PointCloud2 msg;
+  msg.header.frame_id = "world";
   pcl::toROSMsg(cloud, msg);
+
+  // pose
   geometry_msgs::PoseStamped pose;
   pose.header.frame_id = "world";
   pose.pose.position.x = 0.0;
@@ -68,7 +72,6 @@ int main(int argc, char** argv) {
   pose.pose.orientation.x = 0.0;
   pose.pose.orientation.y = 0.0;
   pose.pose.orientation.z = 0.0; 
-  msg.header.frame_id = "world";
   
   int count = 0;
   while (ros::ok()) {

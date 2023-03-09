@@ -67,7 +67,7 @@ private:
 
     // serial
     serial::Serial ser_;
-    bool use_ser;
+    bool use_ser_flag_;
 
     double L, Lfw, Lrv, Vcmd, lfw, lrv, steering, u, v;
     double Gas_gain, baseAngle, Angle_gain, goalRadius;
@@ -100,7 +100,7 @@ L1Controller::L1Controller()
     pn.param("GasGain", Gas_gain, 1.0);
     pn.param("baseSpeed", baseSpeed, 1470);
     pn.param("baseAngle", baseAngle, 90.0);
-    pn.param("SerialUsing", use_ser, true);
+    pn.param("SerialUsing", use_ser_flag_, true);
 
     // Publishers and Subscribers
     odom_sub = n_.subscribe("/odometry/filtered", 1, &L1Controller::odomCB, this);
@@ -121,7 +121,7 @@ L1Controller::L1Controller()
     pn.param("baudrate", baudrate, baudrate);
 
     // Serial
-    if (use_ser)
+    if (use_ser_flag_)
     {
         ser_.setPort(port);
         ser_.setBaudrate(baudrate);
@@ -407,13 +407,17 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
             ROS_INFO("Goal Reached !");
         }
     }
-    u_char recv_data[200];
-    if (ser_.available())
+    if (use_ser_flag_)
     {
-        ROS_INFO_STREAM("Reading from serial port\n");
-        // 保存串口数据至数值 recv_data[200]
-        ser_.read(recv_data, ser_.available());
-        ROS_INFO("%s",recv_data);
+        u_char recv_data[200];
+
+        if (ser_.available())
+        {
+            ROS_INFO_STREAM("Reading from serial port\n");
+            // 保存串口数据至数值 recv_data[200]
+            ser_.read(recv_data, ser_.available());
+            ROS_INFO("%s", recv_data);
+        }
     }
 }
 
@@ -442,13 +446,16 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
             }
         }
     }
-    std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z-baseAngle)*100)) + "\n";
 
-    u_char send_data_char[send_data.size()];
-    for (size_t i = 0; i < send_data.size(); i++)
-        send_data_char[i] = send_data.c_str()[i];
-    ROS_INFO("%s",send_data_char);
-    ser_.write(send_data_char, send_data.size());
+    if (use_ser_flag_)
+    {
+        std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z - baseAngle) * 100)) + "\n";
+        u_char send_data_char[send_data.size()];
+        for (size_t i = 0; i < send_data.size(); i++)
+            send_data_char[i] = send_data.c_str()[i];
+        ROS_INFO("%s", send_data_char);
+        ser_.write(send_data_char, send_data.size());
+    }
     pub_.publish(cmd_vel);
 }
 

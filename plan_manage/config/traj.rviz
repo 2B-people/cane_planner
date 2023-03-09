@@ -6,6 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /PointCloud21
+        - /PointCloud22
       Splitter Ratio: 0.5
     Tree Height: 493
   - Class: rviz/Selection
@@ -55,42 +57,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 1.2999999523162842
+        Min Value: -0.5
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: Intensity
-      Decay Time: 0
-      Enabled: false
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Min Color: 0; 0; 0
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Queue Size: 10
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.10000000149011612
-      Style: Flat Squares
-      Topic: /sdf_map/esdf
-      Unreliable: false
-      Use Fixed Frame: true
-      Use rainbow: true
-      Value: false
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 2.450000047683716
-        Min Value: -0.44999998807907104
-        Value: true
-      Axis: Z
-      Channel Name: z
-      Class: rviz/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color Transformer: AxisColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -103,7 +77,35 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.10000000149011612
       Style: Boxes
-      Topic: /sdf_map/occupancy_all
+      Topic: /pcl_render_node/cloud
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 2.4000000953674316
+        Min Value: -0.5
+        Value: true
+      Axis: Z
+      Channel Name: z
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.10000000149011612
+      Style: Boxes
+      Topic: /Simulation_generator/global_cloud
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -113,7 +115,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/astar
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -121,7 +123,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_astar
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -129,7 +131,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_foot
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Image
@@ -173,7 +175,7 @@ Visualization Manager:
       Marker Topic: /car_path
       Name: Marker
       Namespaces:
-        Markers: true
+        {}
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -228,7 +230,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 37.766944885253906
+      Distance: 42.656490325927734
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -244,9 +246,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.2547961473464966
+      Pitch: 0.8797962665557861
       Target Frame: <Fixed Frame>
-      Yaw: 0.06858880072832108
+      Yaw: 5.971774578094482
     Saved: ~
 Window Geometry:
   Displays:
@@ -266,5 +268,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1938
-  X: 2770
-  Y: 137
+  X: 2738
+  Y: 105

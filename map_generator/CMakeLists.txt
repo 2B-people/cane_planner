@@ -43,3 +43,8 @@ add_executable (click_map src/click_map.cpp )
 target_link_libraries(click_map
   ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}) 
+
+add_executable (simulation_generator src/simulation_generator.cpp )
+target_link_libraries(simulation_generator
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES})
