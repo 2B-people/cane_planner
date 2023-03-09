@@ -1,41 +1,33 @@
 <launch>
     <arg name="odometry_topic" value = "/Simulation_generator/odom"/>
 
-    <include file="$(find plan_manage)/launch/simulation.launch"/>
-
+    <!-- kindynameic alogoritm -->
     <include file="$(find plan_manage)/launch/algorithm.launch">
         <arg name="odometry_topic" value = "$(arg odometry_topic)"/>
-        <arg name="cloud_topic" value = "/pcl_render_node/cloud"/> 
-        <!-- <arg name="depth_topic" value="/pcl_render_node/depth"/> -->
-        <!-- <arg name="sensor_pose_topic" value=""/> -->
-
+        <arg name="cloud_topic" value = "/pcl_render_node/cloud"/>
     </include>
-    
 
-    <!-- L1 controller -->  
-    <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">       
-    <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
-        <!-- L1 -->
-        <param name="Vcmd" value="1.0" /> <!-- speed of car m/s -->        
-        <!-- ESC -->
-        <param name="baseSpeed" value="1425"/> <!-- pwm for motor constant speed, 1480: stop, 1440: ~0.5m/s, 1430: ~1.5m/s --> 
-        <!-- Servo -->
-        <param name="baseAngle" value="90.0"/> <!-- the middle pos of servo, for tt02: 87, for hsp: ? -->
-        <param name="AngleGain" value="-3.5"/> <!-- for tt02: >0, for hsp: <0 -->
+    <!-- L1 controller -->
+    <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
+        <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
+        <param name="Vcmd" value="1.0" />
+        <param name="baseSpeed" value="1425"/>
+        <param name="baseAngle" value="90.0"/>
+        <param name="AngleGain" value="-3.5"/>
         <param name="SerialUsing" value="false"/>
-        		
-
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
-        <!-- <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" />  -->
     </node>
 
     <!-- waypoint generator -->
     <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
-        <remap from="~odom" to="$(arg odometry_topic)"/>        
+        <remap from="~odom" to="$(arg odometry_topic)"/>
         <remap from="~goal" to="/move_base_simple/goal"/>
         <remap from="~traj_start_trigger" to="/traj_start_trigger" />
-        <param name="waypoint_type" value="manual-lonely-waypoint"/>    
+        <param name="waypoint_type" value="manual-lonely-waypoint"/>
     </node>
+    
+    <!-- simulation -->
+    <include file="$(find plan_manage)/launch/simulation.launch"/>
 
     <!-- visualisation -->
     <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />

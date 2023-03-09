@@ -224,7 +224,7 @@ void MapROS::cloudPoseCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
     local_updated_ = false;
   }
 }
-
+ 
 void MapROS::cloudOdomCallback(const sensor_msgs::PointCloud2ConstPtr& msg,
                                const nav_msgs::OdometryConstPtr& odom) {
   camera_pos_(0) =  odom->pose.pose.position.x;
