@@ -1,15 +1,19 @@
 <launch>
-    <arg name="odometry_topic" value = "/simulation_generator/odom"/>
+    <!-- using Image and odom -->
+    <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
+    <arg name="odometry_topic" value="/vins_estimator/camera_pose" />
+
+    <!-- not using PointCloud2 and PoseStamped -->
+    <arg name="cloud_topic" value="/global_cloud"/>
+    <arg name="sensor_pose_topic" value="/pose"/>
 
     <!-- kindynameic alogoritm -->
     <include file="$(find plan_manage)/launch/algorithm.launch">
         <arg name="odometry_topic" value = "$(arg odometry_topic)"/>
-        <arg name="cloud_topic" value = "/simulation_generator/global_cloud"/>
-
-        <!-- not using Image and pose -->
-        <arg name="depth_topic" value="depth"/>
-        <arg name="sensor_pose_topic" value="pose"/>
-
+        <arg name="depth_topic" value="$(depth_topic)"/>
+        <arg name="cloud_topic" value = "~/cloud"/>
+        <arg name="sensor_pose_topic" value="$(sensor_pose_topic)"/>
+        
     </include>
 
     <!-- L1 controller -->
@@ -30,11 +34,5 @@
         <remap from="~traj_start_trigger" to="/traj_start_trigger" />
         <param name="waypoint_type" value="manual-lonely-waypoint"/>
     </node>
-
-    <!-- simulation -->
-    <include file="$(find plan_manage)/launch/simulation.launch"/>
-
-    <!-- visualisation -->
-    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />
 
 </launch>

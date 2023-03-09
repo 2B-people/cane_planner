@@ -7,8 +7,8 @@
     <node pkg="plan_manage" name="cane_planner_node" type="cane_planner_node" output="screen">
         <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
         <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
-        <!-- <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/> -->
-        <!-- <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
+        <!-- <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
+        <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
 
         <param name="sdf_map/map_size_x" value="20.0" />
         <param name="sdf_map/map_size_y" value="50.0" />

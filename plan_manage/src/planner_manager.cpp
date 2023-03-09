@@ -136,9 +136,9 @@ namespace cane_planner
         if (fsm_num == 100)
         {
             if (!have_odom_)
-                ROS_WARN("no odom.");
+                // ROS_WARN("no odom.");
             if (!have_target_)
-                ROS_WARN("wait for goal.");
+                // ROS_WARN("wait for goal.");
             fsm_num = 0;
         }
 

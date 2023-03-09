@@ -2,10 +2,10 @@
 
   <!-- using Image and odom -->
   <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
-  <arg name="odometry_topic" value="/map_generator/odom" />
+  <arg name="odometry_topic" value="/simulation_generator/odom" />
 
   <!-- using PointCloud2 and PoseStamped -->
-  <arg name="cloud_topic" value="/map_generator/global_cloud"/>
+  <arg name="cloud_topic" value="/simulation_generator/global_cloud"/>
   <!-- <arg name="sensor_pose_topic" value="/map_generator/pose"/> -->
 
   <!-- publish static tf -->
@@ -15,7 +15,7 @@
     <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
     <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
     <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
-    <!-- <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
+    <!-- <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/> -->
 
     <param name="sdf_map/map_size_x" value="20.0" />
     <param name="sdf_map/map_size_y" value="50.0" />
@@ -71,35 +71,11 @@
     <param name="Collision/SliceHeight" value="1.0"/>
   </node>
 
-  <!-- L1 controller -->
-  <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
-    <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
-    <!-- L1 -->
-    <param name="Vcmd" value="1.0" />
-    <!-- speed of car m/s -->
-    <!-- ESC -->
-    <param name="baseSpeed" value="1425"/>
-    <!-- pwm for motor constant speed, 1480: stop, 1440: ~0.5m/s, 1430: ~1.5m/s -->
-    <!-- Servo -->
-    <param name="baseAngle" value="90.0"/>
-    <!-- the middle pos of servo, for tt02: 87, for hsp: ? -->
-    <param name="AngleGain" value="-3.5"/>
-    <!-- for tt02: >0, for hsp: <0 -->
-
-    <remap from="/odometry/filtered" to="/kin_astar/test_odom" />
-    <!-- <remap from="/move_base_node/NavfnROS/plan" to="/move_base/NavfnROS/plan" />  -->
+  <node name="simulation_generator" pkg="map_generator" type="simulation_generator" output="log" args=" $(find map_generator)/resource/office3.pcd">
+    <remap from="/cmd_vel" to="teleop/cmd_vel"/>
   </node>
-
-  <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
-    <remap from="~odom" to="$(arg odometry_topic)"/>
-    <remap from="~goal" to="/move_base_simple/goal"/>
-    <remap from="~traj_start_trigger" to="/traj_start_trigger" />
-    <param name="waypoint_type" value="manual-lonely-waypoint"/>
-  </node>
-
-
   <!-- visualisation -->
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />
   <!-- map generator 16X36的办公室地图-->
-  <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office3.pcd" />
+  <!-- <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office3.pcd" /> -->
 </launch>

@@ -12,14 +12,14 @@
 
 using namespace std;
 string file_name;
-ros::Publisher odom_pub,pose_pub;
+ros::Publisher odom_pub, pose_pub;
 nav_msgs::Odometry odom;
 
 void testCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start)
 {
   odom.header.frame_id = "world";
   odom.pose = start->pose;
-  ROS_WARN("get start");
+  ROS_INFO("get start");
 }
 
 void cmdCallback(const geometry_msgs::Twist::ConstPtr &twist)
@@ -27,12 +27,10 @@ void cmdCallback(const geometry_msgs::Twist::ConstPtr &twist)
   static ros::Time current_time = ros::Time::now();
   ros::Time now_time = ros::Time::now();
   double T = now_time.toSec() - current_time.toSec();
-  ROS_INFO("time change is %lf",T);
+  ROS_INFO("time change is %lf", T);
 
-  // odom 
+  // odom
   // TODO:odom change
-
-  
 }
 
 int main(int argc, char **argv)
@@ -41,19 +39,18 @@ int main(int argc, char **argv)
   ros::NodeHandle node;
 
   ros::Publisher cloud_pub =
-      node.advertise<sensor_msgs::PointCloud2>("/Simulation_generator/global_cloud", 10, true);
+      node.advertise<sensor_msgs::PointCloud2>("/simulation_generator/global_cloud", 10, true);
   pose_pub =
       node.advertise<geometry_msgs::PoseStamped>("/simulation_generator/pose", 10, true);
   odom_pub =
-      node.advertise<nav_msgs::Odometry>("/Simulation_generator/odom", 10, true);
+      node.advertise<nav_msgs::Odometry>("/simulation_generator/odom", 10, true);
 
   ros::Subscriber start_sub = node.subscribe("/initialpose", 10, testCallback);
-  ros::Subscriber cmd_sub = node.subscribe("/cmd_vel",10,cmdCallback);
-
+  ros::Subscriber cmd_sub = node.subscribe("/cmd_vel", 10, cmdCallback);
 
   file_name = argv[1];
 
-  // ros::Duration(1.0).sleep();
+  ros::Duration(1.0).sleep();
 
   /* load cloud from pcd */
   pcl::PointCloud<pcl::PointXYZ> cloud;
@@ -65,7 +62,6 @@ int main(int argc, char **argv)
   }
   // init odom
   odom.header.frame_id = "world";
-  odom.header.stamp = ros::Time::now();
   odom.pose.pose.position.x = 0.0;
   odom.pose.pose.position.y = 0.0;
   odom.pose.pose.position.z = 0.0;
@@ -92,27 +88,15 @@ int main(int argc, char **argv)
 
   sensor_msgs::PointCloud2 msg;
   pcl::toROSMsg(cloud, msg);
+  msg.header.frame_id = "world";
 
   int count = 0;
-  while (1)
-  {
-    ros::Duration(0.1).sleep();
-    msg.header.frame_id = "world";
-    msg.header.stamp = ros::Time::now();
-    cloud_pub.publish(msg);
-    if (count++ > 10)
-    {
-      break;
-    }
-  }
-
   while (ros::ok())
   {
     ros::Duration(0.05).sleep();
-
-    odom.header.stamp = ros::Time::now();
     odom_pub.publish(odom);
-
+    cloud_pub.publish(msg);
+    count++;
     ros::spinOnce();
   }
 

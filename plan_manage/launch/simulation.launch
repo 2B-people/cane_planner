@@ -10,7 +10,7 @@
             <remap from="/cmd_vel" to="teleop/cmd_vel"/>
       </node>
 
-      <node pkg="local_sensing_node" type="pcl_render_node" name="pcl_render_node" output="screen">
+      <!-- <node pkg="local_sensing_node" type="pcl_render_node" name="pcl_render_node" output="screen">
             <rosparam command="load" file="$(find local_sensing_node)/params/camera.yaml" />
             <param name="sensing_horizon" value="5.0" />
             <param name="sensing_rate" value="30.0"/>
@@ -20,8 +20,8 @@
             <param name="map/y_size" value="$(arg map_size_y)"/>
             <param name="map/z_size" value="$(arg map_size_z)"/>
 
-            <remap from="~global_map" to="/Simulation_generator/global_cloud"/>
-            <remap from="~odometry" to="/Simulation_generator/odom"/>
-      </node>
+            <remap from="~global_map" to="/simulation_generator/global_cloud"/>
+            <remap from="~odometry" to="/simulation_generator/odom"/>
+      </node> -->
 
 </launch>

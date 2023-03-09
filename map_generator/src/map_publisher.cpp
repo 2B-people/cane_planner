@@ -5,6 +5,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Odometry.h>
 
 using namespace std;
 string file_name;
@@ -17,6 +18,8 @@ int main(int argc, char** argv) {
       node.advertise<sensor_msgs::PointCloud2>("/map_generator/global_cloud", 10, true);
   ros::Publisher pose_pub = 
       node.advertise<geometry_msgs::PoseStamped>("/map_generator/pose", 10, true);
+  ros::Publisher odom_pub =
+      node.advertise<nav_msgs::Odometry>("/simulation_generator/odom", 10, true);
   file_name = argv[1];
 
   ros::Duration(1.0).sleep();
@@ -72,12 +75,25 @@ int main(int argc, char** argv) {
   pose.pose.orientation.x = 0.0;
   pose.pose.orientation.y = 0.0;
   pose.pose.orientation.z = 0.0; 
+
+  // odom
+  nav_msgs::Odometry odom;
+  odom.header.frame_id = "world";
+  odom.pose.pose.position.x = 0.0;
+  odom.pose.pose.position.y = 0.0;
+  odom.pose.pose.position.z = 0.0;
+  odom.pose.pose.orientation.w = 1.0;
+  odom.pose.pose.orientation.x = 0.0;
+  odom.pose.pose.orientation.y = 0.0;
+  odom.pose.pose.orientation.z = 0.0; 
+
   
   int count = 0;
   while (ros::ok()) {
     ros::Duration(0.1).sleep();
     cloud_pub.publish(msg);
     pose_pub.publish(pose);
+    odom_pub.publish(odom);
     ++count;
     if (count > 10) {
       break;
