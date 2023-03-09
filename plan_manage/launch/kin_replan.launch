@@ -1,18 +1,13 @@
 <launch>
     <!-- using Image and odom -->
-    <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
     <arg name="odometry_topic" value="/vins_estimator/camera_pose" />
-
-    <!-- not using PointCloud2 and PoseStamped -->
-    <arg name="cloud_topic" value="/global_cloud"/>
-    <arg name="sensor_pose_topic" value="/pose"/>
 
     <!-- kindynameic alogoritm -->
     <include file="$(find plan_manage)/launch/algorithm.launch">
         <arg name="odometry_topic" value = "$(arg odometry_topic)"/>
-        <arg name="depth_topic" value="$(depth_topic)"/>
+        <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
         <arg name="cloud_topic" value = "~/cloud"/>
-        <arg name="sensor_pose_topic" value="$(sensor_pose_topic)"/>
+        <arg name="sensor_pose_topic" value="/pose"/>
         
     </include>
 
@@ -23,7 +18,7 @@
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
         <param name="AngleGain" value="-3.5"/>
-        <param name="SerialUsing" value="false"/>
+        <param name="SerialUsing" value="true"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
     </node>
 

@@ -74,7 +74,7 @@ namespace cane_planner
         end_state_(1) = goal->pose.position.y;
         double yaw = QuatenionToYaw(goal->pose.orientation);
         end_state_(2) = yaw;
-        cout << "goal yaw:" << yaw << endl;
+        ROS_INFO("goal yaw is: %lf",yaw);
         have_target_ = true;
     }
 
@@ -89,12 +89,6 @@ namespace cane_planner
         double yaw = QuatenionToYaw(start->pose.pose.orientation);
         start_state_(2) = yaw;
         cout << "yaw:" << yaw << endl;
-        // test sim odom
-        nav_msgs::Odometry odom;
-        odom.header.frame_id = "world";
-        odom.header.stamp = ros::Time::now();
-        odom.pose = start->pose;
-        test_odom_pub_.publish(odom);
 
         have_odom_ = true;
     }
@@ -104,6 +98,13 @@ namespace cane_planner
         if (msg->poses[0].pose.position.z < -0.1)
             return;
         end_pt_ << msg->poses[0].pose.position.x, msg->poses[0].pose.position.y;
+        ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
+
+        end_state_(0) = msg->poses[0].pose.position.x;
+        end_state_(1) = msg->poses[0].pose.position.y;
+        double yaw = QuatenionToYaw(msg->poses[0].pose.orientation);
+        end_state_(2) = yaw;
+        ROS_INFO("goal yaw is: %lf",yaw);
 
         have_target_ = true;
     }
@@ -117,6 +118,14 @@ namespace cane_planner
         odom_vel_(0) = msg->twist.twist.linear.x;
         odom_vel_(1) = msg->twist.twist.linear.y;
         odom_vel_(2) = msg->twist.twist.linear.z;
+
+        start_pt_(0) = odom_pos_(0);
+        start_pt_(1) = odom_pos_(1);
+
+        start_state_(0) = odom_pos_(0);
+        start_state_(1) = odom_pos_(1);
+        double yaw = QuatenionToYaw(msg->pose.pose.orientation);
+        start_state_(2) = yaw;
 
         have_odom_ = true;
     }

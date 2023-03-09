@@ -7,8 +7,10 @@
     <node pkg="plan_manage" name="cane_planner_node" type="cane_planner_node" output="screen">
         <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
         <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
-        <!-- <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
-        <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>  -->
+        <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
+        <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/> 
+
+        <remap from="/odom_world" to="$(arg odometry_topic)"/>        
 
         <param name="sdf_map/map_size_x" value="20.0" />
         <param name="sdf_map/map_size_y" value="50.0" />
@@ -43,7 +45,7 @@
         <param name="map_ros/esdf_slice_height" value="1.0"/>
         <param name="map_ros/visualization_truncate_height" value="3.09"/>
         <param name="map_ros/visualization_truncate_low" value="-2.0"/>
-        <param name="map_ros/show_occ_time" value="true"/>
+        <param name="map_ros/show_occ_time" value="false"/>
         <param name="map_ros/show_esdf_time" value="false"/>
         <param name="map_ros/show_all_map" value="true"/>
         <param name="map_ros/frame_id" value="world"/>
