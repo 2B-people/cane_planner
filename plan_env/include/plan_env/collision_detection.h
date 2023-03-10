@@ -21,9 +21,10 @@ namespace cane_planner
     double margin_;
     double slice_height_;
     Eigen::Vector3d slice_height_list_;
-    shared_ptr<SDFMap> sdf_map_;
 
   public:
+    shared_ptr<SDFMap> sdf_map_;
+    
     CollisionDetection(){};
     ~CollisionDetection();
 

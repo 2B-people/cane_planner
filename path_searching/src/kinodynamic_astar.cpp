@@ -15,7 +15,7 @@ namespace cane_planner
     }
 
     bool KinodynamicAstar::search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
-                                 Eigen::Vector3d end_pos)
+                                  Eigen::Vector3d end_pos)
     {
         /* ---------- initialize --------*/
         KdNodePtr cur_node = path_node_pool_[0];
@@ -50,10 +50,10 @@ namespace cane_planner
         KdNodePtr terminate_node = NULL;
 
         // num of can't find path
-        int num_feasible = 0, num_close = 0,num_collision = 0;
+        int num_feasible = 0, num_close = 0, num_collision = 0;
 
-               /* ---------- search loop ---------- */
-            while (!open_set_.empty())
+        /* ---------- search loop ---------- */
+        while (!open_set_.empty())
         {
             cur_node = open_set_.top();
             // std::cout << "Explore while is " << use_node_num_ << std::endl;
@@ -104,6 +104,7 @@ namespace cane_planner
             {
                 // state transit,explore the next gait point.
                 um = inputs[i];
+                // TODO 这里逻辑不对
                 // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
                                    cur_node->support_pos, cur_node->support_feet,
@@ -113,8 +114,11 @@ namespace cane_planner
                 pur_state.com_pos = lfpc_model_->getCOMPos();
                 pur_state.support_pos = lfpc_model_->getStepFootPosition();
                 // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
+                // std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
+                // todo这里合理的方式应该是用com_pos，但是第一步移动的没有做好；
+                pro_state << pur_state.com_pos(0), pur_state.com_pos(1), 0.0;
                 pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
 
@@ -136,15 +140,30 @@ namespace cane_planner
                 }
 
                 // Check safety
-                // TODO 这里先用着这个astar的chheck方法，看看有啥问题
                 /* collision free */
-                Eigen::Vector2d pro_pos;
+                // Eigen::Vector2d pro_pos;
                 // pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
-                // TODO这里考虑是否又落足点来确定Traversable
-                pro_pos << pur_state.support_pos(0),pur_state.support_pos(1);  
-                if (!collision_->isTraversable(pro_pos))
+                // if (!collision_->isTraversable(pro_pos))
+                // {
+                //     // std::cout << "can't Traversable" << std::endl;
+                //     num_collision++;
+                //     continue;
+                // }
+                // new ways
+                Eigen::Vector3d pro_pos;
+                bool is_occ = false;
+                pro_pos << pur_state.com_pos(0), pur_state.com_pos(1), 0.8;
+                for (size_t i = 0; i < pur_state.com_path.size(); i++)
                 {
-                    // std::cout << "can't Traversable" << std::endl;
+                    auto pos = pur_state.com_path[i];
+                    if (collision_->sdf_map_->getInflateOccupancy(pos) == 1)
+                    {
+                        is_occ = true;
+                        break;
+                    }
+                }
+                if (is_occ)
+                {
                     num_collision++;
                     continue;
                 }
@@ -159,6 +178,7 @@ namespace cane_planner
                     pro_node->g_score = tmp_g_score;
                     pro_node->parent = cur_node;
                     pro_node->kdnode_state = IN_OPEN_SET;
+                    // update  state
                     lfpc_model_->switchSupportLeg();
                     pro_node->iter_state = lfpc_model_->getNextIterState();
                     pro_node->com_pos = lfpc_model_->getCOMPos();
@@ -183,7 +203,6 @@ namespace cane_planner
                     if (tmp_g_score < pro_node->g_score)
                     {
                         // std::cout << "update new_node" << std::endl;
-
                         lfpc_model_->switchSupportLeg();
                         pro_node->iter_state = lfpc_model_->getNextIterState();
                         pro_node->com_pos = lfpc_model_->getCOMPos();
@@ -211,9 +230,9 @@ namespace cane_planner
         std::cout << "open set empty, no path!" << std::endl;
         std::cout << "use node num: " << use_node_num_ << std::endl;
         std::cout << "iter num: " << iter_num_ << std::endl;
-        std::cout << "feasible num: " << num_feasible <<std::endl;
-        std::cout << "close num: " << num_close <<std::endl;
-        std::cout << "collision num: " << num_collision <<std::endl;
+        std::cout << "feasible num: " << num_feasible << std::endl;
+        std::cout << "close num: " << num_close << std::endl;
+        std::cout << "collision num: " << num_collision << std::endl;
 
         return false;
     }

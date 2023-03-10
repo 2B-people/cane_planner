@@ -32,7 +32,7 @@ def len(t_coding):
         sum += afileline(file)
     print('program line sum is:',sum)    
     # print('Done! Cost time is ',(time.clock()-s_time),'second')
-    # FileList.clear()
+    FileList.clear()
 
 
 # eg，Timer类，记时测量
@@ -65,3 +65,4 @@ def len(t_coding):
 
 if __name__ == "__main__":
     len('cpp&c')
+    len('py')

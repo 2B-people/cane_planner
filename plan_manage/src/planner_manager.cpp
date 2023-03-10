@@ -179,7 +179,7 @@ namespace cane_planner
 
             success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
-            if (success1 && success2)
+            if (success1 && success2)         
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(REPLAN_TRAJ);
@@ -235,7 +235,7 @@ namespace cane_planner
                 /* try to find a max distance goal around */
                 const double dr = 0.5, dtheta = 30;
                 double new_x, new_y, new_z, max_dist = -1.0;
-                Eigen::Vector3d goal(-1,-1,-1);
+                Eigen::Vector3d goal(-1, -1, -1);
 
                 for (double r = dr; r <= 5 * dr + 1e-3; r += dr)
                 {
@@ -283,6 +283,7 @@ namespace cane_planner
                 }
             }
         }
+
         // Collision replan
         if (exec_state_ == EXEC_TRAJ)
         {
@@ -293,7 +294,7 @@ namespace cane_planner
             {
                 Eigen::Vector2d temp(list[i](0), list[i](1));
                 double dist = collision_->getCollisionDistance(temp);
-                if (dist < 0.4)
+                if (dist < 0.2)
                 {
                     ROS_WARN("current traj in collision.");
                     changeFSMExecState(REPLAN_TRAJ);
@@ -315,6 +316,10 @@ namespace cane_planner
         kin_finder_->reset();
         // todo
         Eigen::Vector4d input;
+        // double vx, vy;
+        // vx = 0.5 * sin(start_state_(2));
+        // vy = 0.5 * cos(start_state_(2));
+        // input << 0.0, vx, 0.0, vy;
         input << 0.0, 0.0, 0.0, 0.0;
         bool plan_success = kin_finder_->search(start_state_, input, end_state_);
         return plan_success;
@@ -378,7 +383,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1.2;
+            pt.z = 1;
             mk.points.push_back(pt);
         }
 
@@ -415,7 +420,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1.2;
+            pt.z = 1;
             mk.points.push_back(pt);
         }
         kin_path_pub_.publish(mk);
@@ -430,7 +435,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1.2;
+            pt.z = 0;
             mk.points.push_back(pt);
         }
         kin_foot_pub_.publish(mk);

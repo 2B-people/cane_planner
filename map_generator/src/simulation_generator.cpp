@@ -19,6 +19,7 @@ void testCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &star
 {
   odom.header.frame_id = "world";
   odom.pose = start->pose;
+  odom.pose.pose.position.z = 1.0;
   ROS_INFO("get start");
 }
 
@@ -64,7 +65,7 @@ int main(int argc, char **argv)
   odom.header.frame_id = "world";
   odom.pose.pose.position.x = 0.0;
   odom.pose.pose.position.y = 0.0;
-  odom.pose.pose.position.z = 0.0;
+  odom.pose.pose.position.z = 1.0;
   odom.pose.pose.orientation.w = 1.0;
   odom.pose.pose.orientation.x = 0.0;
   odom.pose.pose.orientation.y = 0.0;
