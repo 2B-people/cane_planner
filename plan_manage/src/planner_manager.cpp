@@ -136,7 +136,7 @@ namespace cane_planner
 
     void PlannerManager::changeFSMExecState(FSM_STATE new_state)
     {
-        string state_str[4] = {"INIT", "WAIT_TARGET", "GEN_NEW_TRAJ", "EXEC_TRAJ"};
+        string state_str[5] = {"INIT", "WAIT_TARGET", "GEN_NEW_TRAJ", "EXEC_TRAJ", "REPLAN_TRAJ"};
         int pre_s = int(exec_state_);
         exec_state_ = new_state;
         cout << "[now]: from " + state_str[pre_s] + " to " + state_str[int(new_state)] << endl;
@@ -233,10 +233,9 @@ namespace cane_planner
                 ROS_WARN("IN HARE2");
 
                 /* try to find a max distance goal around */
-                bool new_goal = false;
                 const double dr = 0.5, dtheta = 30;
                 double new_x, new_y, new_z, max_dist = -1.0;
-                Eigen::Vector3d goal;
+                Eigen::Vector3d goal(-1,-1,-1);
 
                 for (double r = dr; r <= 5 * dr + 1e-3; r += dr)
                 {
@@ -284,20 +283,16 @@ namespace cane_planner
                 }
             }
         }
-
-        if (exec_state_ == FSM_STATE::EXEC_TRAJ)
+        // Collision replan
+        if (exec_state_ == EXEC_TRAJ)
         {
-            ROS_WARN("in here 5");
-
             vector<Eigen::Vector3d> list;
-
             list = kin_finder_->getPath();
-            ROS_WARN("in here 6");
+
             for (size_t i = 0; i < list.size(); i++)
             {
-                Eigen::Vector2d temp(list[i](0),list[i](1));
+                Eigen::Vector2d temp(list[i](0), list[i](1));
                 double dist = collision_->getCollisionDistance(temp);
-                ROS_WARN("in here cycle %d",i);
                 if (dist < 0.4)
                 {
                     ROS_WARN("current traj in collision.");
@@ -305,6 +300,7 @@ namespace cane_planner
                 }
             }
         }
+        return;
     }
 
     bool PlannerManager::callAstarPlan()
