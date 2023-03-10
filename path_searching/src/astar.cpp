@@ -14,7 +14,7 @@ namespace cane_planner
     }
   }
 
-  int Astar::search(Eigen::Vector2d start_pt, Eigen::Vector2d end_pt, bool dynamic, double time_start)
+  bool Astar::search(Eigen::Vector2d start_pt, Eigen::Vector2d end_pt, bool dynamic, double time_start)
   {
     /* ---------- initialize ---------- */
     NodePtr cur_node = path_node_pool_[0];
@@ -74,7 +74,7 @@ namespace cane_planner
         retrievePath(terminate_node);
         has_path_ = true;
 
-        return REACH_END;
+        return true;
       }
 
       /* ---------- pop node and add to close set ---------- */
@@ -160,7 +160,7 @@ namespace cane_planner
             if (use_node_num_ == allocate_num_)
             {
               cout << "run out of memory." << endl;
-              return NO_PATH;
+              return false;
             }
           }
           else if (pro_node->node_state == IN_OPEN_SET)
@@ -189,7 +189,7 @@ namespace cane_planner
     cout << "open set empty, no path!" << endl;
     cout << "use node num: " << use_node_num_ << endl;
     cout << "iter num: " << iter_num_ << endl;
-    return NO_PATH;
+    return false;
   }
 
   void Astar::setParam(ros::NodeHandle &nh)

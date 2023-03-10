@@ -14,7 +14,7 @@ namespace cane_planner
         }
     }
 
-    int KinodynamicAstar::search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
+    bool KinodynamicAstar::search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
                                  Eigen::Vector3d end_pos)
     {
         /* ---------- initialize --------*/
@@ -74,7 +74,7 @@ namespace cane_planner
                 std::cout << "iter num: " << iter_num_ << std::endl;
                 terminate_node = cur_node;
                 retrievePath(terminate_node);
-                return REACH_END;
+                return true;
             }
 
             /* ---------- pop node and add to close set ---------- */
@@ -139,7 +139,9 @@ namespace cane_planner
                 // TODO 这里先用着这个astar的chheck方法，看看有啥问题
                 /* collision free */
                 Eigen::Vector2d pro_pos;
-                pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
+                // pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
+                // TODO这里考虑是否又落足点来确定Traversable
+                pro_pos << pur_state.support_pos(0),pur_state.support_pos(1);  
                 if (!collision_->isTraversable(pro_pos))
                 {
                     // std::cout << "can't Traversable" << std::endl;
@@ -173,7 +175,7 @@ namespace cane_planner
                     if (use_node_num_ == allocate_num_)
                     {
                         std::cout << "run out of memory." << std::endl;
-                        return NO_PATH;
+                        return false;
                     }
                 }
                 else if (pro_node->kdnode_state == IN_OPEN_SET)
@@ -213,7 +215,7 @@ namespace cane_planner
         std::cout << "close num: " << num_close <<std::endl;
         std::cout << "collision num: " << num_collision <<std::endl;
 
-        return NO_PATH;
+        return false;
     }
 
     void KinodynamicAstar::stateTransit(Eigen::Vector3d &state1, Eigen::Vector3d &state2,

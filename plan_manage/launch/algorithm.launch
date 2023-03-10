@@ -62,7 +62,7 @@
         <param name="astar/lambda_heu" value="0.01"/>
         <param name="astar/allocate_num" value="1000000"/>
 
-        <param name="Collision/margin" value="0.4"/>
+        <param name="Collision/margin" value="0.2"/>
         <param name="Collision/SliceHeight" value="1.0"/>
     </node>
 

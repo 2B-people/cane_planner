@@ -37,6 +37,8 @@ namespace cane_planner
     */
     bool isTraversable(Eigen::Vector2d pos);
     bool isTraversable(Eigen::Vector3d state, double times);
+    double getCollisionDistance(Eigen::Vector2d pos);
+
 
     void getSurroundDistance(Eigen::Vector2d pts[2][2][2], double dists[2][2][2]);
     void getMapRegion(Eigen::Vector3d &ori, Eigen::Vector3d &size)

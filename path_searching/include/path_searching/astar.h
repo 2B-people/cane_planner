@@ -150,7 +150,7 @@ namespace cane_planner
     void setParam(ros::NodeHandle &nh);
     void init();
     void reset();
-    int search(Eigen::Vector2d start_pt, Eigen::Vector2d end_pt, bool dynamic = false,
+    bool search(Eigen::Vector2d start_pt, Eigen::Vector2d end_pt, bool dynamic = false,
                double time_start = -1.0);
 
     // void setEnvironment(const EDTEnvironment::Ptr &env);

@@ -41,7 +41,7 @@ namespace cane_planner
         kin_finder_->setModel(lfpc_model_);
         kin_finder_->init();
 
-        // callback
+        // simulation
         if (simulation_)
         {
             goal_sub_ =
@@ -49,8 +49,12 @@ namespace cane_planner
             start_sub_ =
                 nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
         }
+        // Timer
         exec_timer_ =
             nh.createTimer(ros::Duration(0.01), &PlannerManager::execFSMCallback, this);
+        replan_timer_ =
+            nh.createTimer(ros::Duration(0.05), &PlannerManager::checkCollisionCallback, this);
+        // subscribe
         waypoint_sub_ =
             nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
         odom_sub_ =
@@ -74,7 +78,7 @@ namespace cane_planner
         end_state_(1) = goal->pose.position.y;
         double yaw = QuatenionToYaw(goal->pose.orientation);
         end_state_(2) = yaw;
-        ROS_INFO("goal yaw is: %lf",yaw);
+        ROS_INFO("goal yaw is: %lf", yaw);
         have_target_ = true;
     }
 
@@ -104,7 +108,7 @@ namespace cane_planner
         end_state_(1) = msg->poses[0].pose.position.y;
         double yaw = QuatenionToYaw(msg->poses[0].pose.orientation);
         end_state_(2) = yaw;
-        ROS_INFO("goal yaw is: %lf",yaw);
+        ROS_INFO("goal yaw is: %lf", yaw);
 
         have_target_ = true;
     }
@@ -146,9 +150,9 @@ namespace cane_planner
         {
             if (!have_odom_)
                 // ROS_WARN("no odom.");
-            if (!have_target_)
-                // ROS_WARN("wait for goal.");
-            fsm_num = 0;
+                if (!have_target_)
+                    // ROS_WARN("wait for goal.");
+                    fsm_num = 0;
         }
 
         switch (exec_state_)
@@ -170,7 +174,6 @@ namespace cane_planner
         }
         case GEN_NEW_TRAJ:
         {
-            // TODO:这里先用Odom当作start_pt;
             bool success1 = false;
             bool success2 = false;
 
@@ -179,7 +182,7 @@ namespace cane_planner
             if (success1 && success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
-                changeFSMExecState(GEN_NEW_TRAJ);
+                changeFSMExecState(REPLAN_TRAJ);
             break;
         }
         case EXEC_TRAJ:
@@ -191,12 +194,117 @@ namespace cane_planner
             // publish
             publishKinodynamicAstarPath();
 
-            have_target_ = false;
-            changeFSMExecState(WAIT_TARGET);
+            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.1 &&
+                abs(odom_pos_(1) - end_pt_(1)) <= 0.1)
+            {
+                have_target_ = false;
+                changeFSMExecState(WAIT_TARGET);
+            }
+            else
+            {
+                changeFSMExecState(REPLAN_TRAJ);
+            }
+            break;
+        }
+        case REPLAN_TRAJ:
+        {
+            bool success1 = false;
+            bool success2 = false;
+
+            success1 = callAstarPlan();
+            success2 = callKinodynamicAstarPlan();
+            if (success1 && success2)
+                changeFSMExecState(EXEC_TRAJ);
+            else
+                changeFSMExecState(REPLAN_TRAJ);
             break;
         }
         }
         return;
+    }
+
+    void PlannerManager::checkCollisionCallback(const ros::TimerEvent &e)
+    {
+        if (have_target_)
+        {
+            double dist = collision_->getCollisionDistance(end_pt_);
+            if (dist <= 0.3)
+            {
+                ROS_WARN("IN HARE2");
+
+                /* try to find a max distance goal around */
+                bool new_goal = false;
+                const double dr = 0.5, dtheta = 30;
+                double new_x, new_y, new_z, max_dist = -1.0;
+                Eigen::Vector3d goal;
+
+                for (double r = dr; r <= 5 * dr + 1e-3; r += dr)
+                {
+                    for (double theta = -90; theta <= 270; theta += dtheta)
+                    {
+                        new_x = end_pt_(0) + r * cos(theta / 57.3);
+                        new_y = end_pt_(1) + r * sin(theta / 57.3);
+                        new_z = 1.0;
+
+                        Eigen::Vector2d new_pt(new_x, new_y);
+                        dist = collision_->getCollisionDistance(new_pt);
+
+                        if (dist > max_dist)
+                        {
+                            /* reset end_pt_ */
+                            goal(0) = new_x;
+                            goal(1) = new_y;
+                            goal(2) = new_z;
+                            max_dist = dist;
+                        }
+                    }
+                }
+
+                if (max_dist > 0.3)
+                {
+                    ROS_WARN("IN here 3");
+                    end_pt_ << goal(0), goal(1);
+                    end_state_(0) = goal(0);
+                    end_state_(1) = goal(1);
+                    have_target_ = true;
+
+                    if (exec_state_ == EXEC_TRAJ)
+                    {
+                        changeFSMExecState(REPLAN_TRAJ);
+                    }
+                }
+                else
+                {
+                    // have_target_ = false;
+                    // cout << "Goal near collision, stop." << endl;
+                    // changeFSMExecState(WAIT_TARGET, "SAFETY");
+
+                    ROS_WARN("goal near collision, keep retry");
+                    changeFSMExecState(REPLAN_TRAJ);
+                }
+            }
+        }
+
+        if (exec_state_ == FSM_STATE::EXEC_TRAJ)
+        {
+            ROS_WARN("in here 5");
+
+            vector<Eigen::Vector3d> list;
+
+            list = kin_finder_->getPath();
+            ROS_WARN("in here 6");
+            for (size_t i = 0; i < list.size(); i++)
+            {
+                Eigen::Vector2d temp(list[i](0),list[i](1));
+                double dist = collision_->getCollisionDistance(temp);
+                ROS_WARN("in here cycle %d",i);
+                if (dist < 0.4)
+                {
+                    ROS_WARN("current traj in collision.");
+                    changeFSMExecState(REPLAN_TRAJ);
+                }
+            }
+        }
     }
 
     bool PlannerManager::callAstarPlan()
@@ -236,7 +344,7 @@ namespace cane_planner
             this_pose_stamped.pose.orientation.z = 0.0;
             this_pose_stamped.pose.orientation.w = 1.0;
 
-            this_pose_stamped.header.frame_id ="world";
+            this_pose_stamped.header.frame_id = "world";
             this_pose_stamped.header.stamp = ros::Time::now();
 
             path.poses.push_back(this_pose_stamped);

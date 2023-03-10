@@ -31,7 +31,8 @@ namespace cane_planner
             INIT,
             WAIT_TARGET,
             GEN_NEW_TRAJ,
-            EXEC_TRAJ
+            EXEC_TRAJ,
+            REPLAN_TRAJ
         };
         /*---------- data -----------*/
         fast_planner::SDFMap::Ptr sdf_map_;
@@ -55,6 +56,7 @@ namespace cane_planner
 
         /*---------- Ros utils -----------*/
         ros::Timer exec_timer_;
+        ros::Timer replan_timer_;
         ros::Subscriber odom_sub_, waypoint_sub_;
         ros::Subscriber goal_sub_, start_sub_;
         ros::Publisher astar_pub_,kin_path_pub_,kin_foot_pub_;
@@ -73,7 +75,10 @@ namespace cane_planner
         double QuatenionToYaw(geometry_msgs::Quaternion ori);
 
         /*---------- ROS function -----------*/
+        // timer
         void execFSMCallback(const ros::TimerEvent &e);
+        void checkCollisionCallback(const ros::TimerEvent &e);
+        // sub callback
         void waypointCallback(const nav_msgs::PathConstPtr &msg);
         void odometryCallback(const nav_msgs::OdometryConstPtr &msg);
         void startCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start);

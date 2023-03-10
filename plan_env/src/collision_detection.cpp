@@ -41,6 +41,16 @@ namespace cane_planner
         }
     }
 
+    double CollisionDetection::getCollisionDistance(Eigen::Vector2d pos)
+    {
+        Eigen::Vector3d index;
+        index(0) = pos(0);
+        index(1) = pos(1);
+        index(2) = slice_height_;
+        double dis = sdf_map_->getDistance(index);
+        return dis;
+    }
+
     void CollisionDetection::getSurroundDistance(Eigen::Vector2d pts[2][2][2], double dists[2][2][2])
     {
         Eigen::Vector3d pts_temp[2][2][2];
