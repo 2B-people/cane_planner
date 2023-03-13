@@ -106,6 +106,7 @@
         "nonlinearoptimization": "cpp",
         "numericaldiff": "cpp",
         "polynomials": "cpp",
-        "eigen": "cpp"
+        "eigen": "cpp",
+        "*.ipp": "cpp"
     }
 }

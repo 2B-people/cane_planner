@@ -34,15 +34,15 @@ namespace cane_planner
     /* -------------------- */
     // node's index(from px,py)
     Eigen::Vector2i index;
+    
     // lfpc iter param
     Eigen::Vector3d com_pos;
-    //  iter_state variable: x0,vx0,y0,vy0
-    Eigen::Vector4d  iter_state;
+    //  iter_state variable: vx0，vy0,theta
+    Eigen::Vector3d  iter_state;
+    char support_feet;
     Eigen::Vector2d support_pos;
     std::vector<Eigen::Vector3d> com_path;
-    char support_feet;
     int step_num;
-    double theta;
     // astar param
     double g_score, f_score;
     KdNode *parent;
@@ -162,7 +162,7 @@ namespace cane_planner
     };
 
     /* main API */
-    bool search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
+    bool search(Eigen::Vector3d start_pos, Eigen::Vector3d start_state,
                Eigen::Vector3d end_pos);
     std::vector<Eigen::Vector3d> getPath();
     std::vector<Eigen::Vector3d> getFeetPos();

@@ -14,7 +14,7 @@ namespace cane_planner
         }
     }
 
-    bool KinodynamicAstar::search(Eigen::Vector3d start_pos, Eigen::Vector4d start_state,
+    bool KinodynamicAstar::search(Eigen::Vector3d start_pos, Eigen::Vector3d start_state,
                                   Eigen::Vector3d end_pos)
     {
         /* ---------- initialize --------*/
@@ -25,16 +25,16 @@ namespace cane_planner
         cur_node->iter_state = start_state;
         cur_node->support_feet = LEFT_LEG;
         cur_node->support_pos << start_pos(0), start_pos(1);
-        cur_node->com_pos = start_pos;
+        // start_pos(2) is theta ,in here change 1.0
+        cur_node->com_pos << start_pos(0), start_pos(1), 1.0;
+        // astar variable
         cur_node->index = stateToIndex(start_pos);
         cur_node->g_score = 0.0;
         cur_node->step_num = 0;
 
         // lfpc model reset
-        cur_node->theta = start_pos(2);
         lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
-                           cur_node->support_pos, cur_node->support_feet,
-                           cur_node->step_num);
+                           cur_node->support_feet, cur_node->step_num);
 
         Eigen::Vector2i end_index;
         end_index = stateToIndex(end_pos);
@@ -104,22 +104,20 @@ namespace cane_planner
             {
                 // state transit,explore the next gait point.
                 um = inputs[i];
-                // TODO 这里逻辑不对
                 // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
-                                   cur_node->support_pos, cur_node->support_feet,
-                                   cur_node->step_num);
-                lfpc_model_->SetCtrlParams(um, cur_node->theta);
+                                   cur_node->support_feet,cur_node->step_num);
+                lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
-                pur_state.support_pos = lfpc_model_->getStepFootPosition();
-                // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
-                // std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
+                pur_state.support_pos = lfpc_model_->getFootPosition();
+                std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
+                std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
-                // todo这里合理的方式应该是用com_pos，但是第一步移动的没有做好；
-                pro_state << pur_state.com_pos(0), pur_state.com_pos(1), 0.0;
-                pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
+                // todo这里合理的方式应该是用com_pos，
+                pro_state << pur_state.com_pos;
+                // pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
 
                 // check if in feasible space
@@ -179,13 +177,11 @@ namespace cane_planner
                     pro_node->parent = cur_node;
                     pro_node->kdnode_state = IN_OPEN_SET;
                     // update  state
-                    lfpc_model_->switchSupportLeg();
                     pro_node->iter_state = lfpc_model_->getNextIterState();
                     pro_node->com_pos = lfpc_model_->getCOMPos();
                     pro_node->support_feet = lfpc_model_->getSupportFeet();
-                    pro_node->support_pos = lfpc_model_->getStepFootPosition();
+                    pro_node->support_pos = lfpc_model_->getFootPosition();
                     pro_node->step_num = lfpc_model_->getStepNum();
-                    pro_node->theta = lfpc_model_->getTheta();
                     pro_node->com_path = lfpc_model_->getStepCOMPath();
                     // push in set
                     open_set_.push(pro_node);
@@ -203,13 +199,11 @@ namespace cane_planner
                     if (tmp_g_score < pro_node->g_score)
                     {
                         // std::cout << "update new_node" << std::endl;
-                        lfpc_model_->switchSupportLeg();
                         pro_node->iter_state = lfpc_model_->getNextIterState();
                         pro_node->com_pos = lfpc_model_->getCOMPos();
                         pro_node->support_feet = lfpc_model_->getSupportFeet();
-                        pro_node->support_pos = lfpc_model_->getStepFootPosition();
+                        pro_node->support_pos = lfpc_model_->getFootPosition();
                         pro_node->step_num = lfpc_model_->getStepNum();
-                        pro_node->theta = lfpc_model_->getTheta();
                         pro_node->com_path = lfpc_model_->getStepCOMPath();
 
                         // update score
