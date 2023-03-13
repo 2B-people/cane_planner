@@ -88,7 +88,7 @@ namespace cane_planner
             Eigen::Vector3d um;
 
             /* ---------- param for next gait point ---------- */
-            double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 5.0;
+            double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 4.0;
             /* ----------set input list ---------- */
             // std::cout << "set input list" << std::endl;
             for (double al = max_al_ * al_res; al < max_al_ + 1e-3; al += max_al_ * al_res)
@@ -111,8 +111,8 @@ namespace cane_planner
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
                 pur_state.support_pos = lfpc_model_->getFootPosition();
-                std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
-                std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
+                // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
+                // std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
                 // todo这里合理的方式应该是用com_pos，
@@ -139,32 +139,33 @@ namespace cane_planner
 
                 // Check safety
                 /* collision free */
-                // Eigen::Vector2d pro_pos;
-                // pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
-                // if (!collision_->isTraversable(pro_pos))
-                // {
-                //     // std::cout << "can't Traversable" << std::endl;
-                //     num_collision++;
-                //     continue;
-                // }
-                // new ways
-                Eigen::Vector3d pro_pos;
-                bool is_occ = false;
-                pro_pos << pur_state.com_pos(0), pur_state.com_pos(1), 0.8;
-                for (size_t i = 0; i < pur_state.com_path.size(); i++)
+                Eigen::Vector2d pro_pos;
+                pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
+                if (!collision_->isTraversable(pro_pos))
                 {
-                    auto pos = pur_state.com_path[i];
-                    if (collision_->sdf_map_->getInflateOccupancy(pos) == 1)
-                    {
-                        is_occ = true;
-                        break;
-                    }
-                }
-                if (is_occ)
-                {
+                    // std::cout << "can't Traversable" << std::endl;
                     num_collision++;
                     continue;
                 }
+                // new ways
+                // this way is not good for lim
+                // Eigen::Vector3d pro_pos;
+                // bool is_occ = false;
+                // pro_pos << pur_state.com_pos(0), pur_state.com_pos(1), 0.8;
+                // for (size_t i = 0; i < pur_state.com_path.size(); i++)
+                // {
+                //     auto pos = pur_state.com_path[i];
+                //     if (collision_->sdf_map_->getInflateOccupancy(pos) == 1)
+                //     {
+                //         is_occ = true;
+                //         break;
+                //     }
+                // }
+                // if (is_occ)
+                // {
+                //     num_collision++;
+                //     continue;
+                // }
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
                 double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state.com_pos, end_pos);
                 if (pro_node == NULL)

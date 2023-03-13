@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /PointCloud21
         - /PointCloud22
       Splitter Ratio: 0.5
     Tree Height: 493
@@ -57,13 +58,13 @@ Visualization Manager:
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
         Max Value: 2.450000047683716
-        Min Value: -0.44999998807907104
+        Min Value: 0.44999998807907104
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: AxisColor
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -93,7 +94,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -108,13 +109,13 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz/Marker
       Enabled: true
       Marker Topic: /planning_vis/astar
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -122,7 +123,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_astar
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -130,7 +131,7 @@ Visualization Manager:
       Marker Topic: /planning_vis/kin_foot
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Image
@@ -174,7 +175,7 @@ Visualization Manager:
       Marker Topic: /car_path
       Name: Marker
       Namespaces:
-        Markers: true
+        {}
       Queue Size: 100
       Value: true
     - Alpha: 1
@@ -229,7 +230,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 50.966400146484375
+      Distance: 41.83647155761719
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -245,9 +246,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.0897963047027588
+      Pitch: 1.5697963237762451
       Target Frame: <Fixed Frame>
-      Yaw: 3.9649572372436523
+      Yaw: 2.859956741333008
     Saved: ~
 Window Geometry:
   Displays:
@@ -267,5 +268,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1938
-  X: 105
-  Y: 166
+  X: 73
+  Y: 134

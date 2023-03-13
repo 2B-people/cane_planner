@@ -75,6 +75,9 @@ namespace cane_planner
         else if (cur_support_leg == RIGHT_LEG)
             support_leg_ = LEFT_LEG;
         // LPFC
+
+        vx_0_ = init_v_state(0);
+        vy_0_ = init_v_state(1);
         auto state_f = calculateLFPC(vx_0_, vy_0_);
         // update step support_leg_pos
         support_leg_pos_(0) = COM_pos_(0) + state_f(0);
@@ -83,8 +86,6 @@ namespace cane_planner
         // update step param;
         x_0_ = -state_f(0);
         y_0_ = -state_f(1);
-        vx_0_ = init_v_state(0);
-        vy_0_ = init_v_state(1);
         theta_ = init_v_state(2);
         // step variable
         t_ = 0;
@@ -113,7 +114,7 @@ namespace cane_planner
     Vector2d LFPC::getFootPosition()
     {
         Vector2d support_leg_pos_2d_;
-        support_leg_pos_2d_ << support_leg_pos_(0),support_leg_pos_(1);
+        support_leg_pos_2d_ << support_leg_pos_(0), support_leg_pos_(1);
         return support_leg_pos_2d_;
     }
     Vector3d LFPC::getCOMPos()
