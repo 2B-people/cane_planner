@@ -174,12 +174,12 @@ namespace cane_planner
         }
         case GEN_NEW_TRAJ:
         {
-            bool success1 = false;
+            // bool success1 = false;
             bool success2 = false;
 
-            success1 = callAstarPlan();
+            // success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
-            if (success1 && success2)         
+            if (success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(REPLAN_TRAJ);
@@ -194,8 +194,8 @@ namespace cane_planner
             // publish
             publishKinodynamicAstarPath();
 
-            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.1 &&
-                abs(odom_pos_(1) - end_pt_(1)) <= 0.1)
+            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.5 ||
+                abs(odom_pos_(1) - end_pt_(1)) <= 0.5)
             {
                 have_target_ = false;
                 changeFSMExecState(WAIT_TARGET);
@@ -208,12 +208,12 @@ namespace cane_planner
         }
         case REPLAN_TRAJ:
         {
-            bool success1 = false;
+            // bool success1 = false;
             bool success2 = false;
 
-            success1 = callAstarPlan();
+            // success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
-            if (success1 && success2)
+            if (success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(REPLAN_TRAJ);
@@ -266,17 +266,15 @@ namespace cane_planner
 
                     if (exec_state_ == EXEC_TRAJ)
                     {
+                        ROS_WARN("goal near collision,change end");
                         changeFSMExecState(REPLAN_TRAJ);
                     }
                 }
                 else
                 {
-                    // have_target_ = false;
-                    // cout << "Goal near collision, stop." << endl;
-                    // changeFSMExecState(WAIT_TARGET, "SAFETY");
-
-                    ROS_WARN("goal near collision, keep retry");
-                    changeFSMExecState(REPLAN_TRAJ);
+                    have_target_ = false;
+                    cout << "Goal near collision, stop." << endl;
+                    changeFSMExecState(WAIT_TARGET);
                 }
             }
         }
@@ -291,7 +289,7 @@ namespace cane_planner
             {
                 Eigen::Vector2d temp(list[i](0), list[i](1));
                 double dist = collision_->getCollisionDistance(temp);
-                if (dist < 0.2)
+                if (dist < 0.3)
                 {
                     ROS_WARN("current traj in collision.");
                     changeFSMExecState(REPLAN_TRAJ);

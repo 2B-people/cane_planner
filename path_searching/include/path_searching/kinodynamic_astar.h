@@ -123,6 +123,7 @@ namespace cane_planner
     int allocate_num_;
     double lambda_heu_;
     double tie_breaker_;
+    double horizon_;
     double resolution_, inv_resolution_;
     double max_al_, max_aw_, max_api_;
     Eigen::Vector2d origin_, map_size_2d_;

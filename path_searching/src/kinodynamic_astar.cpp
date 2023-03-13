@@ -26,7 +26,8 @@ namespace cane_planner
         cur_node->support_feet = LEFT_LEG;
         cur_node->support_pos << start_pos(0), start_pos(1);
         // start_pos(2) is theta ,in here change 1.0
-        cur_node->com_pos << start_pos(0), start_pos(1), 1.0;
+        start_pos(2) = 1.0;
+        cur_node->com_pos << start_pos;
         // astar variable
         cur_node->index = stateToIndex(start_pos);
         cur_node->g_score = 0.0;
@@ -67,7 +68,9 @@ namespace cane_planner
             bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 1 &&
                             abs(cur_node->com_pos(1) - end_pos(1)) <= 1;
 
-            if (near_end)
+            bool reach_horizon = (cur_node->com_pos.head(3) - start_pos).norm() >= horizon_;
+
+            if (near_end || reach_horizon)
             {
                 std::cout << "[Kin-Astar]:---------------------- " << use_node_num_ << std::endl;
                 std::cout << "use node num: " << use_node_num_ << std::endl;
@@ -106,7 +109,7 @@ namespace cane_planner
                 um = inputs[i];
                 // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
-                                   cur_node->support_feet,cur_node->step_num);
+                                   cur_node->support_feet, cur_node->step_num);
                 lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
@@ -148,7 +151,6 @@ namespace cane_planner
                     continue;
                 }
                 // new ways
-                // this way is not good for lim
                 // Eigen::Vector3d pro_pos;
                 // bool is_occ = false;
                 // pro_pos << pur_state.com_pos(0), pur_state.com_pos(1), 0.8;
@@ -320,6 +322,8 @@ namespace cane_planner
         inv_resolution_ = ceil(1 / resolution_);
         // 分配的最大可以搜索的数量；
         nh.param("kinastar/allocate_num", allocate_num_, -1);
+        // 分配规划的区域限制
+        nh.param("kinastar/horizon", horizon_, -1.0);
         // 人体动力学限制参数
         nh.param("kinastar/max_al", max_al_, -1.0);
         nh.param("kinastar/max_aw", max_aw_, -1.0);
