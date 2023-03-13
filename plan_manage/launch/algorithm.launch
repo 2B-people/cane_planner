@@ -14,12 +14,12 @@
 
         <param name="sdf_map/map_size_x" value="20.0" />
         <param name="sdf_map/map_size_y" value="50.0" />
-        <param name="sdf_map/map_size_z" value="10.0" />
+        <param name="sdf_map/map_size_z" value="4.0" />
         <param name="sdf_map/resolution" value="0.1" />
         <param name="sdf_map/obstacles_inflation" value="0.099" />
         <param name="sdf_map/local_bound_inflate" value="0.5"/>
-        <param name="sdf_map/local_map_margin" value="20"/>
-        <param name="sdf_map/ground_height" value="0.4"/>
+        <param name="sdf_map/local_map_margin" value="5"/>
+        <param name="sdf_map/ground_height" value="-0.4"/>
         <param name="sdf_map/default_dist" value="5.0"/>
 
         <param name="sdf_map/p_hit" value="0.65"/>
@@ -52,18 +52,18 @@
 
         <param name="kinastar/resolution_astar" value="0.2"/>
         <param name="kinastar/lambda_heu" value="0.01"/>
-        <param name="kinastar/allocate_num" value="1000000"/>
+        <param name="kinastar/allocate_num" value="100000"/>
         <param name="kinastar/max_al" value="0.4"/>
         <param name="kinastar/max_aw" value="0.1"/>
-        <param name="kinastar/max_theta" value="2"/>
+        <param name="kinastar/max_theta" value="1"/>
 
         <param name="astar/resolution_astar" value="0.1"/>
         <param name="astar/time_resolution" value="0"/>
         <param name="astar/lambda_heu" value="0.01"/>
-        <param name="astar/allocate_num" value="1000000"/>
+        <param name="astar/allocate_num" value="100000"/>
 
         <param name="Collision/margin" value="0.3"/>
-        <param name="Collision/SliceHeight" value="0.8"/>
+        <param name="Collision/SliceHeight" value="0.6"/>
     </node>
 
 </launch>

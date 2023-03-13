@@ -122,7 +122,7 @@ namespace fast_planner
     publishESDF();
 
     // publishUpdateRange();
-    // publishDepth();
+    publishDepth();
   }
 
   void MapROS::updateESDFCallback(const ros::TimerEvent & /*event*/)
@@ -221,7 +221,7 @@ namespace fast_planner
   void MapROS::cloudPoseCallback(const sensor_msgs::PointCloud2ConstPtr &msg,
                                  const geometry_msgs::PoseStampedConstPtr &pose)
   {
-    ROS_WARN("IN here");
+
     camera_pos_(0) = pose->pose.position.x;
     camera_pos_(1) = pose->pose.position.y;
     camera_pos_(2) = pose->pose.position.z;

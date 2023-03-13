@@ -230,8 +230,6 @@ namespace cane_planner
             double dist = collision_->getCollisionDistance(end_pt_);
             if (dist <= 0.3)
             {
-                ROS_WARN("IN HARE2");
-
                 /* try to find a max distance goal around */
                 const double dr = 0.5, dtheta = 30;
                 double new_x, new_y, new_z, max_dist = -1.0;
@@ -261,7 +259,6 @@ namespace cane_planner
 
                 if (max_dist > 0.3)
                 {
-                    ROS_WARN("IN here 3");
                     end_pt_ << goal(0), goal(1);
                     end_state_(0) = goal(0);
                     end_state_(1) = goal(1);
