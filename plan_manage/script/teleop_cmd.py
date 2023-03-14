@@ -6,26 +6,23 @@ import sys
 import tty, termios
 import roslib;
 import rospy
-from geometry_msgs.msg import Twist
-from std_msgs.msg import String
+from geometry_msgs.msg import PoseStamped
+from nav_msgs.msg import Path
+
  
 # 全局变量
-cmd = Twist()
-pub = rospy.Publisher('teleop/cmd_vel', Twist)
+pub = rospy.Publisher('/waypoint_generator/waypoints',Path,queue_size=15)
+path_ = Path()
  
 def keyboardLoop():
     #初始化
     rospy.init_node('sim_teleop')
     rate = rospy.Rate(rospy.get_param('~hz', 1))
  
-    #速度变量
-    walk_vel_ = rospy.get_param('walk_vel', 0.5)
-    run_vel_ = rospy.get_param('run_vel', 1.0)
-    yaw_rate_ = rospy.get_param('yaw_rate', 1.0)
-    yaw_rate_run_ = rospy.get_param('yaw_rate_run', 1.5)
+    end_x = 0.0
+    end_y = 0.0
  
-    max_tv = walk_vel_
-    max_rv = yaw_rate_
+
  
     #显示提示信息
     print ("Reading from keyboard")
@@ -46,58 +43,40 @@ def keyboardLoop():
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
  
         if ch == 'w':
-            max_tv = walk_vel_
-            speed = 1
-            turn = 0
+            end_y += 1.0
         elif ch == 's':
-            max_tv = walk_vel_
-            speed = -1
-            turn = 0
+            end_y -= 1.0
         elif ch == 'a':
-            max_rv = yaw_rate_
-            speed = 0
-            turn = 1
+            end_x -= 1.0
         elif ch == 'd':
-            max_rv = yaw_rate_
-            speed = 0
-            turn = -1
+            end_x += 1.0
         elif ch == 'W':
-            max_tv = run_vel_
-            speed = 1
-            turn = 0
+            end_y += 2.0
         elif ch == 'S':
-            max_tv = run_vel_
-            speed = -1
-            turn = 0
+            end_y -= 2.0
         elif ch == 'A':
-            max_rv = yaw_rate_run_
-            speed = 0
-            turn = 1
+            end_x -= 2.0
         elif ch == 'D':
-            max_rv = yaw_rate_run_
-            speed = 0
-            turn = -1
+            end_y += 2.0
         elif ch == 'q':
             exit()
-        else:
-            max_tv = walk_vel_
-            max_rv = yaw_rate_
-            speed = 0
-            turn = 0
+        elif ch == 'e':
+            end_x = 0.0
+            end_y = 0.0
  
         #发送消息
-        cmd.linear.x = speed * max_tv;
-        cmd.angular.z = turn * max_rv;
-        pub.publish(cmd)
-        rate.sleep()
-		#停止机器人
-        stop_robot();
- 
-def stop_robot():
-    cmd.linear.x = 0.0
-    cmd.angular.z = 0.0
-    pub.publish(cmd)
- 
+        cur_point = PoseStamped()
+        cur_point.pose.position.x = end_x
+        cur_point.pose.position.y = end_y
+        cur_point.pose.position.z = 1.0
+        cur_point.pose.orientation.w = 1.0
+        cur_point.pose.orientation.x = 0.0
+        cur_point.pose.orientation.y = 0.0
+        cur_point.pose.orientation.z = 0.0
+        path_.poses.append(cur_point)
+
+        pub.publish(path_)
+
 if __name__ == '__main__':
     try:
         keyboardLoop()
