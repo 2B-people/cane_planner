@@ -57,8 +57,8 @@ namespace cane_planner
         while (!open_set_.empty())
         {
             cur_node = open_set_.top();
-            std::cout << "Explore while is " << use_node_num_ << std::endl;
-            std::cout << "----------------------------" << std::endl;
+            // std::cout << "Explore while is " << use_node_num_ << std::endl;
+            // std::cout << "----------------------------" << std::endl;
 
             /* ---------- determine termination ---------- */
             // bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
@@ -190,8 +190,8 @@ namespace cane_planner
                     expanded_nodes_.insert(pro_id, pro_node);
                     // add used node num
                     use_node_num_ += 1;
-                    std::cout << "---------------" << std::endl;
-                    std::cout << "f_score:" << tmp_f_score << " g_score:" << tmp_g_score << std::endl;
+                    // std::cout << "---------------" << std::endl;
+                    // std::cout << "f_score:" << tmp_f_score << " g_score:" << tmp_g_score << std::endl;
                     if (use_node_num_ == allocate_num_)
                     {
                         std::cout << "run out of memory." << std::endl;
