@@ -6,7 +6,7 @@
 
       <node pkg="tf" type="static_transform_publisher" name="tf_pub" args="0 0 0 0 0 0 1 world base_link 20" />
 
-      <node name="simulation_generator" pkg="map_generator" type="simulation_generator" output="log" args=" $(find map_generator)/resource/office3.pcd">
+      <node name="simulation_generator" pkg="map_generator" type="simulation_generator" output="log" args=" $(find map_generator)/resource/office.pcd">
             <remap from="/cmd_vel" to="teleop/cmd_vel"/>
       </node>
 

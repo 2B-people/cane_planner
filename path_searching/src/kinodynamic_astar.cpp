@@ -57,8 +57,8 @@ namespace cane_planner
         while (!open_set_.empty())
         {
             cur_node = open_set_.top();
-            // std::cout << "Explore while is " << use_node_num_ << std::endl;
-            // std::cout << "----------------------------" << std::endl;
+            std::cout << "Explore while is " << use_node_num_ << std::endl;
+            std::cout << "----------------------------" << std::endl;
 
             /* ---------- determine termination ---------- */
             // bool near_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
@@ -118,7 +118,6 @@ namespace cane_planner
                 // std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
-                // todo这里合理的方式应该是用com_pos，
                 pro_state << pur_state.com_pos;
                 // pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
@@ -135,7 +134,7 @@ namespace cane_planner
                 KdNodePtr pro_node = expanded_nodes_.find(pro_id);
                 if (pro_node != NULL && pro_node->kdnode_state == IN_CLOSE_SET)
                 {
-                    // std::cout << "in close" << std::endl;
+                    // std::cout << "in close,num:" << num_close << std::endl;
                     num_close++;
                     continue;
                 }
@@ -191,6 +190,8 @@ namespace cane_planner
                     expanded_nodes_.insert(pro_id, pro_node);
                     // add used node num
                     use_node_num_ += 1;
+                    std::cout << "---------------" << std::endl;
+                    std::cout << "f_score:" << tmp_f_score << " g_score:" << tmp_g_score << std::endl;
                     if (use_node_num_ == allocate_num_)
                     {
                         std::cout << "run out of memory." << std::endl;
@@ -390,6 +391,8 @@ namespace cane_planner
         double dy = fabs(x1(1) - x2(1));
         double h = (dx + dy) + (sqrt(2.0) - 2) * min(dx, dy);
 
+        // std::cout << "f heu is : " << tie_breaker_ * h << std::endl;
+
         return tie_breaker_ * h;
     }
 
@@ -414,8 +417,8 @@ namespace cane_planner
         Eigen::Vector2d acc_x_y;
         acc_x_y << input(0), input(1);
         // double heu = acc_x_y.norm() + input(2);
-        double heu = acc_x_y.norm() + abs(input(2));
-        // std::cout << "this heu is " << heu << endl;
+        double heu = acc_x_y.norm() + 0.1 * abs(input(2));
+        // std::cout << "this heu is " << heu << std::endl;
         return heu;
     }
 

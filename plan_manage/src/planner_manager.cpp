@@ -174,12 +174,12 @@ namespace cane_planner
         }
         case GEN_NEW_TRAJ:
         {
-            // bool success1 = false;
+            bool success1 = false;
             bool success2 = false;
 
-            // success1 = callAstarPlan();
+            success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
-            if (success2)
+            if (success1 && success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(REPLAN_TRAJ);
@@ -208,12 +208,12 @@ namespace cane_planner
         }
         case REPLAN_TRAJ:
         {
-            // bool success1 = false;
+            bool success1 = false;
             bool success2 = false;
 
-            // success1 = callAstarPlan();
+            success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
-            if (success2)
+            if (success1 && success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(REPLAN_TRAJ);
