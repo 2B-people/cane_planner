@@ -453,7 +453,6 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
         u_char send_data_char[send_data.size()];
         for (size_t i = 0; i < send_data.size(); i++)
             send_data_char[i] = send_data.c_str()[i];
-        ROS_INFO("%s", send_data_char);
         ser_.write(send_data_char, send_data.size());
     }
     pub_.publish(cmd_vel);

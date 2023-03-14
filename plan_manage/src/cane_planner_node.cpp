@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     int planner;
     bool simulation;
     nh.param("planner_node/planner", planner, 1);
-    nh.param("planner_node/planner", simulation, true);
+    nh.param("planner_node/simulation", simulation, true);
 
     PlannerManager plan_manage(simulation);
     plan_manage.init(nh);
