@@ -194,8 +194,8 @@ namespace cane_planner
             // publish
             publishKinodynamicAstarPath();
 
-            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.5 ||
-                abs(odom_pos_(1) - end_pt_(1)) <= 0.5)
+            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.4 ||
+                abs(odom_pos_(1) - end_pt_(1)) <= 0.4)
             {
                 have_target_ = false;
                 changeFSMExecState(WAIT_TARGET);
