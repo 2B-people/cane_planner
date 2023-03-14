@@ -60,7 +60,7 @@ namespace cane_planner
         ros::Subscriber odom_sub_, waypoint_sub_;
         ros::Subscriber goal_sub_, start_sub_;
         ros::Publisher astar_pub_,kin_path_pub_,kin_foot_pub_;
-        ros::Publisher path_pub_,test_odom_pub_;
+        ros::Publisher path_pub_;
 
         /*---------- helper function -----------*/
         bool callAstarPlan();

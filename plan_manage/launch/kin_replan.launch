@@ -8,6 +8,7 @@
         <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
         <arg name="cloud_topic" value = "/cloud"/>
         <arg name="sensor_pose_topic" value="/pose"/>
+        <arg name="simulation" value="false"/>
         
     </include>
 
@@ -17,17 +18,10 @@
         <param name="Vcmd" value="1.0" />
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
-        <param name="AngleGain" value="-0.5"/>
+        <param name="AngleGain" value="-1.5"/>
         <param name="SerialUsing" value="false"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
     </node>
 
-    <!-- waypoint generator -->
-    <!-- <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
-        <remap from="~odom" to="$(arg odometry_topic)"/>
-        <remap from="~goal" to="/move_base_simple/goal"/>
-        <remap from="~traj_start_trigger" to="/traj_start_trigger" />
-        <param name="waypoint_type" value="manual-lonely-waypoint"/>
-    </node> -->
 
 </launch>

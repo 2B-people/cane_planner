@@ -51,7 +51,7 @@ namespace cane_planner
         KdNodePtr terminate_node = NULL;
 
         // num of can't find path
-        int num_feasible = 0, num_close = 0, num_collision = 0;
+        int num_feasible = 0, num_close = 0, num_collision = 0,num_outedf = 0;
 
         /* ---------- search loop ---------- */
         while (!open_set_.empty())
@@ -149,6 +149,11 @@ namespace cane_planner
                     num_collision++;
                     continue;
                 }
+                // if(collision_->getCollisionDistance(pro_pos) >= 6.0)
+                // {
+                //     num_outedf++;
+                //     continue;
+                // }
                 // new ways
                 // Eigen::Vector3d pro_pos;
                 // bool is_occ = false;

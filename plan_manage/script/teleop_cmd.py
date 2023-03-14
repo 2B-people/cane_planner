@@ -37,13 +37,13 @@ def keyboardLoop():
     mk.pose.orientation.y = 0.0
     mk.pose.orientation.z = 0.0
     mk.pose.orientation.w = 1.0
-    mk.color.r = 0.0
+    mk.color.r = 1.0
     mk.color.g = 0.0
-    mk.color.b = 1.0
+    mk.color.b = 0.0
     mk.color.a = 1
-    mk.scale.x = 0.2
-    mk.scale.y = 0.2
-    mk.scale.z = 0.2
+    mk.scale.x = 0.5
+    mk.scale.y = 0.5
+    mk.scale.z = 0.5
     pt = Point()
 
     # 显示提示信息
@@ -91,7 +91,7 @@ def keyboardLoop():
         cur_point = PoseStamped()
         cur_point.pose.position.x = end_x
         cur_point.pose.position.y = end_y
-        cur_point.pose.position.z = 1.0
+        cur_point.pose.position.z = 0.0
         cur_point.pose.orientation.w = 1.0
         cur_point.pose.orientation.x = 0.0
         cur_point.pose.orientation.y = 0.0

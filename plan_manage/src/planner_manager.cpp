@@ -51,9 +51,9 @@ namespace cane_planner
         }
         // Timer
         exec_timer_ =
-            nh.createTimer(ros::Duration(0.01), &PlannerManager::execFSMCallback, this);
+            nh.createTimer(ros::Duration(0.05), &PlannerManager::execFSMCallback, this);
         replan_timer_ =
-            nh.createTimer(ros::Duration(0.05), &PlannerManager::checkCollisionCallback, this);
+            nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
         // subscribe
         waypoint_sub_ =
             nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
@@ -64,8 +64,8 @@ namespace cane_planner
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
         kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
         kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
+        // path
         path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
-        test_odom_pub_ = nh.advertise<nav_msgs::Odometry>("/kin_astar/test_odom", 20);
     }
 
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
@@ -333,11 +333,11 @@ namespace cane_planner
 
             this_pose_stamped.pose.position.x = list[i](0);
             this_pose_stamped.pose.position.y = list[i](1);
-            this_pose_stamped.pose.position.z = 0;
+            this_pose_stamped.pose.position.z = -0.4;
 
             this_pose_stamped.pose.orientation.x = 0.0;
             this_pose_stamped.pose.orientation.y = 0.0;
-            this_pose_stamped.pose.orientation.z = 0.0;
+            this_pose_stamped.pose.orientation.z = 1.0;
             this_pose_stamped.pose.orientation.w = 1.0;
 
             this_pose_stamped.header.frame_id = "world";
@@ -378,7 +378,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1;
+            pt.z = 1 - 0.4;
             mk.points.push_back(pt);
         }
 
@@ -415,7 +415,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1;
+            pt.z = 1 - 0.4;
             mk.points.push_back(pt);
         }
         kin_path_pub_.publish(mk);
