@@ -51,7 +51,7 @@ namespace cane_planner
         KdNodePtr terminate_node = NULL;
 
         // num of can't find path
-        int num_feasible = 0, num_close = 0, num_collision = 0,num_outedf = 0;
+        int num_feasible = 0, num_close = 0, num_collision = 0, num_outedf = 0;
 
         /* ---------- search loop ---------- */
         while (!open_set_.empty())
@@ -68,9 +68,9 @@ namespace cane_planner
             bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 1 &&
                             abs(cur_node->com_pos(1) - end_pos(1)) <= 1;
 
-            bool reach_horizon = (cur_node->com_pos.head(3) - start_pos).norm() >= horizon_;
+            double reach_horizon = (cur_node->com_pos.head(3) - start_pos).norm();
 
-            if (near_end || reach_horizon)
+            if (near_end)
             {
                 std::cout << "[Kin-Astar]:---------------------- " << use_node_num_ << std::endl;
                 std::cout << "use node num: " << use_node_num_ << std::endl;
@@ -78,6 +78,25 @@ namespace cane_planner
                 terminate_node = cur_node;
                 retrievePath(terminate_node);
                 return true;
+            }
+            if (reach_horizon >= horizon_)
+            {
+                double cur_near_end = (cur_node->com_pos.head(3) - end_pos).norm();
+                double start_end = (start_pos - end_pos).norm();
+                if (cur_near_end <= start_end)
+                {
+                    std::cout << "[Kin-Astar](horizon):---------------------- " << use_node_num_ << std::endl;
+                    std::cout << "use node num: " << use_node_num_ << std::endl;
+                    std::cout << "iter num: " << iter_num_ << std::endl;
+                    terminate_node = cur_node;
+                    retrievePath(terminate_node);
+                    return true;
+                }
+                else
+                {
+                    std::cout << "[Kin-Astar](horizon):---------------------- " << use_node_num_ << std::endl;
+                    std::cout << "no find" << std::endl;
+                }
             }
 
             /* ---------- pop node and add to close set ---------- */
@@ -91,7 +110,7 @@ namespace cane_planner
             Eigen::Vector3d um;
 
             /* ---------- param for next gait point ---------- */
-            double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 4.0;
+            double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 3.0;
             /* ----------set input list ---------- */
             // std::cout << "set input list" << std::endl;
             for (double al = max_al_ * al_res; al < max_al_ + 1e-3; al += max_al_ * al_res)

@@ -29,6 +29,6 @@
     <include file="$(find plan_manage)/launch/simulation.launch"/>
 
     <!-- visualisation -->
-    <!-- <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" /> -->
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />
 
 </launch>
