@@ -19,7 +19,7 @@
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
         <param name="AngleGain" value="-1.5"/>
-        <param name="SerialUsing" value="false"/>
+        <param name="SerialUsing" value="true"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
     </node>
 

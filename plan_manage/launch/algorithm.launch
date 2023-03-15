@@ -45,7 +45,7 @@
         <param name="map_ros/depth_filter_margin" value="2"/>
         <param name="map_ros/k_depth_scaling_factor" value="1000.0"/>
         <param name="map_ros/skip_pixel" value="2"/>
-        <param name="map_ros/esdf_slice_height" value="0.0"/>
+        <param name="map_ros/esdf_slice_height" value="0.1"/>
         <param name="map_ros/visualization_truncate_height" value="3.09"/>
         <param name="map_ros/visualization_truncate_low" value="-2.0"/>
         <param name="map_ros/show_occ_time" value="false"/>
@@ -66,7 +66,7 @@
         <param name="astar/lambda_heu" value="0.01"/>
         <param name="astar/allocate_num" value="100000"/>
 
-        <param name="Collision/margin" value="0.6"/>
+        <param name="Collision/margin" value="0.3"/>
         <param name="Collision/SliceHeight" value="0.1"/>
     </node>
 
