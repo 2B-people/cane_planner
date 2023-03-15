@@ -49,17 +49,18 @@ namespace cane_planner
             start_sub_ =
                 nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
         }
+        else // subscribe
+        {
+            waypoint_sub_ =
+                nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
+            odom_sub_ =
+                nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
+        }
         // Timer
         exec_timer_ =
             nh.createTimer(ros::Duration(0.05), &PlannerManager::execFSMCallback, this);
         replan_timer_ =
             nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
-        // subscribe
-        waypoint_sub_ =
-            nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
-        odom_sub_ =
-            nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
-
         // visial
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
         kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
@@ -445,6 +446,21 @@ namespace cane_planner
         double roll, pitch, yaw;
         tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
         return yaw;
+    }
+
+    double PlannerManager::QuatenionToYaw(Eigen::Quaterniond ori)
+    {
+        Eigen::Matrix3d oRx = ori.toRotationMatrix();
+
+        double yaw = M_PI / 2, pitch = M_PI / 2, roll = M_PI / 2;
+
+        Eigen::Matrix3d Rx;
+        Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
+
+        oRx = oRx * Rx;
+
+        Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
+        
     }
 
 } // namespace cane_planner

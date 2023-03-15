@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <Eigen/Eigen>
+#include <Eigen/Geometry>
 #include <ros/ros.h>
 #include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
@@ -73,6 +74,7 @@ namespace cane_planner
 
         void changeFSMExecState(FSM_STATE new_state);
         double QuatenionToYaw(geometry_msgs::Quaternion ori);
+        double QuatenionToYaw(Eigen::Quaterniond  ori);
 
         /*---------- ROS function -----------*/
         // timer
