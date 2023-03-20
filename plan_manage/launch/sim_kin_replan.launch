@@ -8,13 +8,13 @@
         <arg name="depth_topic" value="depth"/>
         <arg name="sensor_pose_topic" value="pose"/>
         <!-- simulation opion -->
-        <arg name="simulation" value="false"/>
+        <arg name="simulation" value="ture"/>
         <arg name="slice_height" value="0.1"/>
-        <arg name="kin_horizon" value="3"/>
+        <arg name="kin_horizon" value="5.0"/>
         <!-- map size -->
         <arg name="map_size_x" value="40.0"/>
-        <arg name="map_size_y" value="20.0"/>
-        <arg name="map_size_z" value=" 5.0"/>
+        <arg name="map_size_y" value="40.0"/>
+        <arg name="map_size_z" value="5.0"/>
     </include>
     <!-- L1 controller -->
     <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
@@ -23,7 +23,7 @@
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
         <param name="AngleGain" value="-1.5"/>
-        <param name="SerialUsing" value="ture"/>
+        <param name="SerialUsing" value="false"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
     </node>
     <!-- simulation -->

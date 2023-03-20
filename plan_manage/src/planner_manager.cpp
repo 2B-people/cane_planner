@@ -36,24 +36,14 @@ namespace cane_planner
         kin_finder_->setCollision(collision_);
         kin_finder_->setModel(lfpc_model_);
         kin_finder_->init();
-        // simulation kin plan vis astar plan
-        if (simulation_)
-        {
-            goal_sub_ =
-                nh.subscribe("/move_base_simple/goal", 1, &PlannerManager::goalCallback, this); // 接收目标的topic
-            start_sub_ =
-                nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
-        }
-        else // replan
-        {
-            waypoint_sub_ =
-                nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
-            odom_sub_ =
-                nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
-        }
+        // replan
+        waypoint_sub_ =
+            nh.subscribe("/waypoint_generator/waypoints", 1, &PlannerManager::waypointCallback, this);
+        odom_sub_ =
+            nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
         // Timer
         exec_timer_ =
-            nh.createTimer(ros::Duration(0.05), &PlannerManager::execFSMCallback, this);
+            nh.createTimer(ros::Duration(0.1), &PlannerManager::execFSMCallback, this);
         replan_timer_ =
             nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
         // Visial
@@ -62,36 +52,6 @@ namespace cane_planner
         kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
         // Path
         path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
-    }
-    //------------------- simulation ---------------------
-    // simulation callback goal
-    void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
-    {
-        end_pt_(0) = goal->pose.position.x;
-        end_pt_(1) = goal->pose.position.y;
-        ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
-
-        end_state_(0) = goal->pose.position.x;
-        end_state_(1) = goal->pose.position.y;
-        double yaw = QuatenionToYaw(goal->pose.orientation);
-        end_state_(2) = yaw;
-        ROS_INFO("goal yaw is: %lf", yaw);
-        have_target_ = true;
-    }
-    // simulation callback start or odom
-    void PlannerManager::startCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start)
-    {
-        start_pt_(0) = start->pose.pose.position.x;
-        start_pt_(1) = start->pose.pose.position.y;
-        ROS_INFO("set start pos is:%lf and %lf", start_pt_(0), start_pt_(1));
-
-        start_state_(0) = start->pose.pose.position.x;
-        start_state_(1) = start->pose.pose.position.y;
-        double yaw = QuatenionToYaw(start->pose.pose.orientation);
-        start_state_(2) = yaw;
-        cout << "yaw:" << yaw << endl;
-
-        have_odom_ = true;
     }
     //------------------- real experience ---------------------
     // real experience callback waypoint or goal
@@ -121,16 +81,18 @@ namespace cane_planner
         odom_ori_.y() = msg->pose.pose.orientation.y;
         odom_ori_.z() = msg->pose.pose.orientation.z;
         odom_ori_.w() = msg->pose.pose.orientation.w;
-        //! test yaw
-        double yaw_test = QuatenionToYaw(msg->pose.pose.orientation);
+        // double yaw_test = QuatenionToYaw(msg->pose.pose.orientation);
 
         // odom and start set
         start_pt_(0) = odom_pos_(0);
         start_pt_(1) = odom_pos_(1);
         start_state_(0) = odom_pos_(0);
         start_state_(1) = odom_pos_(1);
-        // TODO:test
-        double yaw = QuatenionToYaw(odom_ori_);
+        double yaw = 0.0;
+        if (simulation_)
+            yaw = QuatenionToYaw(msg->pose.pose.orientation);
+        else
+            yaw = QuatenionToYaw(odom_ori_);
         start_state_(2) = yaw;
 
         // ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
@@ -201,25 +163,16 @@ namespace cane_planner
                 displayKinastar();
                 publishKinodynamicAstarPath();
             }
-            // simulation stop replan
-            if (simulation_)
+            // real experience using odom judge stop replan
+            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.4 &&
+                abs(odom_pos_(1) - end_pt_(1)) <= 0.4)
             {
                 have_target_ = false;
                 changeFSMExecState(WAIT_TARGET);
             }
-            else
+            else // replan
             {
-                // real experience using odom judge stop replan
-                if (abs(odom_pos_(0) - end_pt_(0)) <= 0.4 &&
-                    abs(odom_pos_(1) - end_pt_(1)) <= 0.4)
-                {
-                    have_target_ = false;
-                    changeFSMExecState(WAIT_TARGET);
-                }
-                else // replan
-                {
-                    changeFSMExecState(REPLAN_TRAJ);
-                }
+                changeFSMExecState(REPLAN_TRAJ);
             }
             break;
         }
@@ -454,13 +407,13 @@ namespace cane_planner
     double PlannerManager::QuatenionToYaw(Eigen::Quaterniond ori)
     {
         Eigen::Matrix3d oRx = ori.toRotationMatrix();
-        // roll world to body is 
+        // roll world to body is
         double yaw = 0, pitch = -M_PI / 2, roll = M_PI / 2;
         Eigen::Matrix3d Rx;
         Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
         oRx = oRx * Rx;
         Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
-        //ZYX ,yaw is ea(0)
+        // ZYX ,yaw is ea(0)
         return ea(0);
     }
 } // namespace cane_planner

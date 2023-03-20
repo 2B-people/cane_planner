@@ -42,7 +42,7 @@ include_directories(
 )
 
 add_executable(cane_planner_node
-		src/cane_planner_node.cpp
+		src/kin_replan_node.cpp
     src/planner_manager.cpp
 )
 

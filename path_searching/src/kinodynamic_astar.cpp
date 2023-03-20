@@ -34,8 +34,18 @@ namespace cane_planner
         cur_node->step_num = 0;
 
         // lfpc model reset
+        Eigen::Vector3d um;
+        um << 0.2, 0.1, 0;
+        lfpc_model_->SetCtrlParams(um);
         lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
                            cur_node->support_feet, cur_node->step_num);
+        lfpc_model_->updateOneStep();
+        cur_node->iter_state = lfpc_model_->getNextIterState();
+        cur_node->com_pos = lfpc_model_->getCOMPos();
+        cur_node->support_feet = lfpc_model_->getSupportFeet();
+        cur_node->support_pos = lfpc_model_->getFootPosition();
+        cur_node->step_num = lfpc_model_->getStepNum();
+        cur_node->com_path = lfpc_model_->getStepCOMPath();
 
         Eigen::Vector2i end_index;
         end_index = stateToIndex(end_pos);
@@ -127,9 +137,9 @@ namespace cane_planner
             {
                 // state transit,explore the next gait point.
                 um = inputs[i];
+                lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
                                    cur_node->support_feet, cur_node->step_num);
-                lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
                 pur_state.support_pos = lfpc_model_->getFootPosition();
@@ -434,7 +444,7 @@ namespace cane_planner
         Eigen::Vector2d acc_x_y;
         acc_x_y << input(0), input(1);
         // double heu = acc_x_y.norm() + input(2);
-        double heu = acc_x_y.norm() + 0.1 * abs(input(2));
+        double heu = acc_x_y.norm() + 0.5 * abs(input(2));
         // std::cout << "this heu is " << heu << std::endl;
         return heu;
     }
