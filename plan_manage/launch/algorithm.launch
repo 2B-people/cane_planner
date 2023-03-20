@@ -68,7 +68,7 @@
         <param name="kinastar/horizon" value="$(arg kin_horizon)"/>
         <param name="kinastar/max_al" value="0.4"/>
         <param name="kinastar/max_aw" value="0.1"/>
-        <param name="kinastar/max_theta" value="1"/>
+        <param name="kinastar/max_theta" value="1.5"/>
         <!-- astar set -->
         <param name="astar/resolution_astar" value="0.1"/>
         <param name="astar/time_resolution" value="0"/>

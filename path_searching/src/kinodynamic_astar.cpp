@@ -65,8 +65,8 @@ namespace cane_planner
             //                 abs(cur_node->index(1) - end_index(1)) <= 1;
             // abs(cur_node->state_variable(2) - end_pos(2)) <= 0.1;
             // have tourble in here;
-            bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 1 &&
-                            abs(cur_node->com_pos(1) - end_pos(1)) <= 1;
+            bool near_end = abs(cur_node->com_pos(0) - end_pos(0)) <= 0.5 &&
+                            abs(cur_node->com_pos(1) - end_pos(1)) <= 0.5;
 
             double reach_horizon = (cur_node->com_pos.head(3) - start_pos).norm();
 
@@ -95,7 +95,7 @@ namespace cane_planner
                 else
                 {
                     std::cout << "[Kin-Astar](horizon):---------------------- " << use_node_num_ << std::endl;
-                    std::cout << "no find" << std::endl;
+                    std::cout << "!---in horizion no find path--" << std::endl;
                 }
             }
 
@@ -112,7 +112,6 @@ namespace cane_planner
             /* ---------- param for next gait point ---------- */
             double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 3.0;
             /* ----------set input list ---------- */
-            // std::cout << "set input list" << std::endl;
             for (double al = max_al_ * al_res; al < max_al_ + 1e-3; al += max_al_ * al_res)
                 for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
                     for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
@@ -120,25 +119,26 @@ namespace cane_planner
                         um << al, aw, api;
                         inputs.push_back(um);
                     }
-            // std::cout << "new state explore,size: " << inputs.size() << std::endl;
+
             /* ----------Explore the next gait point ---------- */
+            // std::cout << "set input list" << std::endl;
+            // std::cout << "new state explore,size: " << inputs.size() << std::endl;
             for (size_t i = 0; i < inputs.size(); i++)
             {
                 // state transit,explore the next gait point.
                 um = inputs[i];
-                // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
                                    cur_node->support_feet, cur_node->step_num);
                 lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
                 pur_state.support_pos = lfpc_model_->getFootPosition();
+                // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
                 // std::cout << "pur_support_pos" << pur_state.support_pos.transpose() << std::endl;
 
                 Eigen::Vector3d pro_state;
                 pro_state << pur_state.com_pos;
-                // pro_state << pur_state.support_pos(0), pur_state.support_pos(1), 0.0;
                 Eigen::Vector2i pro_id = stateToIndex(pro_state);
 
                 // check if in feasible space
@@ -158,8 +158,8 @@ namespace cane_planner
                     continue;
                 }
 
-                // Check safety
-                /* collision free */
+                // Check com and feet safety
+                /* collision com pos free */
                 Eigen::Vector2d pro_pos;
                 pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
                 if (!collision_->isTraversable(pro_pos))
@@ -168,29 +168,22 @@ namespace cane_planner
                     num_collision++;
                     continue;
                 }
-                // if(collision_->getCollisionDistance(pro_pos) >= 6.0)
+                // support pos safety collision free
+                //  TODO this is mast in gourd
+                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
+                if (!collision_->isTraversable(pro_pos))
+                {
+                    // std::cout << "can't Traversable" << std::endl;
+                    num_collision++;
+                    continue;
+                }
+                // // out edf map by expert
+                // if (collision_->getCollisionDistance(pro_pos) >= 6.0)
                 // {
                 //     num_outedf++;
                 //     continue;
                 // }
-                // new ways
-                // Eigen::Vector3d pro_pos;
-                // bool is_occ = false;
-                // pro_pos << pur_state.com_pos(0), pur_state.com_pos(1), 0.8;
-                // for (size_t i = 0; i < pur_state.com_path.size(); i++)
-                // {
-                //     auto pos = pur_state.com_path[i];
-                //     if (collision_->sdf_map_->getInflateOccupancy(pos) == 1)
-                //     {
-                //         is_occ = true;
-                //         break;
-                //     }
-                // }
-                // if (is_occ)
-                // {
-                //     num_collision++;
-                //     continue;
-                // }
+
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
                 double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state.com_pos, end_pos);
                 if (pro_node == NULL)
