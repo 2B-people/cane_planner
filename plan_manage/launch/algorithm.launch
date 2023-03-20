@@ -62,13 +62,13 @@
         <param name="map_ros/frame_id" value="world"/>
         <!-- kin astar  -->
         <param name="kinastar/resolution_astar" value="0.2"/>
-        <param name="kinastar/lambda_heu" value="0.5"/>
+        <param name="kinastar/lambda_heu" value="0.01"/>
         <param name="kinastar/allocate_num" value="100000"/>
         <!-- kin astar contorl param -->
         <param name="kinastar/horizon" value="$(arg kin_horizon)"/>
         <param name="kinastar/max_al" value="0.4"/>
         <param name="kinastar/max_aw" value="0.1"/>
-        <param name="kinastar/max_theta" value="1.5"/>
+        <param name="kinastar/max_theta" value="1"/>
         <!-- astar set -->
         <param name="astar/resolution_astar" value="0.1"/>
         <param name="astar/time_resolution" value="0"/>

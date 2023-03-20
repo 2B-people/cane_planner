@@ -54,7 +54,7 @@ public:
 
 private:
     ros::NodeHandle n_;
-    ros::Subscriber odom_sub, path_sub, goal_sub;
+    ros::Subscriber odom_sub, path_sub, goal_sub, way_sub;
     ros::Publisher pub_, marker_pub;
     ros::Timer timer1, timer2;
     tf::TransformListener tf_listener;
@@ -77,6 +77,7 @@ private:
     void odomCB(const nav_msgs::Odometry::ConstPtr &odomMsg);
     void pathCB(const nav_msgs::Path::ConstPtr &pathMsg);
     void goalCB(const geometry_msgs::PoseStamped::ConstPtr &goalMsg);
+    void waypointCB(const nav_msgs::PathConstPtr &msg);
     void goalReachingCB(const ros::TimerEvent &);
     void controlLoopCB(const ros::TimerEvent &);
 
@@ -106,6 +107,7 @@ L1Controller::L1Controller()
     odom_sub = n_.subscribe("/odometry/filtered", 1, &L1Controller::odomCB, this);
     path_sub = n_.subscribe("/kin_astar/path", 1, &L1Controller::pathCB, this);
     goal_sub = n_.subscribe("/move_base_simple/goal", 1, &L1Controller::goalCB, this);
+    way_sub = n_.subscribe("/waypoint_generator/waypoints", 1, &L1Controller::waypointCB, this);
 
     marker_pub = n_.advertise<visualization_msgs::Marker>("car_path", 10);
     pub_ = n_.advertise<geometry_msgs::Twist>("car/cmd_vel", 1);
@@ -216,6 +218,20 @@ void L1Controller::odomCB(const nav_msgs::Odometry::ConstPtr &odomMsg)
 void L1Controller::pathCB(const nav_msgs::Path::ConstPtr &pathMsg)
 {
     map_path = *pathMsg;
+}
+
+void L1Controller::waypointCB(const nav_msgs::PathConstPtr &msg)
+{
+    geometry_msgs::PoseStamped odom_goal;
+    // tf_listener.transformPose("world", ros::Time(0), *goalMsg, "world", odom_goal);
+    // odom_goal_pos = odom_goal.pose.position;
+    odom_goal_pos = msg->poses[0].pose.position;
+    goal_received = true;
+    goal_reached = false;
+
+    /*Draw Goal on RVIZ*/
+    goal_circle.pose = odom_goal.pose;
+    marker_pub.publish(goal_circle);
 }
 
 void L1Controller::goalCB(const geometry_msgs::PoseStamped::ConstPtr &goalMsg)

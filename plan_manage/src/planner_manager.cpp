@@ -129,12 +129,12 @@ namespace cane_planner
         start_pt_(1) = odom_pos_(1);
         start_state_(0) = odom_pos_(0);
         start_state_(1) = odom_pos_(1);
-        // TODO:vins' yaw have bug,need
+        // TODO:test
         double yaw = QuatenionToYaw(odom_ori_);
         start_state_(2) = yaw;
 
-        ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
-        ROS_WARN("odom_yaw is %f,change is %f", yaw_test, yaw);
+        // ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
+        // ROS_WARN("odom_yaw is %f,change is %f", yaw_test, yaw);
         have_odom_ = true;
     }
     // ------------------------ FSM Callback --------------------------------
@@ -210,7 +210,7 @@ namespace cane_planner
             else
             {
                 // real experience using odom judge stop replan
-                if (abs(odom_pos_(0) - end_pt_(0)) <= 0.4 ||
+                if (abs(odom_pos_(0) - end_pt_(0)) <= 0.4 &&
                     abs(odom_pos_(1) - end_pt_(1)) <= 0.4)
                 {
                     have_target_ = false;
@@ -338,7 +338,7 @@ namespace cane_planner
             geometry_msgs::PoseStamped this_pose_stamped;
             this_pose_stamped.pose.position.x = list[i](0);
             this_pose_stamped.pose.position.y = list[i](1);
-            this_pose_stamped.pose.position.z = -0.4;
+            this_pose_stamped.pose.position.z = 0.0;
             this_pose_stamped.pose.orientation.x = 0.0;
             this_pose_stamped.pose.orientation.y = 0.0;
             this_pose_stamped.pose.orientation.z = 1.0;
@@ -450,12 +450,12 @@ namespace cane_planner
         tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
         return yaw;
     }
-    // TODO这里待验证正确性
+    // yaw
     double PlannerManager::QuatenionToYaw(Eigen::Quaterniond ori)
     {
         Eigen::Matrix3d oRx = ori.toRotationMatrix();
         // roll world to body is 
-        double yaw = 0, pitch = 0, roll = M_PI / 2;
+        double yaw = 0, pitch = -M_PI / 2, roll = M_PI / 2;
         Eigen::Matrix3d Rx;
         Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
         oRx = oRx * Rx;
