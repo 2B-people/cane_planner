@@ -6,13 +6,13 @@
 
   <node pkg="tf" type="static_transform_publisher" name="tf_pub" args="0 0 0 0 0 0 1 world base_link 20" />
 
-  <node name="simulation_generator" pkg="map_generator" type="simulation_generator" output="log" args=" $(find map_generator)/resource/office3.pcd" >
+  <node name="simulation_generator" pkg="map_generator" type="simulation_generator" output="log" args=" $(find map_generator)/resource/indoor.pcd" >
         <remap from="/cmd_vel"   to="teleop/cmd_vel"/>
   </node>
   
   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find map_generator)/launch/test.rviz" />
 
-  <node pkg="local_sensing_node" type="pcl_render_node" name="pcl_render_node" output="screen">
+  <!-- <node pkg="local_sensing_node" type="pcl_render_node" name="pcl_render_node" output="screen">
         <rosparam command="load" file="$(find local_sensing_node)/params/camera.yaml" />
         <param name="sensing_horizon"  value="5.0" />
         <param name="sensing_rate"     value="30.0"/>
@@ -24,6 +24,6 @@
 
         <remap from="~global_map" to="/Simulation_generator/global_cloud"/>
         <remap from="~odometry"   to="/Simulation_generator/odom"/>
-  </node>
+  </node> -->
 
 </launch>

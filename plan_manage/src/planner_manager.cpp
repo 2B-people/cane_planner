@@ -448,11 +448,12 @@ namespace cane_planner
         return yaw;
     }
 
+    // TODO这里待验证正确性
     double PlannerManager::QuatenionToYaw(Eigen::Quaterniond ori)
     {
         Eigen::Matrix3d oRx = ori.toRotationMatrix();
 
-        double yaw = M_PI / 2, pitch = M_PI / 2, roll = M_PI / 2;
+        double yaw = M_PI / 2, pitch =0, roll = M_PI / 2;
 
         Eigen::Matrix3d Rx;
         Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
@@ -461,6 +462,7 @@ namespace cane_planner
 
         Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
         
+        return ea(0);
     }
 
 } // namespace cane_planner

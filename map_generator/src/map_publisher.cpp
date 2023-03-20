@@ -44,19 +44,19 @@ int main(int argc, char** argv) {
   // }
 
   // Find range of map
-  Eigen::Vector2d mmin(0, 0), mmax(0, 0);
-  for (auto pt : cloud) {
-    mmin[0] = min(mmin[0], double(pt.x));
-    mmin[1] = min(mmin[1], double(pt.y));
-    mmax[0] = max(mmax[0], double(pt.x));
-    mmax[1] = max(mmax[1], double(pt.y));
-  }
+  // Eigen::Vector2d mmin(0, 0), mmax(0, 0);
+  // for (auto pt : cloud) {
+  //   mmin[0] = min(mmin[0], double(pt.x));
+  //   mmin[1] = min(mmin[1], double(pt.y));
+  //   mmax[0] = max(mmax[0], double(pt.x));
+  //   mmax[1] = max(mmax[1], double(pt.y));
+  // }
 
-  // Add ground
-  for (double x = mmin[0]; x <= mmax[0]; x += 0.1)
-    for (double y = mmin[1]; y <= mmax[1]; y += 0.1) {
-      cloud.push_back(pcl::PointXYZ(x, y, -0.5));
-    }
+  // // Add ground
+  // for (double x = mmin[0]; x <= mmax[0]; x += 0.1)
+  //   for (double y = mmin[1]; y <= mmax[1]; y += 0.1) {
+  //     cloud.push_back(pcl::PointXYZ(x, y, -0.5));
+  //   }
 
   // cout << "Publishing map..." << endl;
 
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
   
   int count = 0;
   while (ros::ok()) {
-    ros::Duration(0.1).sleep();
+    ros::Duration(0.2).sleep();
     cloud_pub.publish(msg);
     pose_pub.publish(pose);
     odom_pub.publish(odom);
