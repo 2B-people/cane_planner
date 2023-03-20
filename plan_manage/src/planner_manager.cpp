@@ -117,15 +117,24 @@ namespace cane_planner
         odom_vel_(0) = msg->twist.twist.linear.x;
         odom_vel_(1) = msg->twist.twist.linear.y;
         odom_vel_(2) = msg->twist.twist.linear.z;
+        odom_ori_.x() = msg->pose.pose.orientation.x;
+        odom_ori_.y() = msg->pose.pose.orientation.y;
+        odom_ori_.z() = msg->pose.pose.orientation.z;
+        odom_ori_.w() = msg->pose.pose.orientation.w;
+        //! test yaw
+        double yaw_test = QuatenionToYaw(msg->pose.pose.orientation);
+
         // odom and start set
         start_pt_(0) = odom_pos_(0);
         start_pt_(1) = odom_pos_(1);
         start_state_(0) = odom_pos_(0);
         start_state_(1) = odom_pos_(1);
         // TODO:vins' yaw have bug,need
-        double yaw = QuatenionToYaw(msg->pose.pose.orientation);
+        double yaw = QuatenionToYaw(odom_ori_);
         start_state_(2) = yaw;
 
+        ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
+        ROS_WARN("odom_yaw is %f,change is %f", yaw_test, yaw);
         have_odom_ = true;
     }
     // ------------------------ FSM Callback --------------------------------
@@ -445,12 +454,13 @@ namespace cane_planner
     double PlannerManager::QuatenionToYaw(Eigen::Quaterniond ori)
     {
         Eigen::Matrix3d oRx = ori.toRotationMatrix();
-        double yaw = M_PI / 2, pitch = 0, roll = M_PI / 2;
+        // roll world to body is 
+        double yaw = 0, pitch = 0, roll = M_PI / 2;
         Eigen::Matrix3d Rx;
         Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
         oRx = oRx * Rx;
         Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
-
+        //ZYX ,yaw is ea(0)
         return ea(0);
     }
 } // namespace cane_planner
