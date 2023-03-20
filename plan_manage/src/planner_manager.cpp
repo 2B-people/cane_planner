@@ -7,7 +7,76 @@ namespace cane_planner
     PlannerManager::~PlannerManager()
     {
     }
+    // ------------------ simulation --------------------------
+    void PlannerManager::simInit(ros::NodeHandle &nh)
+    {
+        // init FSM
+        exec_state_ = FSM_STATE::INIT;
+        have_odom_ = false;
+        have_target_ = false;
+        // init esdf_map and collision
+        sdf_map_.reset(new fast_planner::SDFMap);
+        sdf_map_->initMap(nh);
+        collision_.reset(new CollisionDetection);
+        collision_->init(nh);
+        collision_->setMap(sdf_map_);
+        // init kin planner
+        ROS_WARN(" Astar planer start");
+        astar_finder_.reset(new Astar);
+        astar_finder_->setParam(nh);
+        astar_finder_->setCollision(collision_);
+        astar_finder_->init();
+        // init lfpc model
+        lfpc_model_.reset(new LFPC);
+        lfpc_model_->initializeModel(nh);
+        // init astar planner
+        ROS_WARN(" kinodynamic planer start");
+        kin_finder_.reset(new KinodynamicAstar);
+        kin_finder_->setParam(nh);
+        kin_finder_->setCollision(collision_);
+        kin_finder_->setModel(lfpc_model_);
+        kin_finder_->init();
+        goal_sub_ =
+            nh.subscribe("/move_base_simple/goal", 1, &PlannerManager::goalCallback, this); // 接收目标的topic
+        start_sub_ =
+            nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
+        // Timer
+        exec_timer_ =
+            nh.createTimer(ros::Duration(0.1), &PlannerManager::execFSMCallback, this);
+        // Visial
+        astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
+        kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
+        kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
+    }
+    // simulation callback goal
+    void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
+    {
+        end_pt_(0) = goal->pose.position.x;
+        end_pt_(1) = goal->pose.position.y;
+        ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
 
+        end_state_(0) = goal->pose.position.x;
+        end_state_(1) = goal->pose.position.y;
+        double yaw = QuatenionToYaw(goal->pose.orientation);
+        end_state_(2) = yaw;
+        ROS_INFO("goal yaw is: %lf", yaw);
+        have_target_ = true;
+    }
+    // simulation callback start or odom
+    void PlannerManager::startCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start)
+    {
+        start_pt_(0) = start->pose.pose.position.x;
+        start_pt_(1) = start->pose.pose.position.y;
+        ROS_INFO("set start pos is:%lf and %lf", start_pt_(0), start_pt_(1));
+        start_state_(0) = start->pose.pose.position.x;
+        start_state_(1) = start->pose.pose.position.y;
+        double yaw = QuatenionToYaw(start->pose.pose.orientation);
+        start_state_(2) = yaw;
+        cout << "yaw:" << yaw << endl;
+        have_odom_ = true;
+    }
+
+    //------------------- real experience ---------------------
     void PlannerManager::init(ros::NodeHandle &nh)
     {
         // init FSM
@@ -53,7 +122,6 @@ namespace cane_planner
         // Path
         path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
     }
-    //------------------- real experience ---------------------
     // real experience callback waypoint or goal
     void PlannerManager::waypointCallback(const nav_msgs::PathConstPtr &msg)
     {

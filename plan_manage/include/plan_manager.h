@@ -60,6 +60,7 @@ namespace cane_planner
         ros::Timer exec_timer_;
         ros::Timer replan_timer_;
         ros::Subscriber odom_sub_, waypoint_sub_;
+        ros::Subscriber goal_sub_, start_sub_;
         ros::Publisher astar_pub_,kin_path_pub_,kin_foot_pub_;
         ros::Publisher path_pub_;
 
@@ -83,6 +84,10 @@ namespace cane_planner
         // sub callback
         void waypointCallback(const nav_msgs::PathConstPtr &msg);
         void odometryCallback(const nav_msgs::OdometryConstPtr &msg);
+        //sim sub callback
+        void goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal);
+        void startCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start);
+
     public:
         PlannerManager(bool simulation)
         {
@@ -90,6 +95,7 @@ namespace cane_planner
         }
         ~PlannerManager();
         void init(ros::NodeHandle &nh);
+        void simInit(ros::NodeHandle &nh);
     };
 
 } // namespace cane_planner

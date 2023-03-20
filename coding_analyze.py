@@ -30,7 +30,7 @@ def len(t_coding):
     sum = 0
     for file in FileList:
         sum += afileline(file)
-    print('program line sum is:',sum)    
+    print(t_coding,'program line sum is:',sum)    
     # print('Done! Cost time is ',(time.clock()-s_time),'second')
     FileList.clear()
 
