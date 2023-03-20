@@ -48,6 +48,7 @@ namespace cane_planner
         bool simulation_;
 
         Eigen::Vector3d odom_pos_, odom_vel_;
+        Eigen::Quaterniond odom_ori_;
 
         Eigen::Vector2d start_pt_; // start pos
         Eigen::Vector2d end_pt_;   // target pos
