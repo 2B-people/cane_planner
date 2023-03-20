@@ -1,18 +1,21 @@
 <launch>
     <arg name="odometry_topic" value = "/simulation_generator/odom"/>
-
     <!-- kindynameic alogoritm -->
     <include file="$(find plan_manage)/launch/algorithm.launch">
+        <!-- not using cloud and odom -->
         <arg name="odometry_topic" value = "$(arg odometry_topic)"/>
         <arg name="cloud_topic" value = "/simulation_generator/global_cloud"/>
-
-        <!-- not using Image and pose -->
         <arg name="depth_topic" value="depth"/>
         <arg name="sensor_pose_topic" value="pose"/>
-
-        <arg name="simulation" value="true"/>
+        <!-- simulation opion -->
+        <arg name="simulation" value="false"/>
+        <arg name="slice_height" value="0.1"/>
+        <arg name="kin_horizon" value="3"/>
+        <!-- map size -->
+        <arg name="map_size_x" value="40.0"/>
+        <arg name="map_size_y" value="20.0"/>
+        <arg name="map_size_z" value=" 5.0"/>
     </include>
-
     <!-- L1 controller -->
     <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
         <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
@@ -20,15 +23,20 @@
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
         <param name="AngleGain" value="-1.5"/>
-        <param name="SerialUsing" value="true"/>
+        <param name="SerialUsing" value="false"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
     </node>
-
-
     <!-- simulation -->
     <include file="$(find plan_manage)/launch/simulation.launch"/>
-
+    <!-- waypoint -->
+    <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+        <remap from="~odom" to="$(arg odometry_topic)"/>
+        <remap from="~goal" to="/move_base_simple/goal"/>
+        <remap from="~traj_start_trigger" to="/traj_start_trigger" />
+        <param name="waypoint_type" value="manual-lonely-waypoint"/>
+    </node>
     <!-- visualisation -->
-    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find plan_manage)/config/traj.rviz" />
+    <include file="$(find plan_manage)/launch/rviz.launch">
 
+    </include>
 </launch>
