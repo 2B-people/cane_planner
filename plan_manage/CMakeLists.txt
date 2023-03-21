@@ -41,11 +41,20 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-add_executable(cane_planner_node
+# replan FSM
+add_executable(kin_replan_node
 		src/kin_replan_node.cpp
     src/planner_manager.cpp
 )
-
-target_link_libraries(cane_planner_node 
+target_link_libraries(kin_replan_node 
   ${catkin_LIBRARIES}
   )
+
+# sim
+add_executable(sim_plan_node
+    src/sim_plan_node.cpp
+    src/planner_manager.cpp
+)
+target_link_libraries(sim_plan_node 
+  ${catkin_LIBRARIES}
+)

@@ -142,6 +142,7 @@ namespace cane_planner
 
     /*Compute Heuristic*/
     double estimateHeuristic(Eigen::Vector3d input);
+    double estimateHeuristic(Eigen::Vector3d input,Eigen::Vector3d state1, Eigen::Vector3d state2);
     /* heuristic function */
     double getDiagHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);
     double getManhHeu(Eigen::Vector3d x1, Eigen::Vector3d x2);

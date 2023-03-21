@@ -78,15 +78,8 @@ namespace cane_planner
 
         vx_0_ = init_v_state(0);
         vy_0_ = init_v_state(1);
-        auto state_f = calculateLFPC(vx_0_, vy_0_);
-        // update step support_leg_pos
-        support_leg_pos_(0) = COM_pos_(0) + state_f(0);
-        support_leg_pos_(1) = COM_pos_(1) + state_f(1);
-        support_leg_pos_(2) = 0.0;
-        // update step param;
-        x_0_ = -state_f(0);
-        y_0_ = -state_f(1);
         theta_ = init_v_state(2);
+
         // step variable
         t_ = 0;
         x_t_ = 0.0;
@@ -101,6 +94,14 @@ namespace cane_planner
     void LFPC::updateOneStep()
     {
         int swing_data_len = int(t_sup_ / delta_t_);
+        auto state_f = calculateLFPC(vx_0_, vy_0_);
+        // update step support_leg_pos
+        support_leg_pos_(0) = COM_pos_(0) + state_f(0);
+        support_leg_pos_(1) = COM_pos_(1) + state_f(1);
+        support_leg_pos_(2) = 0.0;
+        // update step param;
+        x_0_ = -state_f(0);
+        y_0_ = -state_f(1);
         // update motion com_pos into step_path_
         for (int i = 0; i < swing_data_len; i++)
         {

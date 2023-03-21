@@ -33,24 +33,11 @@ namespace cane_planner
         cur_node->g_score = 0.0;
         cur_node->step_num = 0;
 
-        // lfpc model reset
-        Eigen::Vector3d um;
-        um << 0.2, 0.1, 0;
-        lfpc_model_->SetCtrlParams(um);
-        lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
-                           cur_node->support_feet, cur_node->step_num);
-        lfpc_model_->updateOneStep();
-        cur_node->iter_state = lfpc_model_->getNextIterState();
-        cur_node->com_pos = lfpc_model_->getCOMPos();
-        cur_node->support_feet = lfpc_model_->getSupportFeet();
-        cur_node->support_pos = lfpc_model_->getFootPosition();
-        cur_node->step_num = lfpc_model_->getStepNum();
-        cur_node->com_path = lfpc_model_->getStepCOMPath();
-
+        // end set
         Eigen::Vector2i end_index;
         end_index = stateToIndex(end_pos);
         // TODO(1): Heuristic compute
-        cur_node->f_score = lambda_heu_ * getEuclHeu(start_pos, end_pos);
+        cur_node->f_score = lambda_heu_ * getManhHeu(start_pos, end_pos);
         cur_node->kdnode_state = IN_OPEN_SET;
 
         open_set_.push(cur_node);
@@ -120,9 +107,9 @@ namespace cane_planner
             Eigen::Vector3d um;
 
             /* ---------- param for next gait point ---------- */
-            double al_res = 1 / 1.0, aw_res = 1 / 1.0, pi_res = 1 / 3.0;
+            double al_res = 1 / 2.0, aw_res = 1 / 1.0, pi_res = 1 / 3.0;
             /* ----------set input list ---------- */
-            for (double al = max_al_ * al_res; al < max_al_ + 1e-3; al += max_al_ * al_res)
+            for (double al = max_al_ - 0.1; al < max_al_ + 1e-3; al += al_res * 0.1)
                 for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
                     for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
                     {
@@ -137,9 +124,9 @@ namespace cane_planner
             {
                 // state transit,explore the next gait point.
                 um = inputs[i];
-                lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->reset(cur_node->iter_state, cur_node->com_pos,
                                    cur_node->support_feet, cur_node->step_num);
+                lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
                 pur_state.support_pos = lfpc_model_->getFootPosition();
@@ -194,8 +181,8 @@ namespace cane_planner
                 //     continue;
                 // }
 
-                double tmp_g_score = cur_node->g_score + estimateHeuristic(um);
-                double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state.com_pos, end_pos);
+                double tmp_g_score = cur_node->g_score + estimateHeuristic(um, pur_state.com_pos, cur_node->com_pos);
+                double tmp_f_score = tmp_g_score + lambda_heu_ * getManhHeu(pur_state.com_pos, end_pos);
                 if (pro_node == NULL)
                 {
                     // std::cout << "find new pro_node" << std::endl;
@@ -218,7 +205,6 @@ namespace cane_planner
                     // add used node num
                     use_node_num_ += 1;
                     // std::cout << "---------------" << std::endl;
-                    // std::cout << "f_score:" << tmp_f_score << " g_score:" << tmp_g_score << std::endl;
                     if (use_node_num_ == allocate_num_)
                     {
                         std::cout << "run out of memory." << std::endl;
@@ -241,6 +227,7 @@ namespace cane_planner
                         pro_node->f_score = tmp_f_score;
                         pro_node->g_score = tmp_g_score;
                         pro_node->parent = cur_node;
+                        // std::cout << "f_score:" << tmp_f_score << " g_score:" << tmp_g_score << std::endl;
                     }
                 }
                 else
@@ -444,8 +431,21 @@ namespace cane_planner
         Eigen::Vector2d acc_x_y;
         acc_x_y << input(0), input(1);
         // double heu = acc_x_y.norm() + input(2);
-        double heu = acc_x_y.norm() + 0.5 * abs(input(2));
+        double heu = 0.1 * abs(input(2));
         // std::cout << "this heu is " << heu << std::endl;
+        return heu;
+    }
+
+    double KinodynamicAstar::estimateHeuristic(Eigen::Vector3d input, Eigen::Vector3d state1, Eigen::Vector3d state2)
+    {
+        Eigen::Vector2d acc_x_y;
+        acc_x_y << input(0), input(1);
+        double dx = fabs(state1(0) - state2(0));
+        double dy = fabs(state1(1) - state2(1));
+        double heu = dx + dy + 0.05 * abs(input(2));
+        // double heu = (state1 - state2).norm() + 0.01 * abs(input(2));
+        // std::cout << "this heu is " << heu << std::endl;
+
         return heu;
     }
 

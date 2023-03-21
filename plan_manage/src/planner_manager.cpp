@@ -40,9 +40,6 @@ namespace cane_planner
             nh.subscribe("/move_base_simple/goal", 1, &PlannerManager::goalCallback, this); // 接收目标的topic
         start_sub_ =
             nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
-        // Timer
-        exec_timer_ =
-            nh.createTimer(ros::Duration(0.1), &PlannerManager::execFSMCallback, this);
         // Visial
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
         kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
@@ -74,6 +71,31 @@ namespace cane_planner
         start_state_(2) = yaw;
         cout << "yaw:" << yaw << endl;
         have_odom_ = true;
+    }
+    void PlannerManager::callPath()
+    {
+        static int fsm_num = 0;
+        static bool success1 = false;
+        static bool success2 = false;
+        if (have_odom_ && have_target_)
+        {
+            success1 = callAstarPlan();
+            success2 = callKinodynamicAstarPlan();
+            if (success1)
+                displayAstar();
+            if (success2)
+                displayKinastar();
+            have_target_ = false;
+        }
+        fsm_num++;
+        if (fsm_num == 1000)
+        {
+            if (!have_odom_)
+                ROS_WARN("no odom.");
+            if (!have_target_)
+                ROS_WARN("wait for goal.");
+            fsm_num = 0;
+        }
     }
 
     //------------------- real experience ---------------------

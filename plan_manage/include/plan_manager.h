@@ -96,6 +96,8 @@ namespace cane_planner
         ~PlannerManager();
         void init(ros::NodeHandle &nh);
         void simInit(ros::NodeHandle &nh);
+
+        void callPath();
     };
 
 } // namespace cane_planner
