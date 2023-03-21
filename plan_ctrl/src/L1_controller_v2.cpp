@@ -32,6 +32,8 @@ along with hypha_racecar.  If not, see <http://www.gnu.org/licenses/>.
 #include <visualization_msgs/Marker.h>
 #include <serial/serial.h>
 
+#include <Eigen/Eigen>
+
 #define PI 3.14159265358979
 
 /********************/
@@ -258,17 +260,25 @@ void L1Controller::goalCB(const geometry_msgs::PoseStamped::ConstPtr &goalMsg)
 
 double L1Controller::getYawFromPose(const geometry_msgs::Pose &carPose)
 {
-    float x = carPose.orientation.x;
-    float y = carPose.orientation.y;
-    float z = carPose.orientation.z;
-    float w = carPose.orientation.w;
+    Eigen::Quaterniond ori;
+    double x,y,z,w;
+    x = ori.x() = carPose.orientation.x;
+    y = ori.y() = carPose.orientation.y;
+    z = ori.z() = carPose.orientation.z;
+    w = ori.w() = carPose.orientation.w;
 
-    double tmp, yaw;
-    tf::Quaternion q(x, y, z, w);
-    tf::Matrix3x3 quaternion(q);
-    quaternion.getRPY(tmp, tmp, yaw);
-
-    return yaw;
+    Eigen::Matrix3d oRx = ori.toRotationMatrix();
+    double yaw = 0, pitch = -M_PI / 2, roll = M_PI / 2;
+    Eigen::Matrix3d Rx;
+    Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
+    oRx = oRx * Rx;
+    Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
+    return ea(0);
+    // double tmp, yaw;
+    // tf::Quaternion q(x, y, z, w);
+    // tf::Matrix3x3 quaternion(q);
+    // quaternion.getRPY(tmp, tmp, yaw);
+    // return yaw;
 }
 
 bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geometry_msgs::Pose &carPose)

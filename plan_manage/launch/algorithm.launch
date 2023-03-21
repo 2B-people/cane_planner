@@ -75,7 +75,7 @@
         <param name="astar/lambda_heu" value="0.01"/>
         <param name="astar/allocate_num" value="100000"/>
         <!-- collision set -->
-        <param name="Collision/margin" value="0.4"/>
+        <param name="Collision/margin" value="0.3"/>
         <param name="Collision/SliceHeight" value="$(arg slice_height)"/>
         <!-- lfpc set -->
         <param name="lfpc/delta_t" value="0.05"/>
