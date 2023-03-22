@@ -44,6 +44,8 @@ namespace cane_planner
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
         kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
         kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
+        // Path
+        path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
     }
     // simulation callback goal
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
@@ -84,7 +86,10 @@ namespace cane_planner
             if (success1)
                 displayAstar();
             if (success2)
+            {
                 displayKinastar();
+                publishKinodynamicAstarPath();
+            }
             have_target_ = false;
         }
         fsm_num++;
@@ -352,7 +357,11 @@ namespace cane_planner
     bool PlannerManager::callAstarPlan()
     {
         astar_finder_->reset();
+        ros::Time time_1 = ros::Time::now();
         bool plan_success = astar_finder_->search(start_pt_, end_pt_);
+        ros::Time time_2 = ros::Time::now();
+        if (plan_success)
+            ROS_WARN("Time consume in Astar path finding is %f", (time_2 - time_1).toSec());
         return plan_success;
     }
     bool PlannerManager::callKinodynamicAstarPlan()
@@ -365,7 +374,12 @@ namespace cane_planner
         // vy = 0.5 * cos(start_state_(2));
         // input << 0.0, vx, 0.0, vy;
         input << 0.0, 0.0, start_state_(2);
+        //
+        ros::Time time_k = ros::Time::now();
         bool plan_success = kin_finder_->search(start_state_, input, end_state_);
+        ros::Time time_2 = ros::Time::now();
+        if (plan_success)
+            ROS_WARN("Time consume in KinodynamicAstar path finding is %f", (time_2 - time_k).toSec());
         return plan_success;
     }
     // publish traj to L1-control

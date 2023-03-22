@@ -44,6 +44,7 @@ void SDFMap::initMap(ros::NodeHandle& nh) {
   nh.param("sdf_map/p_max", mp_->p_max_, 0.97);
   nh.param("sdf_map/p_occ", mp_->p_occ_, 0.80);
   nh.param("sdf_map/max_ray_length", mp_->max_ray_length_, -0.1);
+  nh.param("sdf_map/max_build_length", mp_->max_build_length_, -0.1);
   nh.param("sdf_map/virtual_ceil_height", mp_->virtual_ceil_height_, -0.1);
 
   auto logit = [](const double& x) { return log(x / (1 - x)); };
@@ -281,14 +282,14 @@ void SDFMap::BuildsimulationMap(const pcl::PointCloud<pcl::PointXYZ>& points, co
       // Find closest point in map and set free
       pt_w = closetPointInMap(pt_w, camera_pos);
       length = (pt_w - camera_pos).norm();
-      if (length > 30.0)
-        pt_w = (pt_w - camera_pos) / length * 30.0 + camera_pos;
+      if (length > mp_->max_build_length_)
+        pt_w = (pt_w - camera_pos) / length * mp_->max_build_length_ + camera_pos;
       if (pt_w[2] < 0.2) continue;
       tmp_flag = 0;
     } else {
       length = (pt_w - camera_pos).norm();
-      if (length > 30.0) {
-        pt_w = (pt_w - camera_pos) / length * 30.0 + camera_pos;
+      if (length > mp_->max_build_length_) {
+        pt_w = (pt_w - camera_pos) / length * mp_->max_build_length_ + camera_pos;
         if (pt_w[2] < 0.2) continue;
         tmp_flag = 0;
       } else

@@ -7,6 +7,7 @@
 #include <Eigen/Eigen>
 #include <Eigen/Geometry>
 #include <ros/ros.h>
+#include <ros/console.h>
 #include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>

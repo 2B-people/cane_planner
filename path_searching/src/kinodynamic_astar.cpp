@@ -72,6 +72,9 @@ namespace cane_planner
                 std::cout << "[Kin-Astar]:---------------------- " << use_node_num_ << std::endl;
                 std::cout << "use node num: " << use_node_num_ << std::endl;
                 std::cout << "iter num: " << iter_num_ << std::endl;
+                // std::cout << "feasible num: " << num_feasible << std::endl;
+                // std::cout << "close num: " << num_close << std::endl;
+                // std::cout << "collision num: " << num_collision << std::endl;
                 terminate_node = cur_node;
                 retrievePath(terminate_node);
                 return true;
@@ -85,6 +88,9 @@ namespace cane_planner
                     std::cout << "[Kin-Astar](horizon):---------------------- " << use_node_num_ << std::endl;
                     std::cout << "use node num: " << use_node_num_ << std::endl;
                     std::cout << "iter num: " << iter_num_ << std::endl;
+                    // std::cout << "feasible num: " << num_feasible << std::endl;
+                    // std::cout << "close num: " << num_close << std::endl;
+                    // std::cout << "collision num: " << num_collision << std::endl;
                     terminate_node = cur_node;
                     retrievePath(terminate_node);
                     return true;
@@ -109,13 +115,13 @@ namespace cane_planner
             /* ---------- param for next gait point ---------- */
             double al_res = 1 / 2.0, aw_res = 1 / 1.0, pi_res = 1 / 3.0;
             /* ----------set input list ---------- */
-            for (double al = max_al_ - 0.1; al < max_al_ + 1e-3; al += al_res * 0.1)
-                for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
-                    for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
-                    {
-                        um << al, aw, api;
-                        inputs.push_back(um);
-                    }
+            // for (double al = max_al_ - 0.1; al < max_al_ + 1e-3; al += al_res * 0.1)
+            for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
+                for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
+                {
+                    um << max_al_, aw, api;
+                    inputs.push_back(um);
+                }
 
             /* ----------Explore the next gait point ---------- */
             // std::cout << "set input list" << std::endl;
@@ -129,6 +135,7 @@ namespace cane_planner
                 lfpc_model_->SetCtrlParams(um);
                 lfpc_model_->updateOneStep();
                 pur_state.com_pos = lfpc_model_->getCOMPos();
+                pur_state.com_path = lfpc_model_->getStepCOMPath();
                 pur_state.support_pos = lfpc_model_->getFootPosition();
                 // std::cout << "\ninput:sx,sy,yaw" << um.transpose() << std::endl;
                 // std::cout << "pur_state: " << pur_state.com_pos.transpose() << std::endl;
@@ -158,28 +165,38 @@ namespace cane_planner
                 // Check com and feet safety
                 /* collision com pos free */
                 Eigen::Vector2d pro_pos;
-                pro_pos << pur_state.com_pos(0), pur_state.com_pos(1);
-                if (!collision_->isTraversable(pro_pos))
+                bool safe_flag = true;
+                for (size_t i = 0; i < pur_state.com_path.size(); i++)
+                {
+                    pro_pos << pur_state.com_path[i](0), pur_state.com_path[i](1);
+                    if (!collision_->isTraversable(pro_pos))
+                    {
+                        safe_flag = false;
+                        break;
+                    }
+                }
+                if (!safe_flag)
                 {
                     // std::cout << "can't Traversable" << std::endl;
                     num_collision++;
                     continue;
                 }
+
                 // support pos safety collision free
-                //  TODO this is mast in gourd
-                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
-                if (!collision_->isTraversable(pro_pos))
-                {
-                    // std::cout << "can't Traversable" << std::endl;
-                    num_collision++;
-                    continue;
-                }
-                // // out edf map by expert
-                // if (collision_->getCollisionDistance(pro_pos) >= 6.0)
+                // //  TODO this is mast in gourd
+                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
+                // if (!collision_->isTraversable(pro_pos))
                 // {
-                //     num_outedf++;
+                //     // std::cout << "can't Traversable" << std::endl;
+                //     num_collision++;
                 //     continue;
                 // }
+                // // out edf map by expert
+                if (collision_->getCollisionDistance(pro_pos) >= 6.0)
+                {
+                    num_outedf++;
+                    continue;
+                }
 
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um, pur_state.com_pos, cur_node->com_pos);
                 double tmp_f_score = tmp_g_score + lambda_heu_ * getManhHeu(pur_state.com_pos, end_pos);
@@ -443,7 +460,7 @@ namespace cane_planner
         double dx = fabs(state1(0) - state2(0));
         double dy = fabs(state1(1) - state2(1));
         double heu = dx + dy + 0.05 * abs(input(2));
-        // double heu = (state1 - state2).norm() + 0.01 * abs(input(2));
+        // double heu = (state1 - state2).norm() + 0.05 * abs(input(2));
         // std::cout << "this heu is " << heu << std::endl;
 
         return heu;

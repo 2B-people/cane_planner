@@ -62,12 +62,12 @@
         <param name="map_ros/frame_id" value="world"/>
         <!-- kin astar  -->
         <param name="kinastar/resolution_astar" value="0.1"/>
-        <param name="kinastar/lambda_heu" value="1"/>
+        <param name="kinastar/lambda_heu" value="1.2"/>
         <param name="kinastar/allocate_num" value="100000"/>
         <!-- kin astar contorl param -->
         <param name="kinastar/horizon" value="$(arg kin_horizon)"/>
-        <param name="kinastar/max_al" value="0.4"/>
-        <param name="kinastar/max_aw" value="0.1"/>
+        <param name="kinastar/max_al" value="0.6"/>
+        <param name="kinastar/max_aw" value="0.2"/>
         <param name="kinastar/max_theta" value="0.6"/>
         <!-- astar set -->
         <param name="astar/resolution_astar" value="0.1"/>
@@ -78,7 +78,7 @@
         <param name="Collision/margin" value="0.4"/>
         <param name="Collision/SliceHeight" value="$(arg slice_height)"/>
         <!-- lfpc set -->
-        <param name="lfpc/delta_t" value="0.05"/>
+        <param name="lfpc/delta_t" value="0.1"/>
         <param name="lfpc/t_sup" value="0.35"/>
     </node>
 
