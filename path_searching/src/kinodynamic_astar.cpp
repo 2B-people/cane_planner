@@ -173,12 +173,12 @@ namespace cane_planner
                 //     continue;
                 // }
                 /* collision com pos free */
-                Eigen::Vector2d pro_pos;
+                Eigen::Vector3d pro_pos;
                 bool safe_flag = true;
                 for (size_t i = 0; i < pur_state.com_path.size(); i++)
                 {
-                    pro_pos << pur_state.com_path[i](0), pur_state.com_path[i](1);
-                    if (!collision_->isTraversable(pro_pos))
+                    pro_pos << pur_state.com_path[i];
+                    if (collision_->sdf_map_->getInflateOccupancy(pro_pos) == 1)
                     {
                         safe_flag = false;
                         break;

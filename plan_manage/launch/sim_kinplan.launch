@@ -16,7 +16,7 @@
     <arg name="resolution" value=" 0.1"/>
 
     <!-- map -->
-    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/pillar.pcd"/>
+    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office.pcd"/>
     <!-- sim_plan -->
     <node pkg="plan_manage" name="sim_plan_node" type="sim_plan_node" output="screen">
         <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
@@ -33,8 +33,8 @@
         <param name="sdf_map/map_size_x" value="$(arg map_size_x)" />
         <param name="sdf_map/map_size_y" value="$(arg map_size_y)" />
         <param name="sdf_map/map_size_z" value="$(arg map_size_z)" />
-        <param name="sdf_map/obstacles_inflation" value="0.099" />
-        <param name="sdf_map/local_bound_inflate" value="0.5"/>
+        <param name="sdf_map/obstacles_inflation" value="0.3" />
+        <param name="sdf_map/local_bound_inflate" value="0.1"/>
         <param name="sdf_map/local_map_margin" value="50"/>
         <param name="sdf_map/ground_height" value="0.1"/>
         <param name="sdf_map/default_dist" value="5.0"/>
