@@ -79,7 +79,7 @@
         <param name="Collision/SliceHeight" value="$(arg slice_height)"/>
         <!-- lfpc set -->
         <param name="lfpc/delta_t" value="0.1"/>
-        <param name="lfpc/t_sup" value="0.3"/>
+        <param name="lfpc/t_sup" value="0.35"/>
     </node>
 
 </launch>

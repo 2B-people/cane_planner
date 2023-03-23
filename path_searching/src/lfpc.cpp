@@ -62,7 +62,7 @@ namespace cane_planner
                      char cur_support_leg, int step_num)
     {
         COM_pos_ = COM_init_pos;
-        COM_pos_(2) = h_;
+        COM_pos_(2) = 0.1;
 
         step_num_ = step_num;
         // change support_leg
@@ -152,6 +152,7 @@ namespace cane_planner
 
         COM_pos_(0) = x_t_ + support_leg_pos_(0);
         COM_pos_(1) = y_t_ + support_leg_pos_(1);
+        COM_pos_(2) = 0.1;
     }
 
     Vector4d LFPC::calculateXtVt(double t)

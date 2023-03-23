@@ -143,7 +143,7 @@ namespace cane_planner
             nh.subscribe("/odom_world", 1, &PlannerManager::odometryCallback, this);
         // Timer
         exec_timer_ =
-            nh.createTimer(ros::Duration(0.1), &PlannerManager::execFSMCallback, this);
+            nh.createTimer(ros::Duration(0.2), &PlannerManager::execFSMCallback, this);
         replan_timer_ =
             nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
         // Visial
@@ -208,11 +208,11 @@ namespace cane_planner
         fsm_num++;
         if (fsm_num == 100)
         {
+            fsm_num = 0;
             if (!have_odom_)
-                // ROS_WARN("no odom.");
-                if (!have_target_)
-                    // ROS_WARN("wait for goal.");
-                    fsm_num = 0;
+                ROS_WARN("no odom.");
+            if (!have_target_)
+                ROS_WARN("wait for goal.");
         }
         // FSM loop
         switch (exec_state_)
@@ -270,7 +270,7 @@ namespace cane_planner
                 have_target_ = false;
                 changeFSMExecState(WAIT_TARGET);
             }
-            else // replan
+            else if (fsm_num % 10 == 0) // replan
             {
                 changeFSMExecState(REPLAN_TRAJ);
             }
@@ -286,7 +286,7 @@ namespace cane_planner
         if (have_target_)
         {
             double dist = collision_->getCollisionDistance(end_pt_);
-            if (dist <= 0.3)
+            if (dist <= 0.2)
             {
                 /* try to find a max distance goal around */
                 const double dr = 0.5, dtheta = 30;
@@ -311,7 +311,7 @@ namespace cane_planner
                         }
                     }
                 }
-                if (max_dist > 0.3)
+                if (max_dist > 0.2)
                 {
                     end_pt_ << goal(0), goal(1);
                     end_state_(0) = goal(0);
@@ -338,10 +338,11 @@ namespace cane_planner
             list = kin_finder_->getPath();
             for (size_t i = 0; i < list.size(); i++)
             {
-                Eigen::Vector2d temp(list[i](0), list[i](1));
-                double dist = collision_->getCollisionDistance(temp);
-                // todo 这里的距离可以修改
-                if (dist < 0.3)
+                // Eigen::Vector2d temp(list[i](0), list[i](1));
+                // double dist = collision_->getCollisionDistance(temp);
+                // if (dist < 0.1)
+                Eigen::Vector3d pro_pos = list[i];
+                if (collision_->sdf_map_->getInflateOccupancy(pro_pos) == 1)
                 {
                     ROS_WARN("current traj in collision.");
                     changeFSMExecState(REPLAN_TRAJ);

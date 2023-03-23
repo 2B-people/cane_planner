@@ -156,7 +156,6 @@ L1Controller::L1Controller()
 
     // Init variables
     Lfw = goalRadius = getL1Distance(Vcmd);
-    Lfw = 0.5;
     foundForwardPt = false;
     goal_received = false;
     goal_reached = false;

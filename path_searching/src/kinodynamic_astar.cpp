@@ -26,7 +26,7 @@ namespace cane_planner
         cur_node->support_feet = LEFT_LEG;
         cur_node->support_pos << start_pos(0), start_pos(1);
         // start_pos(2) is theta ,in here change 1.0
-        start_pos(2) = 1.0;
+        start_pos(2) = 0.0;
         cur_node->com_pos << start_pos;
         // astar variable
         cur_node->index = stateToIndex(start_pos);
