@@ -53,10 +53,6 @@ namespace cane_planner
         al_ = input(0);
         aw_ = input(1);
         theta_ = theta_ + input(2);
-        // if (theta_ > M_PI)
-        //     theta_ -= M_PI;
-        // else if (theta_ < -M_PI)
-        //     theta_ += M_PI;
         // std::cout << "al " << al_ << " aw_ " << aw_ << " theta_ " << theta_ << std::endl;
     }
 

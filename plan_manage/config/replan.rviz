@@ -7,8 +7,8 @@ Panels:
         - /Global Options1
         - /map1
         - /map1/PointCloud21
-        - /plan_path1/Path1
-        - /plan_path1/Path2
+        - /plan_path1
+        - /Odometry1
       Splitter Ratio: 0.5
     Tree Height: 445
   - Class: rviz/Selection
@@ -56,13 +56,13 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/Marker
-      Enabled: false
+      Enabled: true
       Marker Topic: /car_path
       Name: Marker
       Namespaces:
-        {}
+        Markers: true
       Queue Size: 100
-      Value: false
+      Value: true
     - Class: rviz/Group
       Displays:
         - Alpha: 1
@@ -126,9 +126,9 @@ Visualization Manager:
           Queue Size: 10
           Selectable: true
           Size (Pixels): 3
-          Size (m): 0.10000000149011612
+          Size (m): 0.019999999552965164
           Style: Boxes
-          Topic: /sdf_map/occupancy_all
+          Topic: /simulation_generator/global_cloud
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
@@ -136,16 +136,16 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 10
-            Min Value: -10
+            Max Value: 2.450000047683716
+            Min Value: -0.3499999940395355
             Value: true
           Axis: Z
           Channel Name: intensity
           Class: rviz/PointCloud2
           Color: 255; 255; 255
-          Color Transformer: Intensity
+          Color Transformer: AxisColor
           Decay Time: 0
-          Enabled: false
+          Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Min Color: 0; 0; 0
@@ -154,13 +154,13 @@ Visualization Manager:
           Queue Size: 10
           Selectable: true
           Size (Pixels): 3
-          Size (m): 0.07999999821186066
+          Size (m): 0.05000000074505806
           Style: Flat Squares
-          Topic: /sdf_map/esdf
+          Topic: /sdf_map/occupancy_local
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: false
+          Value: true
       Enabled: true
       Name: map
     - Alpha: 1
@@ -242,13 +242,13 @@ Visualization Manager:
           Unreliable: false
           Value: true
         - Class: rviz/Marker
-          Enabled: false
+          Enabled: true
           Marker Topic: /planning_vis/kin_foot
           Name: Marker
           Namespaces:
-            {}
+            "": true
           Queue Size: 100
-          Value: false
+          Value: true
         - Class: rviz/Marker
           Enabled: false
           Marker Topic: /planning_vis/kin_astar
@@ -267,6 +267,41 @@ Visualization Manager:
           Value: false
       Enabled: true
       Name: plan_path
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: true
+      Keep: 1
+      Name: Odometry
+      Position Tolerance: 0.10000000149011612
+      Queue Size: 10
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 25; 0
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 1
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic: /simulation_generator/odom
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -294,8 +329,8 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/ThirdPersonFollower
-      Distance: 30.065269470214844
+      Class: rviz/Orbit
+      Distance: 16.19094467163086
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -303,17 +338,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
-      Focal Shape Fixed Size: true
+        X: -2.616105794906616
+        Y: 1.8461229801177979
+        Z: 0.7199033498764038
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.39039865136146545
+      Pitch: 0.8297967910766602
       Target Frame: <Fixed Frame>
-      Yaw: 1.4953986406326294
+      Yaw: 0.3254006803035736
     Saved: ~
 Window Geometry:
   Displays:
@@ -333,5 +368,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1938
-  X: 3039
-  Y: 110
+  X: 3019
+  Y: 107

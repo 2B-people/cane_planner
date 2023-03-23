@@ -163,6 +163,15 @@ namespace cane_planner
                 }
 
                 // Check com and feet safety
+                // support pos safety collision free
+                // //  TODO this is mast in gourd
+                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
+                // if (!collision_->isTraversable(pro_pos))
+                // {
+                //     // std::cout << "can't Traversable" << std::endl;
+                //     num_collision++;
+                //     continue;
+                // }
                 /* collision com pos free */
                 Eigen::Vector2d pro_pos;
                 bool safe_flag = true;
@@ -181,22 +190,12 @@ namespace cane_planner
                     num_collision++;
                     continue;
                 }
-
-                // support pos safety collision free
-                // //  TODO this is mast in gourd
-                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
-                // if (!collision_->isTraversable(pro_pos))
+                // // out edf map by expert
+                // if (collision_->getCollisionDistance(pro_pos) >= 6.0)
                 // {
-                //     // std::cout << "can't Traversable" << std::endl;
-                //     num_collision++;
+                //     num_outedf++;
                 //     continue;
                 // }
-                // // out edf map by expert
-                if (collision_->getCollisionDistance(pro_pos) >= 6.0)
-                {
-                    num_outedf++;
-                    continue;
-                }
 
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um, pur_state.com_pos, cur_node->com_pos);
                 double tmp_f_score = tmp_g_score + lambda_heu_ * getManhHeu(pur_state.com_pos, end_pos);

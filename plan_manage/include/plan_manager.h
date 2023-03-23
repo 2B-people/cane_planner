@@ -62,8 +62,8 @@ namespace cane_planner
         ros::Timer replan_timer_;
         ros::Subscriber odom_sub_, waypoint_sub_;
         ros::Subscriber goal_sub_, start_sub_;
-        ros::Publisher astar_pub_,kin_path_pub_,kin_foot_pub_;
-        ros::Publisher path_pub_;
+        ros::Publisher astar_pub_,kin_vis_pub_,kin_foot_pub_;
+        ros::Publisher kin_path_pub_,a_path_pub_;
 
         /*---------- helper function -----------*/
         bool callAstarPlan();
@@ -73,6 +73,7 @@ namespace cane_planner
 
         // publish a star path;
         void publishKinodynamicAstarPath();
+        void publishAstarPath();
 
         void changeFSMExecState(FSM_STATE new_state);
         double QuatenionToYaw(geometry_msgs::Quaternion ori);

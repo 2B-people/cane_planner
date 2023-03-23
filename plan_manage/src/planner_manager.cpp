@@ -42,10 +42,11 @@ namespace cane_planner
             nh.subscribe("/initialpose", 1, &PlannerManager::startCallback, this); // 接收始点的topic
         // Visial
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
-        kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
+        kin_vis_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
         kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
         // Path
-        path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
+        kin_path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
+        a_path_pub_ = nh.advertise<nav_msgs::Path>("/astar/path", 20);
     }
     // simulation callback goal
     void PlannerManager::goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal)
@@ -84,7 +85,10 @@ namespace cane_planner
             success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
             if (success1)
+            {
                 displayAstar();
+                publishAstarPath();
+            }
             if (success2)
             {
                 displayKinastar();
@@ -144,10 +148,11 @@ namespace cane_planner
             nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
         // Visial
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
-        kin_path_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
+        kin_vis_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
         kin_foot_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_foot", 20);
         // Path
-        path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
+        kin_path_pub_ = nh.advertise<nav_msgs::Path>("/kin_astar/path", 20);
+        a_path_pub_ = nh.advertise<nav_msgs::Path>("/astar/path", 20);
     }
     // real experience callback waypoint or goal
     void PlannerManager::waypointCallback(const nav_msgs::PathConstPtr &msg)
@@ -361,7 +366,9 @@ namespace cane_planner
         bool plan_success = astar_finder_->search(start_pt_, end_pt_);
         ros::Time time_2 = ros::Time::now();
         if (plan_success)
-            ROS_WARN("Time consume in Astar path finding is %f", (time_2 - time_1).toSec());
+            // ROS_WARN("Time consume in Astar path finding is %f", (time_2 - time_1).toSec());
+            std::cout << "Time is:" << (time_2 - time_1).toSec() << "s" << std::endl;
+
         return plan_success;
     }
     bool PlannerManager::callKinodynamicAstarPlan()
@@ -375,11 +382,12 @@ namespace cane_planner
         // input << 0.0, vx, 0.0, vy;
         input << 0.0, 0.0, start_state_(2);
         //
-        ros::Time time_k = ros::Time::now();
+        ros::Time time_1 = ros::Time::now();
         bool plan_success = kin_finder_->search(start_state_, input, end_state_);
         ros::Time time_2 = ros::Time::now();
         if (plan_success)
-            ROS_WARN("Time consume in KinodynamicAstar path finding is %f", (time_2 - time_k).toSec());
+            // ROS_WARN("Time consume in KinodynamicAstar path finding is %f", (time_2 - time_k).toSec());
+            std::cout << "Time is:" << (time_2 - time_1).toSec() << "s" << std::endl;
         return plan_success;
     }
     // publish traj to L1-control
@@ -404,8 +412,33 @@ namespace cane_planner
             this_pose_stamped.header.stamp = ros::Time::now();
             path.poses.push_back(this_pose_stamped);
         }
-        path_pub_.publish(path);
+        kin_path_pub_.publish(path);
     }
+    // publish astar traj to L1-control
+    void PlannerManager::publishAstarPath()
+    {
+        vector<Eigen::Vector2d> list;
+        list = astar_finder_->getPath();
+        nav_msgs::Path path;
+        path.header.frame_id = "world";
+        path.header.stamp = ros::Time::now();
+        for (size_t i = 0; i < list.size(); i++)
+        {
+            geometry_msgs::PoseStamped this_pose_stamped;
+            this_pose_stamped.pose.position.x = list[i](0);
+            this_pose_stamped.pose.position.y = list[i](1);
+            this_pose_stamped.pose.position.z = 0.0;
+            this_pose_stamped.pose.orientation.x = 0.0;
+            this_pose_stamped.pose.orientation.y = 0.0;
+            this_pose_stamped.pose.orientation.z = 1.0;
+            this_pose_stamped.pose.orientation.w = 1.0;
+            this_pose_stamped.header.frame_id = "world";
+            this_pose_stamped.header.stamp = ros::Time::now();
+            path.poses.push_back(this_pose_stamped);
+        }
+        a_path_pub_.publish(path);
+    }
+
     // visial
     void PlannerManager::displayAstar()
     {
@@ -477,7 +510,7 @@ namespace cane_planner
             mk.points.push_back(pt);
         }
         // publish traj
-        kin_path_pub_.publish(mk);
+        kin_vis_pub_.publish(mk);
 
         // set feet pos publisher
         mk.points.clear();

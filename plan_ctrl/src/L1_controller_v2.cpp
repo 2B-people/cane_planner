@@ -262,24 +262,26 @@ void L1Controller::goalCB(const geometry_msgs::PoseStamped::ConstPtr &goalMsg)
 double L1Controller::getYawFromPose(const geometry_msgs::Pose &carPose)
 {
     Eigen::Quaterniond ori;
-    double x,y,z,w;
+    double x, y, z, w;
     x = ori.x() = carPose.orientation.x;
     y = ori.y() = carPose.orientation.y;
     z = ori.z() = carPose.orientation.z;
     w = ori.w() = carPose.orientation.w;
 
     Eigen::Matrix3d oRx = ori.toRotationMatrix();
-    double yaw = 0, pitch = -M_PI / 2, roll = M_PI / 2;
+    double yaw_t = 0, pitch = -M_PI / 2, roll = M_PI / 2;
     Eigen::Matrix3d Rx;
-    Rx = Eigen::AngleAxisd(yaw, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
+    Rx = Eigen::AngleAxisd(yaw_t, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
     oRx = oRx * Rx;
     Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
-    return ea(0);
-    // double tmp, yaw;
-    // tf::Quaternion q(x, y, z, w);
-    // tf::Matrix3x3 quaternion(q);
-    // quaternion.getRPY(tmp, tmp, yaw);
-    // return yaw;
+    double tmp, yaw;
+    tf::Quaternion q(x, y, z, w);
+    tf::Matrix3x3 quaternion(q);
+    quaternion.getRPY(tmp, tmp, yaw);
+    if (use_ser_flag_)
+        return ea(0);
+    else
+        return yaw;
 }
 
 bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geometry_msgs::Pose &carPose)
@@ -303,10 +305,10 @@ bool L1Controller::isWayPtAwayFromLfwDist(const geometry_msgs::Point &wayPt, con
     double dy = wayPt.y - car_pos.y;
     double dist = sqrt(dx * dx + dy * dy);
 
-    if (dist < Lfw)
-        return false;
-    else if (dist >= Lfw)
+    if (dist >= Lfw && dist <= 2.0)
         return true;
+    else
+        return false;
 }
 
 geometry_msgs::Point L1Controller::get_odom_car2WayPtVec(const geometry_msgs::Pose &carPose)
@@ -462,7 +464,9 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
         double eta = getEta(carPose);
         if (foundForwardPt)
         {
+            ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
             cmd_vel.angular.z = baseAngle + getSteeringAngle(eta) * Angle_gain;
+
             /*Estimate Gas Input*/
             if (!goal_reached)
             {
