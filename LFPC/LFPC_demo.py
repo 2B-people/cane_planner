@@ -231,6 +231,8 @@ for i in range(int(total_time/delta_t)):
         # change contorl param
         step_num += 1
         print('\n-----step number:', step_num, '----')
+        if step_num >=5:
+            break
         # 90°转向
         # if step_num >= 5:  # stop forward after 5 steps
         #     theta = 1.57
@@ -240,8 +242,8 @@ for i in range(int(total_time/delta_t)):
         #     theta = 3.14
         #     LFPC_model.SetCtrlParams(al, aw, theta)
         # 圆
-        if step_num % 2 == 0:
-            theta += 10/180*np.pi
+        if step_num % 1 == 0:
+            theta += 5/180*np.pi
             print('change theta', theta)
             LFPC_model.SetCtrlParams(al, aw, theta)
 

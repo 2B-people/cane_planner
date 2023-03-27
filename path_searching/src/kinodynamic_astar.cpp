@@ -37,7 +37,7 @@ namespace cane_planner
         Eigen::Vector2i end_index;
         end_index = stateToIndex(end_pos);
         // TODO(1): Heuristic compute
-        cur_node->f_score = lambda_heu_ * getManhHeu(start_pos, end_pos);
+        cur_node->f_score = lambda_heu_ * getDiagHeu(start_pos, end_pos);
         cur_node->kdnode_state = IN_OPEN_SET;
 
         open_set_.push(cur_node);
@@ -165,15 +165,15 @@ namespace cane_planner
                 // Check com and feet safety
                 // support pos safety collision free
                 // //  TODO this is mast in gourd
-                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
-                // if (!collision_->isTraversable(pro_pos))
-                // {
-                //     // std::cout << "can't Traversable" << std::endl;
-                //     num_collision++;
-                //     continue;
-                // }
-                /* collision com pos free */
                 Eigen::Vector3d pro_pos;
+                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
+                if (!collision_->isTraversable(pro_pos))
+                {
+                    // std::cout << "can't Traversable" << std::endl;
+                    num_collision++;
+                    continue;
+                }
+                /* collision com pos free */
                 bool safe_flag = true;
                 for (size_t i = 0; i < pur_state.com_path.size(); i++)
                 {
@@ -198,7 +198,7 @@ namespace cane_planner
                 // }
 
                 double tmp_g_score = cur_node->g_score + estimateHeuristic(um, pur_state.com_pos, cur_node->com_pos);
-                double tmp_f_score = tmp_g_score + lambda_heu_ * getManhHeu(pur_state.com_pos, end_pos);
+                double tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pur_state.com_pos, end_pos);
                 if (pro_node == NULL)
                 {
                     // std::cout << "find new pro_node" << std::endl;
@@ -458,8 +458,8 @@ namespace cane_planner
         acc_x_y << input(0), input(1);
         double dx = fabs(state1(0) - state2(0));
         double dy = fabs(state1(1) - state2(1));
-        double heu = dx + dy + 0.05 * abs(input(2));
-        // double heu = (state1 - state2).norm() + 0.05 * abs(input(2));
+        // double heu = dx + dy + 0.5 * abs(input(2));
+        double heu = (state1 - state2).norm() + 0.5 * abs(input(2));
         // std::cout << "this heu is " << heu << std::endl;
 
         return heu;

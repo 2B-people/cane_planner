@@ -64,27 +64,22 @@ def keyboardLoop():
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
-        if ch == 'w':
+        if ch == 'q':
             end_x += 1.0
-        elif ch == 's':
-            end_x -= 1.0
         elif ch == 'a':
+            end_x -= 1.0
+        elif ch == 'w':
             end_y += 1.0
-        elif ch == 'd':
+        elif ch == 's':
             end_y -= 1.0
-        elif ch == 'W':
-            end_x += 2.0
-        elif ch == 'S':
-            end_x -= 2.0
-        elif ch == 'A':
-            end_y += 2.0
-        elif ch == 'D':
-            end_y -= 2.0
-        elif ch == 'q':
+        elif ch == 'p':
             exit()
         elif ch == 'e':
             end_x = 0.0
             end_y = 0.0
+        elif ch == 'd':
+            end_x = 5.0
+            end_y = 13.0
 
         # 发送消息
         path_.poses.clear()

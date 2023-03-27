@@ -5,7 +5,6 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /map1
         - /map1/PointCloud21
         - /plan_path1/Path1
         - /plan_path1/Path2
@@ -327,5 +326,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1938
-  X: -32
-  Y: -32
+  X: 27
+  Y: 2

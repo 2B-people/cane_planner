@@ -463,7 +463,7 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
         double eta = getEta(carPose);
         if (foundForwardPt)
         {
-            ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
+        //     ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
             cmd_vel.angular.z = baseAngle + getSteeringAngle(eta) * Angle_gain;
 
             /*Estimate Gas Input*/
