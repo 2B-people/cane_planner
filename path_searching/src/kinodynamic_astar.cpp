@@ -165,15 +165,15 @@ namespace cane_planner
                 // Check com and feet safety
                 // support pos safety collision free
                 // //  TODO this is mast in gourd
-                Eigen::Vector3d pro_pos;
-                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
-                if (!collision_->isTraversable(pro_pos))
-                {
-                    // std::cout << "can't Traversable" << std::endl;
-                    num_collision++;
-                    continue;
-                }
+                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
+                // if (!collision_->isTraversable(pro_pos))
+                // {
+                //     // std::cout << "can't Traversable" << std::endl;
+                //     num_collision++;
+                //     continue;
+                // }
                 /* collision com pos free */
+                Eigen::Vector3d pro_pos;
                 bool safe_flag = true;
                 for (size_t i = 0; i < pur_state.com_path.size(); i++)
                 {
