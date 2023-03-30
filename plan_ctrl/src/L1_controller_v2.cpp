@@ -267,20 +267,21 @@ double L1Controller::getYawFromPose(const geometry_msgs::Pose &carPose)
     z = ori.z() = carPose.orientation.z;
     w = ori.w() = carPose.orientation.w;
 
-    Eigen::Matrix3d oRx = ori.toRotationMatrix();
-    double yaw_t = 0, pitch = -M_PI / 2, roll = M_PI / 2;
-    Eigen::Matrix3d Rx;
-    Rx = Eigen::AngleAxisd(yaw_t, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
-    oRx = oRx * Rx;
-    Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
-    double tmp, yaw;
-    tf::Quaternion q(x, y, z, w);
-    tf::Matrix3x3 quaternion(q);
-    quaternion.getRPY(tmp, tmp, yaw);
-    if (use_ser_flag_)
-        return ea(0);
-    else
-        return yaw;
+    // have bug
+    // Eigen::Matrix3d oRx = ori.toRotationMatrix();
+    // double yaw_t = 0, pitch = -M_PI / 2, roll = M_PI / 2;
+    // Eigen::Matrix3d Rx;
+    // Rx = Eigen::AngleAxisd(yaw_t, Eigen::Vector3d::UnitZ()) * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY()) * Eigen::AngleAxisd(roll, Eigen::Vector3d::UnitX());
+    // oRx = oRx * Rx;
+    // Eigen::Vector3d ea = oRx.eulerAngles(2, 1, 0);
+    // double tmp, yaw;
+    // tf::Quaternion q(x, y, z, w);
+    // tf::Matrix3x3 quaternion(q);
+    // quaternion.getRPY(tmp, tmp, yaw);
+    double yaw;
+    Eigen::Vector3d rot_x = ori.toRotationMatrix().block(0, 0, 3, 1);
+    yaw = atan2(rot_x(1), rot_x(0));
+    return yaw;
 }
 
 bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geometry_msgs::Pose &carPose)
@@ -463,7 +464,7 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
         double eta = getEta(carPose);
         if (foundForwardPt)
         {
-        //     ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
+            //     ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
             cmd_vel.angular.z = baseAngle + getSteeringAngle(eta) * Angle_gain;
 
             /*Estimate Gas Input*/

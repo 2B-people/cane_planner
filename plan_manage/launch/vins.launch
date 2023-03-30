@@ -1,0 +1,6 @@
+<launch>
+    <!-- vins -->
+    <node name="vins_estimator" pkg="vins" type="vins_node" args="$(find plan_manage)/config/d455/d455_mono_imu.yaml"  output="screen"/>
+    <!-- loop fusion -->
+    <node name="loop_fusion_node" pkg="loop_fusion" type="loop_fusion_node" args="$(find plan_manage)/config/d455/d455_mono_imu.yaml" output="screen"/>
+</launch>

@@ -181,7 +181,7 @@ namespace cane_planner
         odom_ori_.y() = msg->pose.pose.orientation.y;
         odom_ori_.z() = msg->pose.pose.orientation.z;
         odom_ori_.w() = msg->pose.pose.orientation.w;
-        // double yaw_test = QuatenionToYaw(msg->pose.pose.orientation);
+        double yaw_test = QuatenionToYaw(msg->pose.pose.orientation);
 
         // odom and start set
         start_pt_(0) = odom_pos_(0);
@@ -189,10 +189,12 @@ namespace cane_planner
         start_state_(0) = odom_pos_(0);
         start_state_(1) = odom_pos_(1);
         double yaw = 0.0;
-        if (simulation_)
-            yaw = QuatenionToYaw(msg->pose.pose.orientation);
-        else
-            yaw = QuatenionToYaw(odom_ori_);
+        // if (simulation_)
+        // else
+        // yaw = QuatenionToYaw(odom_ori_);
+            // yaw = QuatenionToYaw(msg->pose.pose.orientation);
+        Eigen::Vector3d rot_x = odom_ori_.toRotationMatrix().block(0, 0, 3, 1);
+        yaw  = atan2(rot_x(1),rot_x(0));
         start_state_(2) = yaw;
 
         // ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
