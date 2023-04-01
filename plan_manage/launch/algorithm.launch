@@ -1,6 +1,7 @@
 <launch>
     <!-- topic -->
     <arg name="odometry_topic"/>
+    <arg name="odometry_world"/>
     <arg name="cloud_topic"/>
     <arg name="depth_topic"/>
     <arg name="sensor_pose_topic"/>
@@ -14,11 +15,11 @@
 
 
     <node pkg="plan_manage" name="kin_replan_node" type="kin_replan_node" output="screen">
-        <remap from ="/map_ros/odom"  to = "/vins_estimator/camera_pose"/>
+        <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
         <remap from ="/map_ros/cloud" to = "$(arg cloud_topic)"/>
         <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
         <remap from ="/map_ros/pose"  to = "$(arg sensor_pose_topic)"/>
-        <remap from="/odom_world" to="$(arg odometry_topic)"/>
+        <remap from="/odom_world" to="$(arg odometry_world)"/>
         <!-- simulation true or false -->
         <param name="planner_node/simulation" value="$(arg simulation)"/>
         <!-- sdf set -->

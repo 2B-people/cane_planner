@@ -115,18 +115,20 @@ namespace cane_planner
         have_odom_ = false;
         have_target_ = false;
         // init esdf_map and collision
+        ROS_WARN(" sdf_map and collision start");
         sdf_map_.reset(new fast_planner::SDFMap);
         sdf_map_->initMap(nh);
         collision_.reset(new CollisionDetection);
         collision_->init(nh);
         collision_->setMap(sdf_map_);
-        // init kin planner
-        ROS_WARN(" Astar planer start");
-        astar_finder_.reset(new Astar);
-        astar_finder_->setParam(nh);
-        astar_finder_->setCollision(collision_);
-        astar_finder_->init();
+        // // init kin planner
+        // ROS_WARN(" Astar planer start");
+        // astar_finder_.reset(new Astar);
+        // astar_finder_->setParam(nh);
+        // astar_finder_->setCollision(collision_);
+        // astar_finder_->init();
         // init lfpc model
+        ROS_WARN(" LFPC model start");
         lfpc_model_.reset(new LFPC);
         lfpc_model_->initializeModel(nh);
         // init astar planner
@@ -181,7 +183,6 @@ namespace cane_planner
         odom_ori_.y() = msg->pose.pose.orientation.y;
         odom_ori_.z() = msg->pose.pose.orientation.z;
         odom_ori_.w() = msg->pose.pose.orientation.w;
-        double yaw_test = QuatenionToYaw(msg->pose.pose.orientation);
 
         // odom and start set
         start_pt_(0) = odom_pos_(0);
@@ -192,20 +193,19 @@ namespace cane_planner
         // if (simulation_)
         // else
         // yaw = QuatenionToYaw(odom_ori_);
-            // yaw = QuatenionToYaw(msg->pose.pose.orientation);
-        Eigen::Vector3d rot_x = odom_ori_.toRotationMatrix().block(0, 0, 3, 1);
-        yaw  = atan2(rot_x(1),rot_x(0));
-        start_state_(2) = yaw;
-
+        // yaw = QuatenionToYaw(msg->pose.pose.orientation);
         // ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
         // ROS_WARN("odom_yaw is %f,change is %f", yaw_test, yaw);
+
+        Eigen::Vector3d rot_x = odom_ori_.toRotationMatrix().block(0, 0, 3, 1);
+        yaw = atan2(rot_x(1), rot_x(0));
+        start_state_(2) = yaw;
         have_odom_ = true;
     }
     // ------------------------ FSM Callback --------------------------------
     void PlannerManager::execFSMCallback(const ros::TimerEvent &e)
     {
         static int fsm_num = 0;
-        static bool success1 = false;
         static bool success2 = false;
         fsm_num++;
         if (fsm_num == 100)
@@ -236,9 +236,9 @@ namespace cane_planner
         }
         case GEN_NEW_TRAJ:
         {
-            success1 = callAstarPlan();
+            // success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
-            if (success1 || success2)
+            if (success2)
                 changeFSMExecState(EXEC_TRAJ);
             else
                 changeFSMExecState(REPLAN_TRAJ);
@@ -256,25 +256,29 @@ namespace cane_planner
         }
         case EXEC_TRAJ:
         {
-            if (success1) // a star success
-            {
-                displayAstar();
-            }
+            // if (success1) // a star success
+            // {
+            //     displayAstar();
+            // }
             if (success2) // kin star success
             {
                 displayKinastar();
                 publishKinodynamicAstarPath();
             }
             // real experience using odom judge stop replan
-            if (abs(odom_pos_(0) - end_pt_(0)) <= 0.4 &&
-                abs(odom_pos_(1) - end_pt_(1)) <= 0.4)
+            Eigen::Vector2d odom_pt(odom_pos_(0), odom_pos_(1));
+
+            double dis = (odom_pt - end_pt_).norm();
+            // ROS_WARN("distance is %lf",dis);
+            if (dis <= 1)
             {
                 have_target_ = false;
+                ROS_WARN("Reach the destination");
                 changeFSMExecState(WAIT_TARGET);
             }
-            else if (fsm_num % 10 == 0) // replan
+            else if (fsm_num % 5 == 0) // replan
             {
-                changeFSMExecState(REPLAN_TRAJ);
+                (REPLAN_TRAJ);
             }
             break;
         }

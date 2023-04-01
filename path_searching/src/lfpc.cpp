@@ -5,10 +5,8 @@ using namespace Eigen;
 
 namespace cane_planner
 {
-
     LFPC::LFPC()
     {
-
         // cycle init params
         x_0_ = 0.0;
         vx_0_ = 0.0;
@@ -27,8 +25,6 @@ namespace cane_planner
     }
     void LFPC::initializeModel(ros::NodeHandle &nh)
     {
-        std::cout << "\n----------initialize LPFC Model----------\n"
-                  << std::endl;
         nh.param("lfpc/delta_t", delta_t_, 0.05);
         nh.param("lfpc/t_sup", t_sup_, 0.3);
         nh.param("lfpc/h_", h_, 1.0);
@@ -42,12 +38,10 @@ namespace cane_planner
         std::cout << "LFPC's first support leg is left leg" << std::endl;
         std::cout << "LFPC's contorl b is: " << b_ << std::endl;
     }
-
     LFPC::~LFPC()
     {
         step_path_.clear();
     }
-
     void LFPC::SetCtrlParams(Vector3d input)
     {
         al_ = input(0);
@@ -55,7 +49,6 @@ namespace cane_planner
         theta_ = theta_ + input(2);
         // std::cout << "al " << al_ << " aw_ " << aw_ << " theta_ " << theta_ << std::endl;
     }
-
     // param:
     // init_v_state : vx,vy,theta
     void LFPC::reset(Vector3d init_v_state, Vector3d COM_init_pos,
@@ -86,7 +79,6 @@ namespace cane_planner
         // path clear;
         step_path_.clear();
     }
-
     void LFPC::updateOneStep()
     {
         int swing_data_len = int(t_sup_ / delta_t_);
@@ -106,7 +98,6 @@ namespace cane_planner
         }
         step_num_ += 1;
     }
-
     // -------------------------------------API function------------------------------------//
     Vector2d LFPC::getFootPosition()
     {
@@ -139,7 +130,6 @@ namespace cane_planner
         next_iter_state(2) = theta_;
         return next_iter_state;
     }
-
     // -------------------------------------private function------------------------------------//
     void LFPC::updateOneDt()
     {
@@ -169,7 +159,6 @@ namespace cane_planner
         iter_state(3) = y_0_ * sinh(tau) / t_c_ + vy_0_ * cosh(tau);
         return iter_state;
     }
-
     Vector4d LFPC::calculateFinalState()
     {
         Vector4d final_state;
@@ -178,7 +167,6 @@ namespace cane_planner
 
         return final_state;
     }
-
     Vector2d LFPC::calculateLFPC(double vx, double vy)
     {
         Vector2d state_f;
@@ -197,5 +185,4 @@ namespace cane_planner
         // std::cout << "LFPC set:" << state_f.transpose() << std::endl;
         return state_f;
     }
-
 } // namespace cane_planner

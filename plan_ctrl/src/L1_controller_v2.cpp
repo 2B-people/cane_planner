@@ -321,7 +321,7 @@ geometry_msgs::Point L1Controller::get_odom_car2WayPtVec(const geometry_msgs::Po
 
     if (!goal_reached)
     {
-        for (int i = 0; i < map_path.poses.size(); i++)
+        for (size_t i = 0; i < map_path.poses.size(); i++)
         {
             geometry_msgs::PoseStamped map_path_pose = map_path.poses[i];
             // geometry_msgs::PoseStamped odom_path_pose;

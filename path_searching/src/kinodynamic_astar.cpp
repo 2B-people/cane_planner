@@ -48,7 +48,8 @@ namespace cane_planner
         KdNodePtr terminate_node = NULL;
 
         // num of can't find path
-        int num_feasible = 0, num_close = 0, num_collision = 0, num_outedf = 0;
+        // int num_feasible = 0, num_close = 0, num_collision = 0, num_outedf = 0;
+        int num_feasible = 0, num_close = 0, num_collision = 0;
 
         /* ---------- search loop ---------- */
         while (!open_set_.empty())
@@ -115,13 +116,13 @@ namespace cane_planner
             /* ---------- param for next gait point ---------- */
             double al_res = 1 / 2.0, aw_res = 1 / 1.0, pi_res = 1 / 3.0;
             /* ----------set input list ---------- */
-            // for (double al = max_al_ - 0.1; al < max_al_ + 1e-3; al += al_res * 0.1)
-            for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
-                for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
-                {
-                    um << max_al_, aw, api;
-                    inputs.push_back(um);
-                }
+            for (double al = max_al_ - 0.1; al < max_al_ + 1e-3; al += al_res * 0.1)
+                for (double aw = max_aw_ * aw_res; aw < max_aw_ + 1e-3; aw += max_aw_ * aw_res)
+                    for (double api = -max_api_; api < max_api_ + 1e-2; api += max_api_ * pi_res)
+                    {
+                        um << al, aw, api;
+                        inputs.push_back(um);
+                    }
 
             /* ----------Explore the next gait point ---------- */
             // std::cout << "set input list" << std::endl;
@@ -163,18 +164,22 @@ namespace cane_planner
                 }
 
                 // Check com and feet safety
-                // support pos safety collision free
-                // //  TODO this is mast in gourd
-                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1);
-                // if (!collision_->isTraversable(pro_pos))
-                // {
-                //     // std::cout << "can't Traversable" << std::endl;
-                //     num_collision++;
-                //     continue;
-                // }
-                /* collision com pos free */
+                // collision feet pos free
                 Eigen::Vector3d pro_pos;
                 bool safe_flag = true;
+                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1), -0.4;
+                if (collision_->sdf_map_->getInflateOccupancy(pro_pos) == 1)
+                {
+                    safe_flag = false;
+                    break;
+                }
+                if (!safe_flag)
+                {
+                    // std::cout << "can't Traversable" << std::endl;
+                    num_collision++;
+                    continue;
+                }
+                // collision com pos free
                 for (size_t i = 0; i < pur_state.com_path.size(); i++)
                 {
                     pro_pos << pur_state.com_path[i];
@@ -454,10 +459,10 @@ namespace cane_planner
 
     double KinodynamicAstar::estimateHeuristic(Eigen::Vector3d input, Eigen::Vector3d state1, Eigen::Vector3d state2)
     {
-        Eigen::Vector2d acc_x_y;
-        acc_x_y << input(0), input(1);
-        double dx = fabs(state1(0) - state2(0));
-        double dy = fabs(state1(1) - state2(1));
+        // Eigen::Vector2d acc_x_y;
+        // acc_x_y << input(0), input(1);
+        // double dx = fabs(state1(0) - state2(0));
+        // double dy = fabs(state1(1) - state2(1));
         // double heu = dx + dy + 0.5 * abs(input(2));
         double heu = (state1 - state2).norm() + 0.5 * abs(input(2));
         // std::cout << "this heu is " << heu << std::endl;
