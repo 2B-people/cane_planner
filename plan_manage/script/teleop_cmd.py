@@ -94,7 +94,7 @@ def keyboardLoop():
         path_.poses.append(cur_point)
         pt.x = end_x
         pt.y = end_y
-        pt.z = 1.0
+        pt.z = 0.0
         mk.points.clear()
         mk.points.append(pt)
 

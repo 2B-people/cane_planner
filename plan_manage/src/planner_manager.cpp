@@ -278,7 +278,7 @@ namespace cane_planner
             }
             else if (fsm_num % 5 == 0) // replan
             {
-                (REPLAN_TRAJ);
+                changeFSMExecState(REPLAN_TRAJ);
             }
             break;
         }

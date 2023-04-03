@@ -148,6 +148,11 @@ L1Controller::L1Controller()
         {
             ROS_ERROR_STREAM("Serial Port fail");
         }
+        std::string send_data = "z000\n";
+        u_char send_data_char[send_data.size()];
+        for (size_t i = 0; i < send_data.size(); i++)
+            send_data_char[i] = send_data.c_str()[i];
+        ser_.write(send_data_char, send_data.size());
     }
     else
     {
@@ -305,7 +310,7 @@ bool L1Controller::isWayPtAwayFromLfwDist(const geometry_msgs::Point &wayPt, con
     double dy = wayPt.y - car_pos.y;
     double dist = sqrt(dx * dx + dy * dy);
 
-    if (dist >= Lfw && dist <= 2.0)
+    if (dist >= Lfw && dist <= 1.0)
         return true;
     else
         return false;
@@ -401,7 +406,7 @@ double L1Controller::getL1Distance(const double &_Vcmd)
 {
     double L1 = 0;
     if (_Vcmd < 1.34)
-        L1 = 3 / 3.0;
+        L1 = 3 / 6.0;
     else if (_Vcmd > 1.34 && _Vcmd < 5.36)
         L1 = _Vcmd * 2.24 / 3.0;
     else
@@ -433,6 +438,14 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
         {
             goal_reached = true;
             goal_received = false;
+            if (use_ser_flag_)
+            {
+                std::string send_data = "z000\n";
+                u_char send_data_char[send_data.size()];
+                for (size_t i = 0; i < send_data.size(); i++)
+                    send_data_char[i] = send_data.c_str()[i];
+                ser_.write(send_data_char, send_data.size());
+            }
             ROS_INFO("Goal Reached !");
         }
     }
@@ -476,17 +489,16 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
                 // ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z - baseAngle) * 100);
             }
         }
+        if (use_ser_flag_)
+        {
+            std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z - baseAngle) * 100)) + "\n";
+            u_char send_data_char[send_data.size()];
+            for (size_t i = 0; i < send_data.size(); i++)
+                send_data_char[i] = send_data.c_str()[i];
+            ser_.write(send_data_char, send_data.size());
+        }
+        pub_.publish(cmd_vel);
     }
-
-    if (use_ser_flag_)
-    {
-        std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z - baseAngle) * 100)) + "\n";
-        u_char send_data_char[send_data.size()];
-        for (size_t i = 0; i < send_data.size(); i++)
-            send_data_char[i] = send_data.c_str()[i];
-        ser_.write(send_data_char, send_data.size());
-    }
-    pub_.publish(cmd_vel);
 }
 
 /*****************/

@@ -167,18 +167,18 @@ namespace cane_planner
                 // collision feet pos free
                 Eigen::Vector3d pro_pos;
                 bool safe_flag = true;
-                pro_pos << pur_state.support_pos(0), pur_state.support_pos(1), -0.4;
-                if (collision_->sdf_map_->getInflateOccupancy(pro_pos) == 1)
-                {
-                    safe_flag = false;
-                    break;
-                }
-                if (!safe_flag)
-                {
-                    // std::cout << "can't Traversable" << std::endl;
-                    num_collision++;
-                    continue;
-                }
+                // pro_pos << pur_state.support_pos(0), pur_state.support_pos(1), -0.4;
+                // if (collision_->sdf_map_->getInflateOccupancy(pro_pos) == 1)
+                // {
+                //     safe_flag = false;
+                //     break;
+                // }
+                // if (!safe_flag)
+                // {
+                //     // std::cout << "can't Traversable" << std::endl;
+                //     num_collision++;
+                //     continue;
+                // }
                 // collision com pos free
                 for (size_t i = 0; i < pur_state.com_path.size(); i++)
                 {
