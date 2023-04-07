@@ -6,7 +6,7 @@
         <!-- using depth and odom -->
         <arg name="odometry_world" value = "$(arg odometry_topic)"/>
         <!-- edf map set -->
-        <arg name="depth_topic" value="/camera/depth/image_rect_raw"/>
+        <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/>
         <arg name="odometry_topic" value = "/vins_estimator/camera_pose"/>
         <arg name="cloud_topic" value = "cloud"/>
         <arg name="sensor_pose_topic" value="pose"/>
@@ -15,9 +15,9 @@
         <arg name="slice_height" value="0.1"/>
         <arg name="kin_horizon" value="3"/>
         <!-- map size -->
-        <arg name="map_size_x" value="20.0"/>
-        <arg name="map_size_y" value="40.0"/>
-        <arg name="map_size_z" value=" 5.0"/>
+        <arg name="map_size_x" value="40.0"/>
+        <arg name="map_size_y" value="20.0"/>
+        <arg name="map_size_z" value=" 4.5"/>
     </include>
     <!-- L1 controller -->
     <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
@@ -25,7 +25,7 @@
         <param name="Vcmd" value="0.5" />
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
-        <param name="AngleGain" value="-2.0"/>
+        <param name="AngleGain" value="-1.5"/>
         <param name="SerialUsing" value="true"/>
         <param name="port" value="/dev/feedback_controller"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />

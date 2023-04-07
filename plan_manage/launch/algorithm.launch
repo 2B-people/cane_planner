@@ -26,28 +26,28 @@
         <param name="sdf_map/map_size_x" value="$(arg map_size_x)" />
         <param name="sdf_map/map_size_y" value="$(arg map_size_y)" />
         <param name="sdf_map/map_size_z" value="$(arg map_size_z)" />
-        <param name="sdf_map/resolution" value="0.08" />
+        <param name="sdf_map/resolution" value="0.1" />
         <param name="sdf_map/obstacles_inflation" value="0.2" />
         <param name="sdf_map/local_bound_inflate" value="0.5"/>
         <param name="sdf_map/local_map_margin" value="50"/>
-        <param name="sdf_map/ground_height" value="-0.4"/>
+        <param name="sdf_map/ground_height" value="-0.3"/>
         <param name="sdf_map/default_dist" value="5.0"/>
         <!-- local fusion -->
         <param name="sdf_map/p_hit" value="0.65"/>
         <param name="sdf_map/p_miss" value="0.43"/>
-        <param name="sdf_map/p_min" value="0.12"/>
+        <param name="sdf_map/p_min" value="0.10"/>
         <param name="sdf_map/p_max" value="0.90"/>
         <param name="sdf_map/p_occ" value="0.80"/>
         <param name="sdf_map/min_ray_length" value="0.5"/>
         <param name="sdf_map/max_ray_length" value="4.5"/>
         <param name="sdf_map/virtual_ceil_height" value="3.2"/>
-        <param name="sdf_map/optimistic" value="true" type="bool"/>
-        <param name="sdf_map/signed_dist" value="true" type="bool"/>
+        <param name="sdf_map/optimistic" value="false" type="bool"/>
+        <param name="sdf_map/signed_dist" value="false" type="bool"/>
         <!--  camera parameter -->
-        <param name="map_ros/cx" value="321.04638671875"/>
-        <param name="map_ros/cy" value="243.44969177246094"/>
-        <param name="map_ros/fx" value="387.229248046875"/>
-        <param name="map_ros/fy" value="387.229248046875"/>
+        <param name="map_ros/cx" value="384.03857421875"/>
+        <param name="map_ros/cy" value="240.05001831054688"/>
+        <param name="map_ros/fx" value="384.96630859375"/>
+        <param name="map_ros/fy" value="327.45794677734375"/>
         <!-- depth filter -->
         <param name="map_ros/depth_filter_maxdist" value="5.0"/>
         <param name="map_ros/depth_filter_mindist" value="0.2"/>

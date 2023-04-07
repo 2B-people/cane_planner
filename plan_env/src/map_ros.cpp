@@ -119,10 +119,10 @@ namespace fast_planner
       }
     }
     // publishUnknown();
-    publishESDF();
+    // publishESDF();
 
     // publishUpdateRange();
-    publishDepth();
+    // publishDepth();
   }
 
   void MapROS::updateESDFCallback(const ros::TimerEvent & /*event*/)
@@ -185,7 +185,8 @@ namespace fast_planner
   {
     camera_pos_(0) = odom->pose.pose.position.x;
     camera_pos_(1) = odom->pose.pose.position.y;
-    camera_pos_(2) = odom->pose.pose.position.z;
+    // camera_pos_(2) = odom->pose.pose.position.z;
+    camera_pos_(2) = 0.0;
     if (!map_->isInMap(camera_pos_)) // exceed mapped region
       return;
     camera_q_ = Eigen::Quaterniond(odom->pose.pose.orientation.w,

@@ -3,8 +3,8 @@
     <!-- 是否输出debug信息 -->
     <param name="debug"  value="false"/>
     <!-- 串口设备，可通过rules.d配置固定 -->
+    <!-- <param name="port"  value="/dev/gps1"/> -->
     <param name="port"  value="/dev/fdilink_ahrs"/>
-    <!-- <param name="port"  value="/dev/fdilink_ahrs"/> -->
     <!-- 波特率 -->
     <param name="baud"  value="921600"/>
     <!-- 发布的imu话题名 -->

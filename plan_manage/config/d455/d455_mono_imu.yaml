@@ -21,13 +21,13 @@ body_T_cam0: !!opencv-matrix
    rows: 4
    cols: 4
    dt: d
-   data: [ 0.0076537,  -0.01178718,  0.99990124, -0.00075298,
-            -0.99993987,  0.00776263,  0.00774551, -0.04978206,
-            -0.00785316, -0.9999004,  -0.01172706,  0.05420435,
+   data: [-0.01179918, -0.00729523,  0.99990377, -0.00022563,
+            -0.99993011, -0.00066202, -0.01180432, -0.05477892,
+            0.00074807, -0.99997317, -0.00728691,  0.03374928,
             0.,          0.,          0.,          1.        ]
 
 #Multiple thread support
-multiple_thread: 4
+multiple_thread: 1
 use_gpu: 1
 use_gpu_acc_flow: 1
 
@@ -53,7 +53,7 @@ g_norm: 9.80490803     # gravity magnitude
 
 #unsynchronization parameters
 estimate_td: 1                      # online estimate time offset between camera and imu
-td: 0.006308822086157201                        # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
+td: -0.010587622595653781                      # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
 
 #loop closure parameters
 load_previous_pose_graph: 0        # load and reuse previous pose graph; load from 'pose_graph_save_path'
