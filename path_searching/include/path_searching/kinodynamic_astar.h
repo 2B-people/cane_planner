@@ -167,6 +167,7 @@ namespace cane_planner
     bool search(Eigen::Vector3d start_pos, Eigen::Vector3d start_state,
                Eigen::Vector3d end_pos);
     std::vector<Eigen::Vector3d> getPath();
+    std::vector<Eigen::Vector3d> getComPos();
     std::vector<Eigen::Vector3d> getFeetPos();
 
 

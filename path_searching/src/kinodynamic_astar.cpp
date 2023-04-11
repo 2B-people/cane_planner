@@ -337,6 +337,18 @@ namespace cane_planner
         }
         return path;
     }
+
+    std::vector<Eigen::Vector3d> KinodynamicAstar::getComPos()
+    {
+        vector<Eigen::Vector3d> path;
+        for (size_t i = 0; i < path_nodes_.size(); i++)
+        {
+            Eigen::Vector3d pos;
+            pos << path_nodes_[i]->com_pos;
+            path.push_back(pos);
+        }
+        return path;
+    } 
     std::vector<Eigen::Vector3d> KinodynamicAstar::getFeetPos()
     {
         vector<Eigen::Vector3d> path;

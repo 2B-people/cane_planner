@@ -501,14 +501,14 @@ namespace cane_planner
         mk.color.r = 0.0;
         mk.color.g = 0.0;
         mk.color.b = 1.0;
-        mk.color.a = 1;
-        mk.scale.x = 0.1;
-        mk.scale.y = 0.1;
+        mk.color.a = 0.4;
+        mk.scale.x = 1.0;
+        mk.scale.y = 1.0;
         mk.scale.z = 0.1;
         // give point
         geometry_msgs::Point pt;
         vector<Eigen::Vector3d> list;
-        list = kin_finder_->getPath();
+        list = kin_finder_->getComPos();
         for (int i = 0; i < int(list.size()); i++)
         {
             pt.x = list[i](0);
@@ -524,6 +524,10 @@ namespace cane_planner
         mk.color.r = 0.0;
         mk.color.g = 1.0;
         mk.color.b = 0.0;
+        mk.color.a = 0.4;
+        mk.scale.x = 0.5;
+        mk.scale.y = 0.5;
+        mk.scale.z = 0.1;
         list.clear();
         list = kin_finder_->getFeetPos();
         for (int i = 0; i < int(list.size()); i++)
