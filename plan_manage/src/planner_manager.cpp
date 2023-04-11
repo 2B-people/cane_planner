@@ -480,7 +480,7 @@ namespace cane_planner
             mk.points.push_back(pt);
         }
 
-        astar_pub_.publish(mk);
+        // astar_pub_.publish(mk);
         ros::Duration(0.001).sleep();
     }
 
@@ -501,7 +501,7 @@ namespace cane_planner
         mk.color.r = 0.0;
         mk.color.g = 0.0;
         mk.color.b = 1.0;
-        mk.color.a = 0.4;
+        mk.color.a = 0.5;
         mk.scale.x = 1.0;
         mk.scale.y = 1.0;
         mk.scale.z = 0.1;
@@ -519,14 +519,23 @@ namespace cane_planner
         // publish traj
         kin_vis_pub_.publish(mk);
 
+        mk.color.r = 1.0;
+        mk.color.g = 0.0;
+        mk.color.b = 0.0;
+        mk.color.a = 1;
+        mk.scale.x = 0.1;
+        mk.scale.y = 0.1;
+        mk.scale.z = 0.1;
+        astar_pub_.publish(mk);
+
         // set feet pos publisher
         mk.points.clear();
         mk.color.r = 0.0;
         mk.color.g = 1.0;
         mk.color.b = 0.0;
-        mk.color.a = 0.4;
-        mk.scale.x = 0.5;
-        mk.scale.y = 0.5;
+        mk.color.a = 0.8;
+        mk.scale.x = 0.1;
+        mk.scale.y = 0.1;
         mk.scale.z = 0.1;
         list.clear();
         list = kin_finder_->getFeetPos();
