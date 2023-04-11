@@ -1,0 +1,89 @@
+%YAML:1.0
+
+#common parameters
+imu_topic: "/imu_data"
+image_topic: "/camera/color/image_raw"
+output_path: "/home/nx/Trajactory"         # vins outputs will be wrttento vins_folder_path + output_path
+
+#camera calibration 
+model_type: PINHOLE
+camera_name: camera
+image_width: 640
+image_height: 480
+distortion_parameters:
+   k1: -0.055958791266280866
+   k2: 0.05268083066469769
+   p1: 0.0007742780373239048
+   p2: 0.0038199234526983925
+projection_parameters:
+   fx: 387.8601777190022
+   fy: 387.0829579682743
+   cx: 334.5546040010289
+   cy: 242.6993975451583
+
+# Extrinsic parameter between IMU and Camera.
+estimate_extrinsic: 1   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
+                        # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
+                        # 2  Don't know anything about extrinsic parameters. You don't need to give R,T. We will try to calibrate it. Do some rotation movement at beginning. 
+ex_calib_result_path: "/config/euroc/ex_calib_result.yaml"  # If you choose 1 or 2, the extrinsic calibration result will be written vins_folder_path + ex_calib_result_path.                        
+#If you choose 0 or 1, you should write down the following matrix.
+#Rotation from camera frame to imu frame, imu^R_cam
+extrinsicRotation: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 1.2518640771160827e-02, 2.1167068824864375e-03,9.9991939834429477e-01, 
+          -9.9990947783021156e-01,4.9583842171028181e-03, 1.2508020277781034e-02,
+          -4.9315087505170602e-03, -9.9998546688335899e-01,2.1785875044059155e-03 ]
+#Translation from camera frame to imu frame, imu^T_cam
+extrinsicTranslation: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 1.2081441358189409e-02, -4.6407225963734505e-02,
+       -1.0319996867430662e-02 ]
+
+#feature traker paprameters
+max_cnt: 150            # max feature number in feature tracking
+min_dist: 30            # min distance between two features 
+freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
+F_threshold: 1.0        # ransac threshold (pixel)
+show_track: 1           # publish tracking image as topic
+equalize: 0             # if image is too dark or light, trun on equalize to find enough features
+fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
+
+#optimization parameters
+max_solver_time: 0.04  # max solver itration time (ms), to guarantee real time
+max_num_iterations: 10   # max solver itrations, to guarantee real time
+keyframe_parallax: 10.0 # keyframe selection threshold (pixel)
+
+#imu parameters       The more accurate parameters you provide, the better performance
+# acc_n: 0.2          # accelerometer measurement noise standard deviation. #0.2
+# gyr_n: 0.02         # gyroscope measurement noise standard deviation.     #0.05
+# acc_w: 0.0002         # accelerometer bias random work noise standard deviation.  #0.02
+# gyr_w: 2.0e-5       # gyroscope bias random work noise standard deviation.     #4.0e-5
+# g_norm: 9.81007     # gravity magnitude
+acc_n: 0.14           # accelerometer measurement noise standard deviation. #0.2   0.04
+gyr_n: 0.005         # gyroscope measurement noise standard deviation.     #0.05  0.004
+acc_w: 0.00004         # accelerometer bias random work noise standard deviation.  #0.02
+gyr_w: 2.0e-6       # gyroscope bias random work noise standard deviation.     #4.0e-5
+g_norm: 9.81007     # gravity magnitude
+
+#unsynchronization parameters
+estimate_td: 1                      # online estimate time offset between camera and imu
+td: -0.010587622595653781                      # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
+
+
+#loop closure parameters
+loop_closure: 1   #if you want to use loop closure to minimize the drift, set loop_closure true and give your brief pattern file path and vocabulary file path accordingly;
+                     #also give the camera calibration file same as feature_tracker node
+load_previous_pose_graph: 1 
+fast_relocalization: 0 
+pose_graph_save_path: "/home/nx/Trajactory" # save and load path
+
+
+pattern_file: "/support_files/brief_pattern.yml"
+voc_file: "/support_files/brief_k10L6.bin"
+min_loop_num: 25
+
+
