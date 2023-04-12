@@ -3,7 +3,7 @@
 #common parameters
 imu_topic: "/imu_data"
 image_topic: "/camera/color/image_raw"
-output_path: "/home/nx/Trajactory"         # vins outputs will be wrttento vins_folder_path + output_path
+output_path: "/home/nx/Trajactory/"         # vins outputs will be wrttento vins_folder_path + output_path
 
 #camera calibration 
 model_type: PINHOLE
@@ -48,7 +48,7 @@ max_cnt: 150            # max feature number in feature tracking
 min_dist: 30            # min distance between two features 
 freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
 F_threshold: 1.0        # ransac threshold (pixel)
-show_track: 1           # publish tracking image as topic
+show_track: 0           # publish tracking image as topic
 equalize: 0             # if image is too dark or light, trun on equalize to find enough features
 fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
 
@@ -77,9 +77,9 @@ td: -0.010587622595653781                      # initial value of time offset. u
 #loop closure parameters
 loop_closure: 1   #if you want to use loop closure to minimize the drift, set loop_closure true and give your brief pattern file path and vocabulary file path accordingly;
                      #also give the camera calibration file same as feature_tracker node
-load_previous_pose_graph: 1 
+load_previous_pose_graph: 0 
 fast_relocalization: 0 
-pose_graph_save_path: "/home/nx/Trajactory" # save and load path
+pose_graph_save_path: "/home/nx/Trajactory/graph/" # save and load path
 
 
 pattern_file: "/support_files/brief_pattern.yml"
