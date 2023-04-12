@@ -1,6 +1,7 @@
 <launch>
     <!-- odom from vins estimator-->
-    <arg name="odometry_topic" value="/vins_estimator/odometry" />
+    <arg name="odometry_topic" value="/plvins_estimator/odometry" />
+    <!-- <arg name="odometry_topic" value="/vins_estimator/odometry" /> -->
     <!-- kindynameic alogoritm -->
     <include file="$(find plan_manage)/launch/algorithm.launch">
         <!-- using depth and odom -->
@@ -9,7 +10,7 @@
         <arg name="depth_topic" value="/camera/aligned_depth_to_color/image_raw"/>
         <arg name="odometry_topic" value = "/vins_estimator/camera_pose"/>
         <arg name="cloud_topic" value = "cloud"/>
-        <arg name="sensor_pose_topic" value="pose"/>
+        <arg name="sensor_pose_topic" value="/plvins_estimator/camera_pose"/>
         <!-- experice set -->
         <arg name="simulation" value="false"/>
         <arg name="slice_height" value="0.1"/>

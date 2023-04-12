@@ -7,7 +7,7 @@ num_of_cam: 1
 
 imu_topic: "/imu_data"
 image0_topic: "/camera/color/image_raw"
-output_path: "~/output/"
+output_path: "/home/nx/Trajactory/"
 
 cam0_calib: "color.yaml"
 image_width: 640
@@ -21,10 +21,12 @@ body_T_cam0: !!opencv-matrix
    rows: 4
    cols: 4
    dt: d
-   data: [-0.01179918, -0.00729523,  0.99990377, 1.2081441358189409e-02,
-            -0.99993011, -0.00066202, -0.01180432, -4.6407225963734505e-02,
-            0.00074807, -0.99997317, -0.00728691,  -1.0319996867430662e-02,
-            0.,          0.,          0.,          1.        ]
+   data: [ 5.4883126044396047e-03, -8.5874086270207404e-04,
+       9.9998457037540678e-01, -7.8886253793893097e-03,
+       -9.9997991785417795e-01, 3.1642943616752017e-03,
+       5.4910044203525521e-03, -4.3680154825065286e-02,
+       -3.1689608876742099e-03, -9.9999462488821589e-01,
+       -8.4135698071374776e-04, 3.4903183045456289e-02, 0., 0., 0., 1. ]
 
 #Multiple thread support
 multiple_thread: 1
@@ -57,5 +59,5 @@ td: -0.010587622595653781                      # initial value of time offset. u
 
 #loop closure parameters
 load_previous_pose_graph: 0        # load and reuse previous pose graph; load from 'pose_graph_save_path'
-pose_graph_save_path: "/home/nx/output/pose_graph/" # save and load path
+pose_graph_save_path: "/home/nx/Trajactory/graph/" # save and load path
 save_image: 0                   # save image in pose graph for visualization prupose; you can close this function by setting 0 
