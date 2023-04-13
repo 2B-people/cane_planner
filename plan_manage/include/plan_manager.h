@@ -70,6 +70,9 @@ namespace cane_planner
         bool callKinodynamicAstarPlan();
         void displayAstar();
         void displayKinastar();
+        double getPathLen(vector<Eigen::Vector2d> list);
+        double getPathLen(vector<Eigen::Vector3d> list);
+
 
         // publish a star path;
         void publishKinodynamicAstarPath();

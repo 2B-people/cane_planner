@@ -8,15 +8,15 @@
     <!-- simulation opion -->
     <arg name="simulation" value="true"/>
     <arg name="slice_height" value="1.0"/>
-    <arg name="kin_horizon" value="200.0"/>
+    <arg name="kin_horizon" value="50.0"/>
     <!-- map size -->
-    <arg name="map_size_x" value="260.0"/>
-    <arg name="map_size_y" value="200.0"/>
+    <arg name="map_size_x" value="40.0"/>
+    <arg name="map_size_y" value="40.0"/>
     <arg name="map_size_z" value=" 4.0"/>
-    <arg name="resolution" value=" 0.2"/>
+    <arg name="resolution" value=" 0.1"/>
 
     <!-- map -->
-    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/indoor.pcd"/>
+    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office2.pcd"/>
     <!-- sim_plan -->
     <node pkg="plan_manage" name="sim_plan_node" type="sim_plan_node" output="screen">
         <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>

@@ -373,8 +373,13 @@ namespace cane_planner
         bool plan_success = astar_finder_->search(start_pt_, end_pt_);
         ros::Time time_2 = ros::Time::now();
         if (plan_success)
-            // ROS_WARN("Time consume in Astar path finding is %f", (time_2 - time_1).toSec());
+        {
             std::cout << "Time is:" << (time_2 - time_1).toSec() << "s" << std::endl;
+            vector<Eigen::Vector2d> list;
+            list = astar_finder_->getPath();
+            double len = getPathLen(list);
+            std::cout << "Len:" << len << std::endl;
+        }
 
         return plan_success;
     }
@@ -393,8 +398,13 @@ namespace cane_planner
         bool plan_success = kin_finder_->search(start_state_, input, end_state_);
         ros::Time time_2 = ros::Time::now();
         if (plan_success)
-            // ROS_WARN("Time consume in KinodynamicAstar path finding is %f", (time_2 - time_k).toSec());
+        {
             std::cout << "Time is:" << (time_2 - time_1).toSec() << "s" << std::endl;
+            vector<Eigen::Vector3d> list;
+            list = kin_finder_->getPath();
+            double len = getPathLen(list);
+            std::cout << "Len:" << len << std::endl;
+        }
         return plan_success;
     }
     // publish traj to L1-control
@@ -573,4 +583,34 @@ namespace cane_planner
         // ZYX ,yaw is ea(0)
         return ea(0);
     }
+    //  calculate path len
+    double PlannerManager::getPathLen(vector<Eigen::Vector2d> list)
+    {
+        Eigen::Vector2d cur;
+        Eigen::Vector2d last;
+        double len = 0.0;
+        last << list[0](0), list[0](1);
+        for (size_t i = 0; i < list.size(); i++)
+        {
+            cur << list[i](0), list[i](1);
+            len = len + (cur - last).norm();
+            last = cur;
+        }
+        return len;
+    }
+    double PlannerManager::getPathLen(vector<Eigen::Vector3d> list)
+    {
+        Eigen::Vector3d cur;
+        Eigen::Vector3d last;
+        double len = 0.0;
+        last << list[0](0), list[0](1),list[0](2);
+        for (size_t i = 0; i < list.size(); i++)
+        {
+            cur << list[i](0), list[i](1),list[i](2);
+            len = len + (cur - last).norm();
+            last = cur;
+        }
+        return len;
+    }
+
 } // namespace cane_planner
