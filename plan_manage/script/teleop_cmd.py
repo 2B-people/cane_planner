@@ -46,12 +46,6 @@ def keyboardLoop():
     mk.scale.z = 0.5
     pt = Point()
 
-    # 显示提示信息
-    print("Reading from keyboard")
-    print("Use WASD keys to control the robot")
-    print("Press Caps to move faster")
-    print("Press q to quit")
-
     # 读取按键循环
     while not rospy.is_shutdown():
         fd = sys.stdin.fileno()
@@ -97,8 +91,6 @@ def keyboardLoop():
         pt.z = 0.0
         mk.points.clear()
         mk.points.append(pt)
-
-        rospy.logwarn("end point x:%f,y:%f",end_x,end_y)
         pub_vis.publish(mk)
         pub.publish(path_)
 

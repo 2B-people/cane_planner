@@ -27,10 +27,10 @@
         <param name="sdf_map/map_size_y" value="$(arg map_size_y)" />
         <param name="sdf_map/map_size_z" value="$(arg map_size_z)" />
         <param name="sdf_map/resolution" value="0.1" />
-        <param name="sdf_map/obstacles_inflation" value="0.3" />
+        <param name="sdf_map/obstacles_inflation" value="0.2" />
         <param name="sdf_map/local_bound_inflate" value="0.5"/>
         <param name="sdf_map/local_map_margin" value="50"/>
-        <param name="sdf_map/ground_height" value="-0.5"/>
+        <param name="sdf_map/ground_height" value="-0.3"/>
         <param name="sdf_map/default_dist" value="5.0"/>
         <!-- local fusion -->
         <param name="sdf_map/p_hit" value="0.65"/>

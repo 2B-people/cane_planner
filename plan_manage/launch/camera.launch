@@ -76,6 +76,8 @@
   <!-- fdilink_ahrs -->
   <include file="$(find fdilink_ahrs)/launch/ahrs_driver.launch"/>
 
+  <node name="teleop_cmd" pkg="plan_manage" type="teleop_cmd.py" output="screen"/>
+  
   <group ns="$(arg camera)">
     <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
       <arg name="tf_prefix"                value="$(arg tf_prefix)"/>
