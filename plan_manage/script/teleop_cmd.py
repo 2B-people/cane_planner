@@ -45,6 +45,7 @@ def keyboardLoop():
     mk.scale.y = 0.5
     mk.scale.z = 0.5
     pt = Point()
+    rospy.loginfo("init success")
 
     # 读取按键循环
     while not rospy.is_shutdown():
@@ -93,6 +94,8 @@ def keyboardLoop():
         mk.points.append(pt)
         pub_vis.publish(mk)
         pub.publish(path_)
+        rospy.loginfo("set end pos is [%lf,%lf]",end_x,end_y)
+        
 
 
 if __name__ == '__main__':

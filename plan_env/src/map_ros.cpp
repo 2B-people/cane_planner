@@ -115,13 +115,13 @@ namespace fast_planner
       if (tpass > 0.1)
       {
         publishMapAll();
+        publishUnknown();
+        publishESDF();
+        publishUpdateRange();
         tpass = 0.0;
       }
     }
-    // publishUnknown();
-    // publishESDF();
 
-    // publishUpdateRange();
     // publishDepth();
   }
 
@@ -149,8 +149,13 @@ namespace fast_planner
     camera_pos_(0) = pose->pose.position.x;
     camera_pos_(1) = pose->pose.position.y;
     camera_pos_(2) = pose->pose.position.z;
+    camera_pos_(2) = 0.0;
+
     if (!map_->isInMap(camera_pos_)) // exceed mapped region
+    {
+      ROS_WARN("camera_pos exceed mapped region");
       return;
+    }
 
     camera_q_ = Eigen::Quaterniond(pose->pose.orientation.w, pose->pose.orientation.x,
                                    pose->pose.orientation.y, pose->pose.orientation.z);
@@ -309,7 +314,7 @@ namespace fast_planner
       }
     }
 
-    publishDepth();
+    // publishDepth();
   }
 
   void MapROS::publishMapAll()
@@ -390,21 +395,21 @@ namespace fast_planner
             pt.z = pos(2);
             cloud.push_back(pt);
           }
-          // else if (map_->md_->occupancy_buffer_inflate_[map_->toAddress(x, y, z)] == 1)
-          // {
-          //   // Inflated occupied cells
-          //   Eigen::Vector3d pos;
-          //   map_->indexToPos(Eigen::Vector3i(x, y, z), pos);
-          //   if (pos(2) > visualization_truncate_height_)
-          //     continue;
-          //   if (pos(2) < visualization_truncate_low_)
-          //     continue;
+          else if (map_->md_->occupancy_buffer_inflate_[map_->toAddress(x, y, z)] == 1)
+          {
+            // Inflated occupied cells
+            Eigen::Vector3d pos;
+            map_->indexToPos(Eigen::Vector3i(x, y, z), pos);
+            if (pos(2) > visualization_truncate_height_)
+              continue;
+            if (pos(2) < visualization_truncate_low_)
+              continue;
 
-          //   pt.x = pos(0);
-          //   pt.y = pos(1);
-          //   pt.z = pos(2);
-          //   cloud2.push_back(pt);
-          // }
+            pt.x = pos(0);
+            pt.y = pos(1);
+            pt.z = pos(2);
+            cloud2.push_back(pt);
+          }
         }
 
     cloud.width = cloud.points.size();
