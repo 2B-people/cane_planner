@@ -1,7 +1,7 @@
 <launch>
     <!-- odom from vins estimator-->
-    <!-- <arg name="odometry_topic" value="/plvins_estimator/odometry" /> -->
-    <arg name="odometry_topic" value="/vins_estimator/odometry" />
+    <arg name="odometry_topic" value="/plvins_estimator/odometry" />
+    <!-- <arg name="odometry_topic" value="/vins_estimator/odometry" /> -->
     <!-- kindynameic alogoritm -->
     <include file="$(find plan_manage)/launch/algorithm.launch">
         <!-- using depth and odom -->
@@ -16,8 +16,8 @@
         <arg name="slice_height" value="0.1"/>
         <arg name="kin_horizon" value="3"/>
         <!-- map size -->
-        <arg name="map_size_x" value="20.0"/>
-        <arg name="map_size_y" value="10.0"/>
+        <arg name="map_size_x" value="30.0"/>
+        <arg name="map_size_y" value="20.0"/>
         <arg name="map_size_z" value=" 4.5"/>
     </include>
     <!-- L1 controller -->
@@ -26,7 +26,8 @@
         <param name="Vcmd" value="0.5" />
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
-        <param name="AngleGain" value="-1.5"/>
+        <param name="AngleGain" value="-2.0"/>
+        <param name="controller_freq" value="10"/>
         <param name="SerialUsing" value="true"/>
         <param name="port" value="/dev/feedback_controller"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />

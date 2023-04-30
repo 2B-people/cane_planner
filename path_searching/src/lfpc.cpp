@@ -55,7 +55,7 @@ namespace cane_planner
                      char cur_support_leg, int step_num)
     {
         COM_pos_ = COM_init_pos;
-        COM_pos_(2) = 0.1;
+        COM_pos_(2) = -0.1;
 
         step_num_ = step_num;
         // change support_leg

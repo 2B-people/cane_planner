@@ -30,7 +30,7 @@
         <param name="sdf_map/obstacles_inflation" value="0.2" />
         <param name="sdf_map/local_bound_inflate" value="0.5"/>
         <param name="sdf_map/local_map_margin" value="50"/>
-        <param name="sdf_map/ground_height" value="-0.5"/>
+        <param name="sdf_map/ground_height" value="-0.3"/>
         <param name="sdf_map/default_dist" value="5.0"/>
         <!-- local fusion -->
         <param name="sdf_map/p_hit" value="0.65"/>
@@ -63,7 +63,7 @@
         <param name="map_ros/frame_id" value="world"/>
         <!-- kin astar  -->
         <param name="kinastar/resolution_astar" value="0.1"/>
-        <param name="kinastar/lambda_heu" value="2"/>
+        <param name="kinastar/lambda_heu" value="3"/>
         <param name="kinastar/allocate_num" value="100000"/>
         <!-- kin astar contorl param -->
         <param name="kinastar/horizon" value="$(arg kin_horizon)"/>
