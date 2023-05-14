@@ -70,12 +70,14 @@ namespace cane_planner
 
             if (near_end)
             {
-                std::cout << "[Kin-Astar]:---------------------- " << use_node_num_ << std::endl;
-                std::cout << "use node num: " << use_node_num_ << std::endl;
-                std::cout << "iter num: " << iter_num_ << std::endl;
+                // std::cout << "[Kin-Astar]:---------------------- " << use_node_num_ << std::endl;
+                // std::cout << "use node num: " << use_node_num_ << std::endl;
+                // std::cout << "iter num: " << iter_num_ << std::endl;
                 // std::cout << "feasible num: " << num_feasible << std::endl;
                 // std::cout << "close num: " << num_close << std::endl;
                 // std::cout << "collision num: " << num_collision << std::endl;
+                std::cout << use_node_num_ << "," << iter_num_ << ",";
+
                 terminate_node = cur_node;
                 retrievePath(terminate_node);
                 return true;
@@ -87,11 +89,12 @@ namespace cane_planner
                 if (cur_near_end <= start_end)
                 {
                     std::cout << "[Kin-Astar](horizon):---------------------- " << use_node_num_ << std::endl;
-                    std::cout << "use node num: " << use_node_num_ << std::endl;
-                    std::cout << "iter num: " << iter_num_ << std::endl;
+                    // std::cout << "use node num: " << use_node_num_ << std::endl;
+                    // std::cout << "iter num: " << iter_num_ << std::endl;
                     // std::cout << "feasible num: " << num_feasible << std::endl;
                     // std::cout << "close num: " << num_close << std::endl;
                     // std::cout << "collision num: " << num_collision << std::endl;
+                    std::cout << use_node_num_ << "," << iter_num_ << ",";
                     terminate_node = cur_node;
                     retrievePath(terminate_node);
                     return true;
@@ -348,7 +351,7 @@ namespace cane_planner
             path.push_back(pos);
         }
         return path;
-    } 
+    }
     std::vector<Eigen::Vector3d> KinodynamicAstar::getFeetPos()
     {
         vector<Eigen::Vector3d> path;

@@ -8,15 +8,15 @@
     <!-- simulation opion -->
     <arg name="simulation" value="true"/>
     <arg name="slice_height" value="1.0"/>
-    <arg name="kin_horizon" value="50.0"/>
+    <arg name="kin_horizon" value="200.0"/>
     <!-- map size -->
-    <arg name="map_size_x" value="40.0"/>
-    <arg name="map_size_y" value="40.0"/>
+    <arg name="map_size_x" value="260.0"/>
+    <arg name="map_size_y" value="150.0"/>
     <arg name="map_size_z" value=" 4.0"/>
-    <arg name="resolution" value=" 0.1"/>
+    <arg name="resolution" value=" 0.2"/>
 
     <!-- map -->
-    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office2.pcd"/>
+    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/indoor.pcd"/>
     <!-- sim_plan -->
     <node pkg="plan_manage" name="sim_plan_node" type="sim_plan_node" output="screen">
         <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
@@ -69,8 +69,8 @@
         <param name="map_ros/show_all_map" value="true"/>
         <param name="map_ros/frame_id" value="world"/>
         <!-- kin astar  -->
-        <param name="kinastar/resolution_astar" value="$(arg resolution)"/>
-        <param name="kinastar/lambda_heu" value="1.2"/>
+        <param name="kinastar/resolution_astar" value="0.5"/>
+        <param name="kinastar/lambda_heu" value="2.5"/>
         <param name="kinastar/allocate_num" value="100000"/>
         <!-- kin astar contorl param -->
         <param name="kinastar/horizon" value="$(arg kin_horizon)"/>
@@ -78,9 +78,9 @@
         <param name="kinastar/max_aw" value="0.2"/>
         <param name="kinastar/max_theta" value="0.5"/>
         <!-- astar set -->
-        <param name="astar/resolution_astar" value="$(arg resolution)"/>
+        <param name="astar/resolution_astar" value="0.5"/>
         <param name="astar/time_resolution" value="0"/>
-        <param name="astar/lambda_heu" value="0.01"/>
+        <param name="astar/lambda_heu" value="0.05"/>
         <param name="astar/allocate_num" value="1000000"/>
         <!-- collision set -->
         <param name="Collision/margin" value="0.3"/>

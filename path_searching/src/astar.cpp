@@ -67,9 +67,10 @@ namespace cane_planner
 
       if (reach_end)
       {
-        cout << "[Astar]:---------------------- " << use_node_num_ << endl;
-        cout << "use node num: " << use_node_num_ << endl;
-        cout << "iter num: " << iter_num_ << endl;
+        // cout << "[Astar]:---------------------- " << use_node_num_ << endl;
+        // cout << "use node num: " << use_node_num_ << endl;
+        // cout << "iter num: " << iter_num_ << endl;
+        cout << use_node_num_ << "," << iter_num_ << ",";
         terminate_node = cur_node;
         retrievePath(terminate_node);
         has_path_ = true;
@@ -104,8 +105,7 @@ namespace cane_planner
 
           /* ---------- check if in feasible space ---------- */
           /* inside map range */
-          if (pro_pos(0) <= origin_(0) || pro_pos(0) >= map_size_2d_(0) 
-           || pro_pos(1) <= origin_(1) || pro_pos(1) >= map_size_2d_(1))
+          if (pro_pos(0) <= origin_(0) || pro_pos(0) >= map_size_2d_(0) || pro_pos(1) <= origin_(1) || pro_pos(1) >= map_size_2d_(1))
           {
             // cout << "outside map" << endl;
             continue;
@@ -134,7 +134,7 @@ namespace cane_planner
           double tmp_g_score, tmp_f_score;
           tmp_g_score = d_pos.squaredNorm() + cur_node->g_score;
           tmp_f_score = tmp_g_score + lambda_heu_ * getDiagHeu(pro_pos, end_pt);
-                
+
           if (pro_node == NULL)
           {
             pro_node = path_node_pool_[use_node_num_];

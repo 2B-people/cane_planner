@@ -53,13 +53,13 @@ namespace cane_planner
     {
         end_pt_(0) = goal->pose.position.x;
         end_pt_(1) = goal->pose.position.y;
-        ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
+        // ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
 
         end_state_(0) = goal->pose.position.x;
         end_state_(1) = goal->pose.position.y;
         double yaw = QuatenionToYaw(goal->pose.orientation);
         end_state_(2) = yaw;
-        ROS_INFO("goal yaw is: %lf", yaw);
+        // ROS_INFO("goal yaw is: %lf", yaw);
         have_target_ = true;
     }
     // simulation callback start or odom
@@ -67,21 +67,25 @@ namespace cane_planner
     {
         start_pt_(0) = start->pose.pose.position.x;
         start_pt_(1) = start->pose.pose.position.y;
-        ROS_INFO("set start pos is:%lf and %lf", start_pt_(0), start_pt_(1));
+        // ROS_INFO("set start pos is:%lf and %lf", start_pt_(0), start_pt_(1));
         start_state_(0) = start->pose.pose.position.x;
         start_state_(1) = start->pose.pose.position.y;
         double yaw = QuatenionToYaw(start->pose.pose.orientation);
         start_state_(2) = yaw;
-        cout << "yaw:" << yaw << endl;
+        // cout << "yaw:" << yaw << endl;
         have_odom_ = true;
     }
     void PlannerManager::callPath()
     {
         static int fsm_num = 0;
+        static int test_num = 0;
+
         static bool success1 = false;
         static bool success2 = false;
         if (have_odom_ && have_target_)
         {
+            test_num++;
+            // std::cout << "-----------[test:" << test_num << "]-----------" << std::endl;
             success1 = callAstarPlan();
             success2 = callKinodynamicAstarPlan();
             if (success1)
@@ -94,6 +98,7 @@ namespace cane_planner
                 displayKinastar();
                 publishKinodynamicAstarPath();
             }
+            // std::cout << "-----------[test end]-----------" << std::endl;
             have_target_ = false;
         }
         fsm_num++;
@@ -166,8 +171,8 @@ namespace cane_planner
         end_state_(1) = msg->poses[0].pose.position.y;
         double yaw = QuatenionToYaw(msg->poses[0].pose.orientation);
         end_state_(2) = yaw;
-        ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
-        ROS_INFO("end yaw is: %lf", yaw);
+        // ROS_INFO("set end pos is: %lf and %lf", end_pt_(0), end_pt_(1));
+        // ROS_INFO("end yaw is: %lf", yaw);
         have_target_ = true;
     }
     // odomtry
@@ -368,24 +373,31 @@ namespace cane_planner
     }
     bool PlannerManager::callAstarPlan()
     {
+        static int num = 0;
         astar_finder_->reset();
+        num++;
+        std::cout <<"astar"<<","<< num << ",";
         ros::Time time_1 = ros::Time::now();
         bool plan_success = astar_finder_->search(start_pt_, end_pt_);
         ros::Time time_2 = ros::Time::now();
         if (plan_success)
         {
-            std::cout << "Time is:" << (time_2 - time_1).toSec() << "s" << std::endl;
+            std::cout << (time_2 - time_1).toSec() << ",";
             vector<Eigen::Vector2d> list;
             list = astar_finder_->getPath();
             double len = getPathLen(list);
-            std::cout << "Len:" << len << std::endl;
+            std::cout << len << ",1" << std::endl;
         }
 
         return plan_success;
     }
     bool PlannerManager::callKinodynamicAstarPlan()
     {
+        static int num = 0;
+
         kin_finder_->reset();
+        num++;
+        std::cout <<"kin,"<< num << ",";
         // todo
         Eigen::Vector3d input;
         // double vx, vy;
@@ -399,11 +411,11 @@ namespace cane_planner
         ros::Time time_2 = ros::Time::now();
         if (plan_success)
         {
-            std::cout << "Time is:" << (time_2 - time_1).toSec() << "s" << std::endl;
+            std::cout << (time_2 - time_1).toSec() << ",";
             vector<Eigen::Vector3d> list;
             list = kin_finder_->getPath();
             double len = getPathLen(list);
-            std::cout << "Len:" << len << std::endl;
+            std::cout << len << ",1" << std::endl;
         }
         return plan_success;
     }
@@ -603,10 +615,10 @@ namespace cane_planner
         Eigen::Vector3d cur;
         Eigen::Vector3d last;
         double len = 0.0;
-        last << list[0](0), list[0](1),list[0](2);
+        last << list[0](0), list[0](1), list[0](2);
         for (size_t i = 0; i < list.size(); i++)
         {
-            cur << list[i](0), list[i](1),list[i](2);
+            cur << list[i](0), list[i](1), list[i](2);
             len = len + (cur - last).norm();
             last = cur;
         }
