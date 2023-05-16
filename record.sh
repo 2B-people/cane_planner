@@ -1,1 +1,1 @@
-rosbag record -O test.bag /plvins_estimator/odometry /plvins_estimator/path /plvins_estimator/camera_pose_visual /plvins_estimator/point_cloud /car_path /imu_data /kin_astar/path /sdf_map/occupancy_all /sdf_map/occupancy_local /sdf_map/esdf
+rosbag record -O test.bag /vins_estimator/odometry /vins_estimator/path /vins_estimator/camera_pose_visual /plvins_estimator/point_cloud /car_path /imu_data /kin_astar/path /sdf_map/occupancy_all /sdf_map/occupancy_local /sdf_map/esdf
