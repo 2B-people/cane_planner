@@ -435,7 +435,7 @@ namespace cane_planner
             this_pose_stamped.pose.position.z = 0.0;
             this_pose_stamped.pose.orientation.x = 0.0;
             this_pose_stamped.pose.orientation.y = 0.0;
-            this_pose_stamped.pose.orientation.z = 1.0;
+            this_pose_stamped.pose.orientation.z = 0.0;
             this_pose_stamped.pose.orientation.w = 1.0;
             this_pose_stamped.header.frame_id = "world";
             this_pose_stamped.header.stamp = ros::Time::now();
@@ -526,7 +526,7 @@ namespace cane_planner
         mk.color.a = 0.5;
         mk.scale.x = 1.0;
         mk.scale.y = 1.0;
-        mk.scale.z = 0.1;
+        mk.scale.z = 1.0;
         // give point
         geometry_msgs::Point pt;
         vector<Eigen::Vector3d> list;
@@ -556,9 +556,9 @@ namespace cane_planner
         mk.color.g = 1.0;
         mk.color.b = 0.0;
         mk.color.a = 0.8;
-        mk.scale.x = 0.1;
-        mk.scale.y = 0.1;
-        mk.scale.z = 0.1;
+        mk.scale.x = 0.2;
+        mk.scale.y = 0.2;
+        mk.scale.z = 0.2;
         list.clear();
         list = kin_finder_->getFeetPos();
         for (int i = 0; i < int(list.size()); i++)

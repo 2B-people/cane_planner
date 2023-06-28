@@ -231,8 +231,8 @@ for i in range(int(total_time/delta_t)):
         # change contorl param
         step_num += 1
         print('\n-----step number:', step_num, '----')
-        if step_num >=5:
-            break
+        # if step_num >=5:
+        #     break
         # 90°转向
         # if step_num >= 5:  # stop forward after 5 steps
         #     theta = 1.57
