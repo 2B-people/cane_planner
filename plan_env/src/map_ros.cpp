@@ -227,7 +227,6 @@ namespace fast_planner
   void MapROS::cloudPoseCallback(const sensor_msgs::PointCloud2ConstPtr &msg,
                                  const geometry_msgs::PoseStampedConstPtr &pose)
   {
-
     camera_pos_(0) = pose->pose.position.x;
     camera_pos_(1) = pose->pose.position.y;
     camera_pos_(2) = pose->pose.position.z;
