@@ -15,9 +15,9 @@
                 "${workspaceFolder}/plan_env/include",
                 "${workspaceFolder}/plan_manage/include",
                 "/usr/include/pcl-1.10",
-                // nx 的配置
                 "/opt/ros/melodic/include",
-                "/opt/ros/melodic/include/**"
+                "/opt/ros/melodic/include/**",
+                "${workspaceFolder}/plan_ctrl2/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
