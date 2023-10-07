@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   std_srvs
-  three_dof_planar_manipulator
+  # three_dof_planar_manipulator
 )
 
 ## System dependencies are found with CMake's conventions
@@ -153,7 +153,7 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
-add_executable(single_joint_hardware_interface src/robot_hardware_interface_node.cpp)
+add_executable(single_joint_hardware_interface src/gkf_hardware_interface_node.cpp)
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
 target_link_libraries(single_joint_hardware_interface ${catkin_LIBRARIES})
 
