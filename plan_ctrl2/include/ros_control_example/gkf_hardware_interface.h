@@ -18,7 +18,7 @@ public:
     ~GKFHardwareInterface();
     void init();
     void update(const ros::TimerEvent &e);
-    void read();
+    void read(ros::Duration elapsed_time);
     void write(ros::Duration elapsed_time);
     ros::Publisher pub;
     ros::ServiceClient client;
