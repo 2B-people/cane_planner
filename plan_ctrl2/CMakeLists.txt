@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ros_control_example)
+project(gkf_control)
 
 add_compile_options(-std=c++11)
 
@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_manager
   roscpp
   rospy
+  serial
   std_msgs
   std_srvs
   # three_dof_planar_manipulator
@@ -14,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES ros_control_example
+  # LIBRARIES gkf_control
   CATKIN_DEPENDS controller_manager roscpp rospy std_msgs std_srvs
 #  DEPENDS system_lib
 )

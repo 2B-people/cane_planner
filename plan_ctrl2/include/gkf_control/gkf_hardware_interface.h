@@ -8,8 +8,11 @@
 #include <controller_manager/controller_manager.h>
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
+#include <string>
+
 #include <rospy_tutorials/Floats.h>
 #include <angles/angles.h>
+#include <serial/serial.h>
 
 class GKFHardwareInterface : public hardware_interface::RobotHW
 {
@@ -41,9 +44,13 @@ protected:
     double joint_effort_command_;
     double joint_velocity_command_;
 
+    serial::Serial ser_;
+
     ros::NodeHandle nh_;
     ros::Timer non_realtime_loop_;
     ros::Duration elapsed_time_;
     double loop_hz_;
     boost::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+    void ser_write(std::string send_data);
+
 };

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch> 
+
+  <node name="robot_hardware_interface" pkg="gkf_control" type="single_joint_hardware_interface" output="screen">
+          <param name="port" value="/dev/feedback_controller"/> 
+  </node>
+
+</launch>

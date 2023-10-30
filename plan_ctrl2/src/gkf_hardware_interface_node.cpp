@@ -1,4 +1,4 @@
-#include <ros_control_example/gkf_hardware_interface.h>
+#include <gkf_control/gkf_hardware_interface.h>
 
 GKFHardwareInterface::GKFHardwareInterface(ros::NodeHandle &nh) : nh_(nh)
 {
@@ -15,6 +15,9 @@ GKFHardwareInterface::GKFHardwareInterface(ros::NodeHandle &nh) : nh_(nh)
 
 GKFHardwareInterface::~GKFHardwareInterface()
 {
+    ser_write("zS\n");
+    ROS_INFO_STREAM("stop connect");
+    ser_.close();
 }
 
 void GKFHardwareInterface::init()
@@ -49,7 +52,38 @@ void GKFHardwareInterface::init()
     registerInterface(&position_joint_interface_);
     registerInterface(&effort_joint_interface_);
     registerInterface(&effortJointSaturationInterface);
+
+    // Serial
+    std::string port("/dev/ttyUSB0");
+    int baudrate = 115200;
+
+    nh_.param("port", port, port);
+    nh_.param("baudrate", baudrate, baudrate);
+    ser_.setPort(port);
+    ser_.setBaudrate(baudrate);
+    serial::Timeout to = serial::Timeout::simpleTimeout(1000);
+    ser_.setTimeout(to);
+    ROS_WARN("---[param] serial set:%s, baudrate set:%d----", port.c_str(), baudrate);
+    try
+    {
+        ser_.open();
+    }
+    catch (serial::IOException &e)
+    {
+        ROS_ERROR_STREAM("Unable to open port ");
+    }
+    if (ser_.isOpen())
+    {
+        ROS_INFO_STREAM("Serial Port initialized");
+    }
+    else
+    {
+        ROS_ERROR_STREAM("Serial Port fail");
+    }
+    ser_write("zO\n");
 }
+
+
 
 void GKFHardwareInterface::update(const ros::TimerEvent &e)
 {
@@ -61,6 +95,10 @@ void GKFHardwareInterface::update(const ros::TimerEvent &e)
 
 void GKFHardwareInterface::read(ros::Duration elapsed_time)
 {
+    u_char recv_data[200];
+    auto time = elapsed_time.toSec();
+    ser_.read(recv_data, ser_.available());
+    ROS_INFO("%lf: reading %s",time, recv_data);
     joint_position_ = 0;
     joint_velocity_ = 0;
 }
@@ -73,7 +111,18 @@ void GKFHardwareInterface::write(ros::Duration elapsed_time)
     joints_pub.data.push_back(joint_effort_command_);
 
     ROS_INFO("PWM Cmd: %.2f", joint_effort_command_);
+    std::string send_data = "z" + std::to_string((int)(joint_effort_command_)) + "\n";
+    ser_write(send_data);
     pub.publish(joints_pub);
+}
+
+// 串口辅助函数
+void GKFHardwareInterface::ser_write(std::string send_data)
+{
+    u_char send_data_char[send_data.size()];
+    for (size_t i = 0; i < send_data.size(); i++)
+        send_data_char[i] = send_data.c_str()[i];
+    ser_.write(send_data_char, send_data.size());
 }
 
 int main(int argc, char **argv)

@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <launch>
     
-  <rosparam file="$(find ros_control_example)/config/controllers.yaml" command="load"/>
-  <rosparam file="$(find ros_control_example)/config/joint_limits.yaml" command="load"/>
+  <rosparam file="$(find gkf_control)/config/controllers.yaml" command="load"/>
+  <rosparam file="$(find gkf_control)/config/joint_limits.yaml" command="load"/>
    
-  <arg name="model" default="$(find ros_control_example)/urdf/single_joint_actuator.urdf.xacro"/>
+  <arg name="model" default="$(find gkf_control)/urdf/single_joint_actuator.urdf.xacro"/>
   <arg name="gui" default="true" />
   
   <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
   <param name="use_gui" value="$(arg gui)"/>
   
-  <node name="robot_hardware_interface" pkg="ros_control_example" type="single_joint_hardware_interface" output="screen"/>
+  <node name="robot_hardware_interface" pkg="gkf_control" type="single_joint_hardware_interface" output="screen"/>
   
-  <node name="subscriber_py" pkg="ros_control_example" type="joints_receive_from_arduino.py" output="screen"/> 
+  <node name="subscriber_py" pkg="gkf_control" type="joints_receive_from_arduino.py" output="screen"/> 
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" >
   </node>

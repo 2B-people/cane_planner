@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-  <arg name="model" default="$(find ros_control_example)/urdf/single_joint_actuator.urdf.xacro"/>
+  <arg name="model" default="$(find gkf_control)/urdf/single_joint_actuator.urdf.xacro"/>
   <arg name="gui" default="true" />
 
 
