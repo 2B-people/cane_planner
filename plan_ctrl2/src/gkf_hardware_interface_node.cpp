@@ -4,7 +4,7 @@ GKFHardwareInterface::GKFHardwareInterface(ros::NodeHandle &nh) : nh_(nh)
 {
     init();
     controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
-    loop_hz_ = 5;
+    loop_hz_ = 50;
     ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
 
     pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
@@ -54,7 +54,7 @@ void GKFHardwareInterface::init()
     registerInterface(&effortJointSaturationInterface);
 
     // Serial
-    std::string port("/dev/ttyUSB0");
+    std::string port("/dev/feedback_controller");
     int baudrate = 115200;
 
     nh_.param("port", port, port);
@@ -83,8 +83,6 @@ void GKFHardwareInterface::init()
     ser_write("zO\n");
 }
 
-
-
 void GKFHardwareInterface::update(const ros::TimerEvent &e)
 {
     elapsed_time_ = ros::Duration(e.current_real - e.last_real);
@@ -96,9 +94,23 @@ void GKFHardwareInterface::update(const ros::TimerEvent &e)
 void GKFHardwareInterface::read(ros::Duration elapsed_time)
 {
     u_char recv_data[200];
+    int encoder = 0;
     auto time = elapsed_time.toSec();
-    ser_.read(recv_data, ser_.available());
-    ROS_INFO("%lf: reading %s",time, recv_data);
+    if (ser_.available() != 0)
+    {
+        auto size_data = ser_.read(recv_data, ser_.available());
+        std::string recv_string(reinterpret_cast<char *>(&recv_data[0]), size_data);
+        // ROS_INFO("%lf: reading %s", time, recv_string.c_str());
+        auto s_index = recv_string.find("E");
+        auto q_index = recv_string.find("\n");
+        if (s_index != std::string::npos && q_index != std::string::npos)
+        {
+            std::string number_str = recv_string.substr(s_index + 1, q_index - s_index - 1);
+            std::istringstream(number_str) >> encoder;
+        }
+        ROS_INFO("encoder is %d", encoder);
+    }
+
     joint_position_ = 0;
     joint_velocity_ = 0;
 }
@@ -109,6 +121,9 @@ void GKFHardwareInterface::write(ros::Duration elapsed_time)
     effortJointSaturationInterface.enforceLimits(elapsed_time);
     joints_pub.data.clear();
     joints_pub.data.push_back(joint_effort_command_);
+
+    // TEST
+    joint_effort_command_ = 2000;
 
     ROS_INFO("PWM Cmd: %.2f", joint_effort_command_);
     std::string send_data = "z" + std::to_string((int)(joint_effort_command_)) + "\n";
