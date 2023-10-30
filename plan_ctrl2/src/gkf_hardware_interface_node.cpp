@@ -54,12 +54,12 @@ void GKFHardwareInterface::init()
 void GKFHardwareInterface::update(const ros::TimerEvent &e)
 {
     elapsed_time_ = ros::Duration(e.current_real - e.last_real);
-    read();
+    read(elapsed_time_);
     controller_manager_->update(ros::Time::now(), elapsed_time_);
     write(elapsed_time_);
 }
 
-void GKFHardwareInterface::read()
+void GKFHardwareInterface::read(ros::Duration elapsed_time)
 {
     joint_position_ = 0;
     joint_velocity_ = 0;
