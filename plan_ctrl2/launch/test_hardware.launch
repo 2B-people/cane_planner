@@ -3,7 +3,7 @@
   <rosparam file="$(find gkf_control)/config/controllers.yaml" command="load"/>
   <rosparam file="$(find gkf_control)/config/joint_limits.yaml" command="load"/>
 
-  <node name="robot_hardware_interface" pkg="gkf_control" type="single_joint_hardware_interface" output="screen">
+  <node name="robot_hardware_interface" pkg="gkf_control" type="gkf_hardware_interface" output="screen">
         <param name="port" value="/dev/feedback_controller"/>
   </node>
 

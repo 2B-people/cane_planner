@@ -32,6 +32,6 @@ include_directories(
 )
 
 
-add_executable(single_joint_hardware_interface src/gkf_hardware_interface_node.cpp)
+add_executable(gkf_hardware_interface src/gkf_hardware_interface_node.cpp)
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
-target_link_libraries(single_joint_hardware_interface ${catkin_LIBRARIES})
+target_link_libraries(gkf_hardware_interface ${catkin_LIBRARIES})

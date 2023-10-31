@@ -23,9 +23,6 @@ public:
     void update(const ros::TimerEvent &e);
     void read(ros::Duration elapsed_time);
     void write(ros::Duration elapsed_time);
-    ros::Publisher pub;
-    ros::ServiceClient client;
-    rospy_tutorials::Floats joints_pub;
     // three_dof_planar_manipulator::Floats_array joint_read;
 
 protected:

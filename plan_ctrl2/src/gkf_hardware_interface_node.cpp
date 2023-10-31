@@ -4,10 +4,9 @@ GKFHardwareInterface::GKFHardwareInterface(ros::NodeHandle &nh) : nh_(nh)
 {
     init();
     controller_manager_.reset(new controller_manager::ControllerManager(this, nh_));
-    loop_hz_ = 50;
+    loop_hz_ = 100;
     ros::Duration update_freq = ros::Duration(1.0 / loop_hz_);
 
-    pub = nh_.advertise<rospy_tutorials::Floats>("/joints_to_aurdino", 10);
     // client = nh_.serviceClient<three_dof_planar_manipulator::Floats_array>("/read_joint_state");
 
     non_realtime_loop_ = nh_.createTimer(update_freq, &GKFHardwareInterface::update, this);
@@ -95,6 +94,7 @@ void GKFHardwareInterface::read(ros::Duration elapsed_time)
 {
     u_char recv_data[200];
     int encoder = 0;
+    static int last_encoder = 0;
     auto time = elapsed_time.toSec();
     if (ser_.available() != 0)
     {
@@ -108,27 +108,23 @@ void GKFHardwareInterface::read(ros::Duration elapsed_time)
             std::string number_str = recv_string.substr(s_index + 1, q_index - s_index - 1);
             std::istringstream(number_str) >> encoder;
         }
-        ROS_INFO("encoder is %d", encoder);
+        // ROS_INFO("times %.4f read encoder is %d", time, encoder);
+        joint_position_ = (encoder * 360.0) / 1040;
+        joint_velocity_ = (encoder - last_encoder) * 360.0 / 1040 * time;
+        last_encoder = encoder;
+        ROS_INFO("Current Pos: %.2f, Vel: %.2f", joint_position_, joint_velocity_);
     }
-
-    joint_position_ = 0;
-    joint_velocity_ = 0;
 }
 
 void GKFHardwareInterface::write(ros::Duration elapsed_time)
 {
 
     effortJointSaturationInterface.enforceLimits(elapsed_time);
-    joints_pub.data.clear();
-    joints_pub.data.push_back(joint_effort_command_);
-
-    // TEST
-    joint_effort_command_ = 2000;
-
+    // in here debug ,furture using transmission interface
+    joint_effort_command_ = -100 * joint_effort_command_;
     ROS_INFO("PWM Cmd: %.2f", joint_effort_command_);
     std::string send_data = "z" + std::to_string((int)(joint_effort_command_)) + "\n";
     ser_write(send_data);
-    pub.publish(joints_pub);
 }
 
 // 串口辅助函数
@@ -142,7 +138,7 @@ void GKFHardwareInterface::ser_write(std::string send_data)
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "single_joint_hardware_interface");
+    ros::init(argc, argv, "gkf_hardware_interface");
     ros::NodeHandle nh;
     // ros::AsyncSpinner spinner(4);
     ros::MultiThreadedSpinner spinner(2); // Multiple threads for controller service callback and for the Service client callback used to get the feedback from ardiuno

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="single_joint_actuator" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="gkf_joint_actuator" xmlns:xacro="http://ros.org/wiki/xacro">
    <material name="blue">
 	  <color rgba="0 0 0.8 1"/>
    </material>
