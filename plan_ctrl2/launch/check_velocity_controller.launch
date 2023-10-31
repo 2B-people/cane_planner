@@ -4,6 +4,12 @@
   <rosparam file="$(find gkf_control)/config/controllers.yaml" command="load"/>
   <rosparam file="$(find gkf_control)/config/joint_limits.yaml" command="load"/>
   
+  <arg name="model" default="$(find gkf_control)/urdf/gkf_joint_actuator.urdf.xacro"/>
+  <arg name="gui" default="true" />
+  
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+  
   <node name="robot_hardware_interface" pkg="gkf_control" type="gkf_hardware_interface" output="screen"/>
   
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
