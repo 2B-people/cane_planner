@@ -108,11 +108,16 @@ void GKFHardwareInterface::read(ros::Duration elapsed_time)
             std::string number_str = recv_string.substr(s_index + 1, q_index - s_index - 1);
             std::istringstream(number_str) >> encoder;
         }
-        // ROS_INFO("times %.4f read encoder is %d", time, encoder);
+
+        ROS_WARN("times %.4f read encoder is %d", time, encoder);
         joint_position_ = (encoder * 360.0) / 1040;
-        joint_velocity_ = (encoder - last_encoder) * 360.0 / 1040 * time;
+        joint_velocity_ = (encoder - last_encoder) * 360.0 / 1040 / time;
         last_encoder = encoder;
         ROS_INFO("Current Pos: %.2f, Vel: %.2f", joint_position_, joint_velocity_);
+    }
+    else
+    {
+        ROS_WARN("no massage");
     }
 }
 
@@ -120,10 +125,11 @@ void GKFHardwareInterface::write(ros::Duration elapsed_time)
 {
 
     effortJointSaturationInterface.enforceLimits(elapsed_time);
+    auto time = elapsed_time.toSec();
+    auto send_cmd = -1 * joint_effort_command_;
     // in here debug ,furture using transmission interface
-    joint_effort_command_ = -100 * joint_effort_command_;
-    ROS_INFO("PWM Cmd: %.2f", joint_effort_command_);
-    std::string send_data = "z" + std::to_string((int)(joint_effort_command_)) + "\n";
+    ROS_INFO("time:%.4f, PWM Cmd: %.2f", time, send_cmd);
+    std::string send_data = "z" + std::to_string((int)(send_cmd)) + "\n";
     ser_write(send_data);
 }
 

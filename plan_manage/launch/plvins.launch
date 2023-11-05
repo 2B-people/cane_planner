@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="config_path" default = "$(find plan_manage)/config/d455/d455_plvins.yaml" />
+    <arg name="config_path" default = "$(find plan_manage)/config/d455/d455_xsens_plvins.yaml" />
 	<arg name="vins_path" default = "$(find feature_tracker)/../config/../" />
       <!-- point tracker -->
     <node name="feature_tracker" pkg="feature_tracker" type="feature_tracker" >

@@ -74,7 +74,8 @@
   <arg name="stereo_module/gain/2"      default="16"/>
   
   <!-- fdilink_ahrs -->
-  <include file="$(find fdilink_ahrs)/launch/ahrs_driver.launch"/>
+  <!-- <include file="$(find fdilink_ahrs)/launch/ahrs_driver.launch"/> -->
+  <include file="$(find xsens_mti_driver)/launch/xsens_mti_node.launch"/>
     
   <group ns="$(arg camera)">
     <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">

@@ -14,4 +14,4 @@ gkf_joint_actuator:
     joint1_velocity_controller:
       type: effort_controllers/JointVelocityController
       joint: joint1
-      pid: {p: 20.0, i: 0.0, d: 0.0, i_clamp_min: -255.0, i_clamp_max: 255, antiwindup: True}
+      pid: {p: 20.0, i: 0.0, d: 0.0, i_clamp_min: 0.0, i_clamp_max: 0, antiwindup: True}
