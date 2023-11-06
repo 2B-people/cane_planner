@@ -7,6 +7,7 @@
     <arg name="sensor_pose_topic"/>
     <!-- simulation param -->
     <arg name="simulation"/>
+    <arg name="planner"/>
     <arg name="slice_height"/>
     <arg name="map_size_x"/>
     <arg name="map_size_y"/>
@@ -22,6 +23,7 @@
         <remap from="/odom_world" to="$(arg odometry_world)"/>
         <!-- simulation true or false -->
         <param name="planner_node/simulation" value="$(arg simulation)"/>
+        <param name="planner_node/planner" value="$(arg planner)"/>
         <!-- sdf set -->
         <param name="sdf_map/map_size_x" value="$(arg map_size_x)" />
         <param name="sdf_map/map_size_y" value="$(arg map_size_y)" />

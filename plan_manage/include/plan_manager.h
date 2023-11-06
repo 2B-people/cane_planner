@@ -14,7 +14,6 @@
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_datatypes.h>
 
-
 // #include <nav_msgs/OccupancyGrid.h>
 
 #include <path_searching/astar.h>
@@ -47,6 +46,8 @@ namespace cane_planner
         FSM_STATE exec_state_;
         bool have_odom_, have_target_;
         bool simulation_;
+        // planner:Astar == 1 or kinplan == 2
+        int planner_;
 
         Eigen::Vector3d odom_pos_, odom_vel_;
         Eigen::Quaterniond odom_ori_;
@@ -54,16 +55,16 @@ namespace cane_planner
         Eigen::Vector2d start_pt_; // start pos
         Eigen::Vector2d end_pt_;   // target pos
 
-        Eigen::Vector3d start_state_; //start state
-        Eigen::Vector3d end_state_;//end state
+        Eigen::Vector3d start_state_; // start state
+        Eigen::Vector3d end_state_;   // end state
 
         /*---------- Ros utils -----------*/
         ros::Timer exec_timer_;
         ros::Timer replan_timer_;
         ros::Subscriber odom_sub_, waypoint_sub_;
         ros::Subscriber goal_sub_, start_sub_;
-        ros::Publisher astar_pub_,kin_vis_pub_,kin_foot_pub_;
-        ros::Publisher kin_path_pub_,a_path_pub_;
+        ros::Publisher astar_pub_, kin_vis_pub_, kin_foot_pub_;
+        ros::Publisher kin_path_pub_, a_path_pub_;
 
         /*---------- helper function -----------*/
         bool callAstarPlan();
@@ -73,14 +74,13 @@ namespace cane_planner
         double getPathLen(vector<Eigen::Vector2d> list);
         double getPathLen(vector<Eigen::Vector3d> list);
 
-
         // publish a star path;
         void publishKinodynamicAstarPath();
         void publishAstarPath();
 
         void changeFSMExecState(FSM_STATE new_state);
         double QuatenionToYaw(geometry_msgs::Quaternion ori);
-        double QuatenionToYaw(Eigen::Quaterniond  ori);
+        double QuatenionToYaw(Eigen::Quaterniond ori);
 
         /*---------- ROS function -----------*/
         // timer
@@ -89,14 +89,15 @@ namespace cane_planner
         // sub callback
         void waypointCallback(const nav_msgs::PathConstPtr &msg);
         void odometryCallback(const nav_msgs::OdometryConstPtr &msg);
-        //sim sub callback
+        // sim sub callback
         void goalCallback(const geometry_msgs::PoseStamped::ConstPtr &goal);
         void startCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &start);
 
     public:
-        PlannerManager(bool simulation)
+        PlannerManager(bool simulation, int planner)
         {
             simulation_ = simulation;
+            planner_ = planner;
         }
         ~PlannerManager();
         void init(ros::NodeHandle &nh);

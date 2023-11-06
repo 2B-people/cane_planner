@@ -126,17 +126,17 @@ namespace cane_planner
         collision_.reset(new CollisionDetection);
         collision_->init(nh);
         collision_->setMap(sdf_map_);
-        // // init kin planner
-        // ROS_WARN(" Astar planer start");
-        // astar_finder_.reset(new Astar);
-        // astar_finder_->setParam(nh);
-        // astar_finder_->setCollision(collision_);
-        // astar_finder_->init();
+        // init kin planner
+        ROS_WARN(" Astar planer start");
+        astar_finder_.reset(new Astar);
+        astar_finder_->setParam(nh);
+        astar_finder_->setCollision(collision_);
+        astar_finder_->init();
         // init lfpc model
         ROS_WARN(" LFPC model start");
         lfpc_model_.reset(new LFPC);
         lfpc_model_->initializeModel(nh);
-        // init astar planner
+        // init kin planner
         ROS_WARN(" kinodynamic planer start");
         kin_finder_.reset(new KinodynamicAstar);
         kin_finder_->setParam(nh);
@@ -211,6 +211,7 @@ namespace cane_planner
     void PlannerManager::execFSMCallback(const ros::TimerEvent &e)
     {
         static int fsm_num = 0;
+        static bool success1 = false;
         static bool success2 = false;
         fsm_num++;
         if (fsm_num == 100)
@@ -241,30 +242,52 @@ namespace cane_planner
         }
         case GEN_NEW_TRAJ:
         {
-            // success1 = callAstarPlan();
-            success2 = callKinodynamicAstarPlan();
-            if (success2)
-                changeFSMExecState(EXEC_TRAJ);
-            else
-                changeFSMExecState(REPLAN_TRAJ);
+            if (planner_ == 1)
+            {
+                success1 = callAstarPlan();
+                if (success1)
+                    changeFSMExecState(EXEC_TRAJ);
+                else
+                    changeFSMExecState(REPLAN_TRAJ);
+            }
+            else if (planner_ == 2)
+            {
+                success2 = callKinodynamicAstarPlan();
+                if (success2)
+                    changeFSMExecState(EXEC_TRAJ);
+                else
+                    changeFSMExecState(REPLAN_TRAJ);
+            }
+
             break;
         }
         case REPLAN_TRAJ:
         {
-            // replan just for kinplan
-            success2 = callKinodynamicAstarPlan();
-            if (success2)
-                changeFSMExecState(EXEC_TRAJ);
-            else
-                changeFSMExecState(REPLAN_TRAJ);
+            if (planner_ == 1)
+            {
+                success1 = callAstarPlan();
+                if (success1)
+                    changeFSMExecState(EXEC_TRAJ);
+                else
+                    changeFSMExecState(REPLAN_TRAJ);
+            }
+            else if (planner_ == 2)
+            {
+                success2 = callKinodynamicAstarPlan();
+                if (success2)
+                    changeFSMExecState(EXEC_TRAJ);
+                else
+                    changeFSMExecState(REPLAN_TRAJ);
+            }
             break;
         }
         case EXEC_TRAJ:
         {
-            // if (success1) // a star success
-            // {
-            //     displayAstar();
-            // }
+            if (success1) // a star success
+            {
+                displayAstar();
+                publishAstarPath();
+            }
             if (success2) // kin star success
             {
                 displayKinastar();
@@ -376,7 +399,8 @@ namespace cane_planner
         static int num = 0;
         astar_finder_->reset();
         num++;
-        std::cout <<"astar"<<","<< num << ",";
+        std::cout << "astar"
+                  << "," << num << ",";
         ros::Time time_1 = ros::Time::now();
         bool plan_success = astar_finder_->search(start_pt_, end_pt_);
         ros::Time time_2 = ros::Time::now();
@@ -397,7 +421,7 @@ namespace cane_planner
 
         kin_finder_->reset();
         num++;
-        std::cout <<"kin,"<< num << ",";
+        std::cout << "kin," << num << ",";
         // todo
         Eigen::Vector3d input;
         // double vx, vy;
