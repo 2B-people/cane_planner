@@ -1,7 +1,9 @@
 <launch>
     <arg name="odometry_topic" value = "/simulation_generator/odom"/>
     <!-- kindynameic alogoritm -->
-    <include file="$(find plan_manage)/launch/algorithm.launch">
+    <include file="$(find plan_manage)/launch/include/algorithm.launch">
+        <!-- choose planner A*:1 kin:2 -->
+        <arg name="planner" value="2"/>
         <!-- not using cloud and odom -->
         <arg name="odometry_topic" value = "$(arg odometry_topic)"/>
         <arg name="odometry_world" value = "$(arg odometry_topic)"/>
@@ -28,7 +30,7 @@
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />
     </node>
     <!-- simulation -->
-    <include file="$(find plan_manage)/launch/simulation.launch"/>
+    <include file="$(find plan_manage)/launch/include/simulation.launch"/>
     <!-- waypoint -->
     <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
         <remap from="~odom" to="$(arg odometry_topic)"/>

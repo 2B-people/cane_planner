@@ -16,7 +16,8 @@
     <arg name="resolution" value=" 0.1"/>
 
     <!-- map -->
-    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" args=" $(find map_generator)/resource/office2.pcd"/>
+    <node name="map_pub" pkg="map_generator" type="map_pub" output="log" 
+    args=" $(find map_generator)/resource/office2.pcd"/>
     <!-- sim_plan -->
     <node pkg="plan_manage" name="sim_plan_node" type="sim_plan_node" output="screen">
         <remap from ="/map_ros/odom"  to = "$(arg odometry_topic)"/>
@@ -90,7 +91,8 @@
         <param name="lfpc/t_sup" value="0.35"/>
     </node>
     <!-- simulation -->
-    <node pkg="tf" type="static_transform_publisher" name="tf_pub" args="0 0 0 0 0 0 1 world base_link 20" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_pub" 
+    args="0 0 0 0 0 0 1 world base_link 20" />
     <!-- L1 controller -->
     <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
         <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
