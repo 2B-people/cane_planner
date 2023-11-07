@@ -108,5 +108,6 @@
         "polynomials": "cpp",
         "eigen": "cpp",
         "*.ipp": "cpp"
-    }
+    },
+    "C_Cpp.default.cppStandard": "c++14"
 }
