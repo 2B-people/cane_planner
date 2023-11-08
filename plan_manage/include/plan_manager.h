@@ -13,6 +13,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
 
 // #include <nav_msgs/OccupancyGrid.h>
 
@@ -65,6 +66,7 @@ namespace cane_planner
         ros::Subscriber goal_sub_, start_sub_;
         ros::Publisher astar_pub_, kin_vis_pub_, kin_foot_pub_;
         ros::Publisher kin_path_pub_, a_path_pub_;
+        tf::TransformListener tf_listener_;
 
         /*---------- helper function -----------*/
         bool callAstarPlan();

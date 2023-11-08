@@ -46,10 +46,10 @@
 	<param name="filter_size_surf" type="double" value="0.5" />
 	<param name="filter_size_map" type="double" value="0.5" />
 	<param name="cube_side_length" type="double" value="1000" />
-	<param name="publish/tf_world_frame" value="world" />
 	<param name="runtime_pos_log_enable" type="bool" value="0" />
+
     <node pkg="faster_lio" type="run_mapping_online" name="laserMapping"/>
 
-
+	<node pkg="tf2_ros" type="static_transform_publisher" name="cam2world" args="0 0 0 -1.57 0 0 /world /camera_init" />
 
 </launch>

@@ -178,16 +178,23 @@ namespace cane_planner
     // odomtry
     void PlannerManager::odometryCallback(const nav_msgs::OdometryConstPtr &msg)
     {
-        odom_pos_(0) = msg->pose.pose.position.x;
-        odom_pos_(1) = msg->pose.pose.position.y;
-        odom_pos_(2) = msg->pose.pose.position.z;
-        odom_vel_(0) = msg->twist.twist.linear.x;
-        odom_vel_(1) = msg->twist.twist.linear.y;
-        odom_vel_(2) = msg->twist.twist.linear.z;
-        odom_ori_.x() = msg->pose.pose.orientation.x;
-        odom_ori_.y() = msg->pose.pose.orientation.y;
-        odom_ori_.z() = msg->pose.pose.orientation.z;
-        odom_ori_.w() = msg->pose.pose.orientation.w;
+        // transform cam to world
+        geometry_msgs::PoseStamped pose_cam;
+        pose_cam.header = msg->header;
+        pose_cam.pose = msg->pose.pose;
+        geometry_msgs::PoseStamped pose_world;
+        tf_listener_.transformPose("world", pose_cam, pose_world);
+
+        odom_pos_(0) = pose_world.pose.position.x;
+        odom_pos_(1) = pose_world.pose.position.y;
+        odom_pos_(2) = pose_world.pose.position.z;
+        // odom_vel_(0) = msg->twist.twist.linear.x;
+        // odom_vel_(1) = msg->twist.twist.linear.y;
+        // odom_vel_(2) = msg->twist.twist.linear.z;
+        odom_ori_.x() = pose_world.pose.orientation.x;
+        odom_ori_.y() = pose_world.pose.orientation.y;
+        odom_ori_.z() = pose_world.pose.orientation.z;
+        odom_ori_.w() = pose_world.pose.orientation.w;
 
         // odom and start set
         start_pt_(0) = odom_pos_(0);
