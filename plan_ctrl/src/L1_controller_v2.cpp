@@ -70,6 +70,7 @@ private:
     // serial
     serial::Serial ser_;
     bool use_ser_flag_;
+    int plan_;
 
     double L, Lfw, Lrv, Vcmd, lfw, lrv, steering, u, v;
     double Gas_gain, baseAngle, Angle_gain, goalRadius;
@@ -104,10 +105,20 @@ L1Controller::L1Controller()
     pn.param("baseSpeed", baseSpeed, 1470);
     pn.param("baseAngle", baseAngle, 90.0);
     pn.param("SerialUsing", use_ser_flag_, true);
+    pn.param("/kin_replan_node/planner_node/planner", plan_, 1);
 
     // Publishers and Subscribers
     odom_sub = n_.subscribe("/odometry/filtered", 1, &L1Controller::odomCB, this);
-    path_sub = n_.subscribe("/kin_astar/path", 1, &L1Controller::pathCB, this);
+    if (plan_ == 1)
+    {
+        path_sub = n_.subscribe("/astar/path", 1, &L1Controller::pathCB, this);
+        ROS_WARN("using astar");
+    }
+    else if (plan_ == 2)
+    {
+        path_sub = n_.subscribe("/kin_astar/path", 1, &L1Controller::pathCB, this);
+        ROS_WARN("using kin_astar");
+    }
     goal_sub = n_.subscribe("/move_base_simple/goal", 1, &L1Controller::goalCB, this);
     way_sub = n_.subscribe("/waypoint_generator/waypoints", 1, &L1Controller::waypointCB, this);
 
