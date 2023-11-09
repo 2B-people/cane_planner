@@ -250,6 +250,13 @@ namespace fast_planner
   void MapROS::cloudOdomCallback(const sensor_msgs::PointCloud2ConstPtr &msg,
                                  const nav_msgs::OdometryConstPtr &odom)
   {
+    // tf from cam to odom
+    geometry_msgs::PoseStamped pose_cam;
+    pose_cam.header = odom->header;
+    pose_cam.pose = odom->pose.pose;
+    geometry_msgs::PoseStamped pose_world;
+    tf_listener_.transformPose("world", pose_cam, pose_world);
+
     camera_pos_(0) = odom->pose.pose.position.x;
     camera_pos_(1) = odom->pose.pose.position.y;
     camera_pos_(2) = odom->pose.pose.position.z;

@@ -76,6 +76,7 @@ private:
     double Gas_gain, baseAngle, Angle_gain, goalRadius;
     int controller_freq, baseSpeed;
     bool foundForwardPt, goal_received, goal_reached;
+    bool have_odom;
 
     void odomCB(const nav_msgs::Odometry::ConstPtr &odomMsg);
     void pathCB(const nav_msgs::Path::ConstPtr &pathMsg);
@@ -175,6 +176,7 @@ L1Controller::L1Controller()
     foundForwardPt = false;
     goal_received = false;
     goal_reached = false;
+    have_odom = false;
     cmd_vel.linear.x = 1500; // 1500 for stop
     cmd_vel.angular.z = baseAngle;
 
@@ -231,6 +233,7 @@ void L1Controller::initMarker()
 void L1Controller::odomCB(const nav_msgs::Odometry::ConstPtr &odomMsg)
 {
     odom = *odomMsg;
+    have_odom = true;
 }
 
 void L1Controller::pathCB(const nav_msgs::Path::ConstPtr &pathMsg)
@@ -404,7 +407,16 @@ double L1Controller::getEta(const geometry_msgs::Pose &carPose)
 
 double L1Controller::getCar2GoalDist()
 {
-    geometry_msgs::Point car_pose = odom.pose.pose.position;
+    geometry_msgs::PoseStamped pose_cam;
+    geometry_msgs::PoseStamped pose_world;
+    if(have_odom)
+    {
+    pose_cam.header = odom.header;
+    pose_cam.pose = odom.pose.pose;
+    tf_listener.transformPose("world", pose_cam, pose_world);
+    }
+
+    geometry_msgs::Point car_pose = pose_world.pose.position;
     double car2goal_x = odom_goal_pos.x - car_pose.x;
     double car2goal_y = odom_goal_pos.y - car_pose.y;
 
@@ -476,8 +488,17 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
 
 void L1Controller::controlLoopCB(const ros::TimerEvent &)
 {
+    geometry_msgs::PoseStamped pose_cam;
+    geometry_msgs::PoseStamped pose_world;
+    if(have_odom)
+    {
+    pose_cam.header = odom.header;
+    pose_cam.pose = odom.pose.pose;
+    tf_listener.transformPose("world", pose_cam, pose_world);
+    }
 
-    geometry_msgs::Pose carPose = odom.pose.pose;
+
+    geometry_msgs::Pose carPose = pose_world.pose;
     geometry_msgs::Twist carVel = odom.twist.twist;
     cmd_vel.linear.x = 1500;
     cmd_vel.angular.z = baseAngle;

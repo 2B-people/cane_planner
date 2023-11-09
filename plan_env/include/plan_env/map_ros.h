@@ -8,6 +8,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <ros/ros.h>
+#include <tf/transform_listener.h>
 
 #include <cv_bridge/cv_bridge.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -89,7 +90,7 @@ private:
   int depth_filter_margin_;
   double k_depth_scaling_factor_;
   int skip_pixel_;
-  string frame_id_;
+  std::string frame_id_;
   // msg publication
   double esdf_slice_height_;
   double visualization_truncate_height_, visualization_truncate_low_;
@@ -113,6 +114,7 @@ private:
   default_random_engine eng_;
 
   ros::Time map_start_time_;
+  tf::TransformListener tf_listener_;
 
   friend SDFMap;
 };

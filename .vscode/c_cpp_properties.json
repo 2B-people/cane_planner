@@ -11,6 +11,7 @@
                 "${workspaceFolder}",
                 "/opt/ros/noetic/include",
                 "/usr/include/eigen3",
+                "/usr/include/eigen3/Eigen",
                 "${workspaceFolder}/path_searching/include",
                 "${workspaceFolder}/plan_env/include",
                 "${workspaceFolder}/plan_manage/include",
