@@ -20,7 +20,7 @@ mapping:
   extrinsic_T: [ -0.011, -0.02329, 0.04412 ]
   extrinsic_R: [ 1, 0, 0,
                  0, 1, 0,
-                 0, 0, 1 ]
+                 0, 0, 1]
 
 publish:
   path_publish_en: false

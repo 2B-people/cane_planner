@@ -40,7 +40,7 @@ namespace fast_planner
     node_.param("map_ros/show_occ_time", show_occ_time_, false);
     node_.param("map_ros/show_esdf_time", show_esdf_time_, false);
     node_.param("map_ros/show_all_map", show_all_map_, false);
-    node_.param("map_ros/frame_id", frame_id_, string("world"));
+    node_.param("map_ros/frame_id", frame_id_, std::string("world"));
 
     proj_points_.resize(640 * 480 / (skip_pixel_ * skip_pixel_));
     point_cloud_.points.resize(640 * 480 / (skip_pixel_ * skip_pixel_));
@@ -257,9 +257,9 @@ namespace fast_planner
     geometry_msgs::PoseStamped pose_world;
     tf_listener_.transformPose("world", pose_cam, pose_world);
 
-    camera_pos_(0) = odom->pose.pose.position.x;
-    camera_pos_(1) = odom->pose.pose.position.y;
-    camera_pos_(2) = odom->pose.pose.position.z;
+    camera_pos_(0) = pose_world.pose.position.x;
+    camera_pos_(1) = pose_world.pose.position.y;
+    camera_pos_(2) = pose_world.pose.position.z;
     if (!map_->isInMap(camera_pos_)) // exceed mapped region
       return;
     camera_q_ = Eigen::Quaterniond(odom->pose.pose.orientation.w,
