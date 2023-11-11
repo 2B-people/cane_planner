@@ -184,34 +184,59 @@ namespace cane_planner
         pose_cam.pose = msg->pose.pose;
         geometry_msgs::PoseStamped pose_world;
         tf_listener_.transformPose("world", pose_cam, pose_world);
-
-        odom_pos_(0) = pose_world.pose.position.x;
+        // position
+        odom_pos_(0) = pose_world.pose.position.x   ;
         odom_pos_(1) = pose_world.pose.position.y;
         odom_pos_(2) = pose_world.pose.position.z;
-        // odom_vel_(0) = msg->twist.twist.linear.x;
-        // odom_vel_(1) = msg->twist.twist.linear.y;
-        // odom_vel_(2) = msg->twist.twist.linear.z;
-        odom_ori_.x() = pose_world.pose.orientation.x;
-        odom_ori_.y() = pose_world.pose.orientation.y;
-        odom_ori_.z() = pose_world.pose.orientation.z;
-        odom_ori_.w() = pose_world.pose.orientation.w;
+        // ori
+        if (!simulation_) // using faster-lio
+        {
+            tf::StampedTransform trans;
+            try
+            {
+                tf_listener_.lookupTransform("/world", "/cane_base", ros::Time(), trans);
+            }
+            catch (tf::TransformException &ex)
+            {
+                ROS_ERROR("%s", ex.what());
+                return;
+            }
+
+            auto cane_Q = trans.getRotation();
+
+            odom_ori_.x() = cane_Q.getX();
+            odom_ori_.y() = cane_Q.getY();
+            odom_ori_.z() = cane_Q.getZ();
+            odom_ori_.w() = cane_Q.getW();
+        }
+        else
+        {
+            odom_vel_(0) = msg->twist.twist.linear.x;
+            odom_vel_(1) = msg->twist.twist.linear.y;
+            odom_vel_(2) = msg->twist.twist.linear.z;
+            odom_ori_.x() = pose_world.pose.orientation.x;
+            odom_ori_.y() = pose_world.pose.orientation.y;
+            odom_ori_.z() = pose_world.pose.orientation.z;
+            odom_ori_.w() = pose_world.pose.orientation.w;
+        }
 
         // odom and start set
         start_pt_(0) = odom_pos_(0);
         start_pt_(1) = odom_pos_(1);
         start_state_(0) = odom_pos_(0);
         start_state_(1) = odom_pos_(1);
-        double yaw = 0.0;
-        // if (simulation_)
-        // else
+
         // yaw = QuatenionToYaw(odom_ori_);
         // yaw = QuatenionToYaw(msg->pose.pose.orientation);
         // ROS_WARN("start_pt_ is %f and %f", start_pt_(0), start_pt_(1));
         // ROS_WARN("odom_yaw is %f,change is %f", yaw_test, yaw);
 
+        double yaw = 0.0;
         Eigen::Vector3d rot_x = odom_ori_.toRotationMatrix().block(0, 0, 3, 1);
         yaw = atan2(rot_x(1), rot_x(0));
         start_state_(2) = yaw;
+        // ROS_WARN("odom_yaw is %f", yaw);
+
         have_odom_ = true;
     }
     // ------------------------ FSM Callback --------------------------------

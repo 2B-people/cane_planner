@@ -409,11 +409,11 @@ double L1Controller::getCar2GoalDist()
 {
     geometry_msgs::PoseStamped pose_cam;
     geometry_msgs::PoseStamped pose_world;
-    if(have_odom)
+    if (have_odom)
     {
-    pose_cam.header = odom.header;
-    pose_cam.pose = odom.pose.pose;
-    tf_listener.transformPose("world", pose_cam, pose_world);
+        pose_cam.header = odom.header;
+        pose_cam.pose = odom.pose.pose;
+        tf_listener.transformPose("world", pose_cam, pose_world);
     }
 
     geometry_msgs::Point car_pose = pose_world.pose.position;
@@ -488,18 +488,28 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
 
 void L1Controller::controlLoopCB(const ros::TimerEvent &)
 {
-    geometry_msgs::PoseStamped pose_cam;
-    geometry_msgs::PoseStamped pose_world;
-    if(have_odom)
+    geometry_msgs::Pose carPose;
+    if (have_odom)
     {
-    pose_cam.header = odom.header;
-    pose_cam.pose = odom.pose.pose;
-    tf_listener.transformPose("world", pose_cam, pose_world);
+        tf::StampedTransform trans;
+        try
+        {
+            tf_listener.lookupTransform("/world", "/cane_base", ros::Time(), trans);
+        }
+        catch (tf::TransformException &ex)
+        {
+            ROS_ERROR("%s", ex.what());
+            return;
+        }
+        auto cane_Q = trans.getRotation();
+        carPose.orientation.x = cane_Q.getX();
+        carPose.orientation.y = cane_Q.getY();
+        carPose.orientation.x = cane_Q.getZ();
+        carPose.orientation.w = cane_Q.getW();
+        carPose.position = odom.pose.pose.position;
     }
 
-
-    geometry_msgs::Pose carPose = pose_world.pose;
-    geometry_msgs::Twist carVel = odom.twist.twist;
+    // geometry_msgs::Twist carVel = odom.twist.twist;
     cmd_vel.linear.x = 1500;
     cmd_vel.angular.z = baseAngle;
 

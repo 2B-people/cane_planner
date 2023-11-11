@@ -16,14 +16,14 @@
         <arg name="sensor_pose_topic" value="/plvins_estimator/camera_pose"/>
         <!-- using cloud and odom -->
         <arg name="odometry_topic" value = "/Odometry"/>
-        <arg name="cloud_topic" value = "cloud_registered"/>
+        <arg name="cloud_topic" value = "/cloud_registered"/>
         <!-- experice set -->
         <arg name="simulation" value="false"/>
         <arg name="slice_height" value="0.1"/>
         <arg name="kin_horizon" value="3"/>
         <!-- map size -->
-        <arg name="map_size_x" value="30.0"/>
-        <arg name="map_size_y" value="20.0"/>
+        <arg name="map_size_x" value="100.0"/>
+        <arg name="map_size_y" value="50.0"/>
         <arg name="map_size_z" value=" 4.5"/>
     </include>
     <!-- L1 controller -->
