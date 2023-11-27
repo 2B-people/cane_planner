@@ -297,7 +297,7 @@ double L1Controller::getYawFromPose(const geometry_msgs::Pose &carPose)
     // tf::Quaternion q(x, y, z, w);
     // tf::Matrix3x3 quaternion(q);
     // quaternion.getRPY(tmp, tmp, yaw);
-    double yaw;
+    double yaw = 0.0;
     Eigen::Vector3d rot_x = ori.toRotationMatrix().block(0, 0, 3, 1);
     yaw = atan2(rot_x(1), rot_x(0));
     return yaw;
@@ -373,7 +373,7 @@ geometry_msgs::Point L1Controller::get_odom_car2WayPtVec(const geometry_msgs::Po
     {
         forwardPt = odom_goal_pos;
         foundForwardPt = false;
-        // ROS_INFO("goal REACHED!");
+        ROS_WARN("goal REACHED!");
     }
 
     /*Visualized Target Point on RVIZ*/
@@ -415,8 +415,8 @@ double L1Controller::getCar2GoalDist()
         pose_cam.pose = odom.pose.pose;
         tf_listener.transformPose("world", pose_cam, pose_world);
     }
-
     geometry_msgs::Point car_pose = pose_world.pose.position;
+
     double car2goal_x = odom_goal_pos.x - car_pose.x;
     double car2goal_y = odom_goal_pos.y - car_pose.y;
 
@@ -453,7 +453,6 @@ double L1Controller::getGasInput(const float &current_v)
 
 void L1Controller::goalReachingCB(const ros::TimerEvent &)
 {
-
     if (goal_received)
     {
         double car2goal_dist = getCar2GoalDist();
@@ -489,8 +488,14 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
 void L1Controller::controlLoopCB(const ros::TimerEvent &)
 {
     geometry_msgs::Pose carPose;
+    geometry_msgs::PoseStamped pose_cam;
+    geometry_msgs::PoseStamped pose_world;
     if (have_odom)
     {
+        pose_cam.header = odom.header;
+        pose_cam.pose = odom.pose.pose;
+        tf_listener.transformPose("world", pose_cam, pose_world);
+
         tf::StampedTransform trans;
         try
         {
@@ -506,7 +511,7 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
         carPose.orientation.y = cane_Q.getY();
         carPose.orientation.x = cane_Q.getZ();
         carPose.orientation.w = cane_Q.getW();
-        carPose.position = odom.pose.pose.position;
+        carPose.position = pose_world.pose.position;
     }
 
     // geometry_msgs::Twist carVel = odom.twist.twist;
@@ -516,10 +521,10 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
     if (goal_received)
     {
         /*Estimate Steering Angle*/
-        double eta = getEta(carPose);
+        double eta = getEta(carPose) + 1.57;
+        ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
         if (foundForwardPt)
         {
-            //     ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
             cmd_vel.angular.z = baseAngle + getSteeringAngle(eta) * Angle_gain;
 
             /*Estimate Gas Input*/
@@ -528,18 +533,18 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
                 // double u = getGasInput(carVel.linear.x);
                 // cmd_vel.linear.x = baseSpeed - u;
                 cmd_vel.linear.x = baseSpeed;
-                // ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z - baseAngle) * 100);
+                ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z - baseAngle) * 100);
             }
+            if (use_ser_flag_)
+            {
+                std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z - baseAngle) * 100)) + "\n";
+                u_char send_data_char[send_data.size()];
+                for (size_t i = 0; i < send_data.size(); i++)
+                    send_data_char[i] = send_data.c_str()[i];
+                ser_.write(send_data_char, send_data.size());
+            }
+            pub_.publish(cmd_vel);
         }
-        if (use_ser_flag_)
-        {
-            std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z - baseAngle) * 100)) + "\n";
-            u_char send_data_char[send_data.size()];
-            for (size_t i = 0; i < send_data.size(); i++)
-                send_data_char[i] = send_data.c_str()[i];
-            ser_.write(send_data_char, send_data.size());
-        }
-        pub_.publish(cmd_vel);
     }
 }
 

@@ -185,7 +185,7 @@ namespace cane_planner
         geometry_msgs::PoseStamped pose_world;
         tf_listener_.transformPose("world", pose_cam, pose_world);
         // position
-        odom_pos_(0) = pose_world.pose.position.x   ;
+        odom_pos_(0) = pose_world.pose.position.x;
         odom_pos_(1) = pose_world.pose.position.y;
         odom_pos_(2) = pose_world.pose.position.z;
         // ori
@@ -554,7 +554,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1 - 0.4;
+            pt.z = 0;
             mk.points.push_back(pt);
         }
 
@@ -591,7 +591,7 @@ namespace cane_planner
         {
             pt.x = list[i](0);
             pt.y = list[i](1);
-            pt.z = 1 - 0.4;
+            pt.z = 0;
             mk.points.push_back(pt);
         }
         // publish traj

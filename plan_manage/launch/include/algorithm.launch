@@ -30,9 +30,9 @@
         <param name="sdf_map/map_size_z" value="$(arg map_size_z)" />
         <param name="sdf_map/resolution" value="0.1" />
         <param name="sdf_map/obstacles_inflation" value="0.2" />
-        <param name="sdf_map/local_bound_inflate" value="0.5"/>
+        <param name="sdf_map/local_bound_inflate" value="0.3"/>
         <param name="sdf_map/local_map_margin" value="50"/>
-        <param name="sdf_map/ground_height" value="-0.3"/>
+        <param name="sdf_map/ground_height" value="-0.4"/>
         <param name="sdf_map/default_dist" value="5.0"/>
         <!-- local fusion -->
         <param name="sdf_map/p_hit" value="0.65"/>
@@ -41,7 +41,7 @@
         <param name="sdf_map/p_max" value="0.90"/>
         <param name="sdf_map/p_occ" value="0.80"/>
         <param name="sdf_map/min_ray_length" value="0.1"/>
-        <param name="sdf_map/max_ray_length" value="15.0"/>
+        <param name="sdf_map/max_ray_length" value="20.0"/>
         <param name="sdf_map/virtual_ceil_height" value="3.2"/>
         <param name="sdf_map/optimistic" value="false" type="bool"/>
         <param name="sdf_map/signed_dist" value="false" type="bool"/>
@@ -57,7 +57,7 @@
         <param name="map_ros/k_depth_scaling_factor" value="1000.0"/>
         <param name="map_ros/skip_pixel" value="2"/>
         <param name="map_ros/esdf_slice_height" value="$(arg slice_height)"/>
-        <param name="map_ros/visualization_truncate_height" value="3.09"/>
+        <param name="map_ros/visualization_truncate_height" value="1.5"/>
         <param name="map_ros/visualization_truncate_low" value="-2.0"/>
         <param name="map_ros/show_occ_time" value="false"/>
         <param name="map_ros/show_esdf_time" value="false"/>
@@ -69,9 +69,9 @@
         <param name="kinastar/allocate_num" value="100000"/>
         <!-- kin astar contorl param -->
         <param name="kinastar/horizon" value="$(arg kin_horizon)"/>
-        <param name="kinastar/max_al" value="0.6"/>
+        <param name="kinastar/max_al" value="0.4"/>
         <param name="kinastar/max_aw" value="0.2"/>
-        <param name="kinastar/max_theta" value="0.6"/>
+        <param name="kinastar/max_theta" value="0.5"/>
         <!-- astar set -->
         <param name="astar/resolution_astar" value="0.1"/>
         <param name="astar/time_resolution" value="0"/>

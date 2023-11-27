@@ -20,14 +20,14 @@
         <!-- experice set -->
         <arg name="simulation" value="false"/>
         <arg name="slice_height" value="0.1"/>
-        <arg name="kin_horizon" value="3"/>
+        <arg name="kin_horizon" value="4.0"/>
         <!-- map size -->
         <arg name="map_size_x" value="100.0"/>
         <arg name="map_size_y" value="50.0"/>
-        <arg name="map_size_z" value=" 4.5"/>
+        <arg name="map_size_z" value="4.0"/>
     </include>
     <!-- L1 controller -->
-    <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="screen">
+    <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2" output="log">
         <!-- <node pkg="plan_ctrl" type="L1_controller_v2" respawn="false" name="L1_controller_v2">        -->
         <param name="Vcmd" value="0.5" />
         <param name="baseSpeed" value="1425"/>
