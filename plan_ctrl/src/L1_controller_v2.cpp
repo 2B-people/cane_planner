@@ -306,14 +306,18 @@ bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geome
 {
     float car2wayPt_x = wayPt.x - carPose.position.x;
     float car2wayPt_y = wayPt.y - carPose.position.y;
-    // 这里用的是carpose的yaw，
+    // 这里用的是carpose的yaw，我的代码中是以cane为坐标系的
     double car_theta = getYawFromPose(carPose);
-
+    car_theta = car_theta + 1.57;
+    // 正x方向为车前向
     float car_car2wayPt_x = cos(car_theta) * car2wayPt_x + sin(car_theta) * car2wayPt_y;
-    float car_car2wayPt_y = -sin(car_theta) * car2wayPt_x + cos(car_theta) * car2wayPt_y;
+    // float car_car2wayPt_y = -sin(car_theta) * car2wayPt_x + cos(car_theta) * car2wayPt_y;
 
-    if (car_car2wayPt_x > 0 || car_car2wayPt_y > 0) /*is Forward WayPt*/
+    if (car_car2wayPt_x > 0) /*is Forward WayPt*/
+    {
+        ROS_WARN("Forward WayPt");
         return true;
+    }
     else
         return false;
 }
