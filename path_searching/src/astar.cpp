@@ -121,9 +121,10 @@ namespace cane_planner
             // cout << "in closeset" << endl;
             continue;
           }
-
+          Eigen::Vector3d pro_pos_3d;
+          pro_pos_3d << pro_pos(0), pro_pos(1), 0.0;
           /* collision free */
-          if (!collision_->isTraversable(pro_pos))
+          if (collision_->sdf_map_->getInflateOccupancy(pro_pos_3d) == 1)
           {
             // cout << "Can't Traversable" << endl;
             continue;

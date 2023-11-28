@@ -280,11 +280,10 @@ void L1Controller::goalCB(const geometry_msgs::PoseStamped::ConstPtr &goalMsg)
 double L1Controller::getYawFromPose(const geometry_msgs::Pose &carPose)
 {
     Eigen::Quaterniond ori;
-    double x, y, z, w;
-    x = ori.x() = carPose.orientation.x;
-    y = ori.y() = carPose.orientation.y;
-    z = ori.z() = carPose.orientation.z;
-    w = ori.w() = carPose.orientation.w;
+    ori.x() = carPose.orientation.x;
+    ori.y() = carPose.orientation.y;
+    ori.z() = carPose.orientation.z;
+    ori.w() = carPose.orientation.w;
 
     // have bug
     // Eigen::Matrix3d oRx = ori.toRotationMatrix();
@@ -307,12 +306,13 @@ bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geome
 {
     float car2wayPt_x = wayPt.x - carPose.position.x;
     float car2wayPt_y = wayPt.y - carPose.position.y;
+    // 这里用的是carpose的yaw，
     double car_theta = getYawFromPose(carPose);
 
     float car_car2wayPt_x = cos(car_theta) * car2wayPt_x + sin(car_theta) * car2wayPt_y;
     float car_car2wayPt_y = -sin(car_theta) * car2wayPt_x + cos(car_theta) * car2wayPt_y;
 
-    if (car_car2wayPt_x > 0) /*is Forward WayPt*/
+    if (car_car2wayPt_x > 0 || car_car2wayPt_y > 0) /*is Forward WayPt*/
         return true;
     else
         return false;
@@ -342,31 +342,34 @@ geometry_msgs::Point L1Controller::get_odom_car2WayPtVec(const geometry_msgs::Po
     {
         for (size_t i = 0; i < map_path.poses.size(); i++)
         {
+            // 取规划的前向点
+            //  bug:有些时候无法取到有效的前向点
             geometry_msgs::PoseStamped map_path_pose = map_path.poses[i];
-            // geometry_msgs::PoseStamped odom_path_pose;
+            geometry_msgs::PoseStamped odom_path_pose;
 
-            // try
-            // {
-            // tf_listener.transformPose("world", ros::Time(0) , map_path_pose, "world" ,odom_path_pose);
-            geometry_msgs::Point odom_path_wayPt = map_path_pose.pose.position;
-            bool _isForwardWayPt = isForwardWayPt(odom_path_wayPt, carPose);
-
-            if (_isForwardWayPt)
+            try
             {
-                bool _isWayPtAwayFromLfwDist = isWayPtAwayFromLfwDist(odom_path_wayPt, carPose_pos);
-                if (_isWayPtAwayFromLfwDist)
+                tf_listener.transformPose("world", ros::Time(0), map_path_pose, "world", odom_path_pose);
+                geometry_msgs::Point odom_path_wayPt = odom_path_pose.pose.position;
+                // 前向点判读
+                bool _isForwardWayPt = isForwardWayPt(odom_path_wayPt, carPose);
+
+                if (_isForwardWayPt)
                 {
-                    forwardPt = odom_path_wayPt;
-                    foundForwardPt = true;
-                    break;
+                    // 前向点Lfw判读
+                    bool _isWayPtAwayFromLfwDist = isWayPtAwayFromLfwDist(odom_path_wayPt, carPose_pos);
+                    if (_isWayPtAwayFromLfwDist)
+                    {
+                        forwardPt = odom_path_wayPt;
+                        foundForwardPt = true;
+                        break;
+                    }
                 }
             }
-            // }
-            // catch(tf::TransformException &ex)
-            // {
-            //     ROS_ERROR("%s",ex.what());
-            //     ros::Duration(1.0).sleep();
-            // }
+            catch (tf::TransformException &ex)
+            {
+                ROS_ERROR("%s", ex.what());
+            }
         }
     }
     else if (goal_reached)
@@ -468,7 +471,7 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
                     send_data_char[i] = send_data.c_str()[i];
                 ser_.write(send_data_char, send_data.size());
             }
-            ROS_INFO("Goal Reached !");
+            ROS_WARN("Goal Reached !");
         }
     }
     if (use_ser_flag_)
@@ -522,10 +525,10 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
     {
         /*Estimate Steering Angle*/
         double eta = getEta(carPose) + 1.57;
-        ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
+        // ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
         if (foundForwardPt)
         {
-            cmd_vel.angular.z = baseAngle + getSteeringAngle(eta) * Angle_gain;
+            cmd_vel.angular.z = getSteeringAngle(eta) * Angle_gain;
 
             /*Estimate Gas Input*/
             if (!goal_reached)
@@ -533,17 +536,20 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
                 // double u = getGasInput(carVel.linear.x);
                 // cmd_vel.linear.x = baseSpeed - u;
                 cmd_vel.linear.x = baseSpeed;
-                ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z - baseAngle) * 100);
+                if (use_ser_flag_)
+                {
+                    std::string send_data = "z" + std::to_string((int)(cmd_vel.angular.z * 100)) + "\n";
+                    u_char send_data_char[send_data.size()];
+                    for (size_t i = 0; i < send_data.size(); i++)
+                        send_data_char[i] = send_data.c_str()[i];
+                    ser_.write(send_data_char, send_data.size());
+                }
+                else
+                {
+                    pub_.publish(cmd_vel);
+                    // ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z) * 100);
+                }
             }
-            if (use_ser_flag_)
-            {
-                std::string send_data = "z" + std::to_string((int)((cmd_vel.angular.z - baseAngle) * 100)) + "\n";
-                u_char send_data_char[send_data.size()];
-                for (size_t i = 0; i < send_data.size(); i++)
-                    send_data_char[i] = send_data.c_str()[i];
-                ser_.write(send_data_char, send_data.size());
-            }
-            pub_.publish(cmd_vel);
         }
     }
 }
