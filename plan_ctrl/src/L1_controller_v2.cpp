@@ -308,12 +308,12 @@ bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geome
     float car2wayPt_y = wayPt.y - carPose.position.y;
     // 这里用的是carpose的yaw，我的代码中是以cane为坐标系的
     double car_theta = getYawFromPose(carPose);
-    car_theta = car_theta + 1.57;
+    car_theta = car_theta;
     // 正x方向为车前向
     float car_car2wayPt_x = cos(car_theta) * car2wayPt_x + sin(car_theta) * car2wayPt_y;
-    // float car_car2wayPt_y = -sin(car_theta) * car2wayPt_x + cos(car_theta) * car2wayPt_y;
+    float car_car2wayPt_y = -sin(car_theta) * car2wayPt_x + cos(car_theta) * car2wayPt_y;
 
-    if (car_car2wayPt_x > 0) /*is Forward WayPt*/
+    if (car_car2wayPt_x > 0 || car_car2wayPt_y > 0) /*is Forward WayPt*/
     {
         ROS_WARN("Forward WayPt");
         return true;
@@ -467,14 +467,14 @@ void L1Controller::goalReachingCB(const ros::TimerEvent &)
         {
             goal_reached = true;
             goal_received = false;
-            if (use_ser_flag_)
-            {
-                std::string send_data = "z000\n";
-                u_char send_data_char[send_data.size()];
-                for (size_t i = 0; i < send_data.size(); i++)
-                    send_data_char[i] = send_data.c_str()[i];
-                ser_.write(send_data_char, send_data.size());
-            }
+            // if (use_ser_flag_)
+            // {
+            //     std::string send_data = "z000\n";
+            //     u_char send_data_char[send_data.size()];
+            //     for (size_t i = 0; i < send_data.size(); i++)
+            //         send_data_char[i] = send_data.c_str()[i];
+            //     ser_.write(send_data_char, send_data.size());
+            // }
             ROS_WARN("Goal Reached !");
         }
     }
@@ -529,10 +529,12 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
     {
         /*Estimate Steering Angle*/
         double eta = getEta(carPose) + 1.57;
-        // ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
         if (foundForwardPt)
         {
+
             cmd_vel.angular.z = getSteeringAngle(eta) * Angle_gain;
+            ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
+            ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z) * 100);
 
             /*Estimate Gas Input*/
             if (!goal_reached)
@@ -551,7 +553,6 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
                 else
                 {
                     pub_.publish(cmd_vel);
-                    // ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z) * 100);
                 }
             }
         }

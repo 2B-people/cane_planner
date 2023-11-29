@@ -30,9 +30,9 @@
         <param name="sdf_map/map_size_z" value="$(arg map_size_z)" />
         <param name="sdf_map/resolution" value="0.1" />
         <param name="sdf_map/obstacles_inflation" value="0.2" />
-        <param name="sdf_map/local_bound_inflate" value="0.3"/>
+        <param name="sdf_map/local_bound_inflate" value="0.4"/>
         <param name="sdf_map/local_map_margin" value="50"/>
-        <param name="sdf_map/ground_height" value="-0.4"/>
+        <param name="sdf_map/ground_height" value="-0.3"/>
         <param name="sdf_map/default_dist" value="5.0"/>
         <!-- local fusion -->
         <param name="sdf_map/p_hit" value="0.65"/>
@@ -51,7 +51,7 @@
         <param name="map_ros/fx" value="384.96630859375"/>
         <param name="map_ros/fy" value="327.45794677734375"/>
         <!-- depth filter -->
-        <param name="map_ros/depth_filter_maxdist" value="40.0"/>
+        <param name="map_ros/depth_filter_maxdist" value="20.0"/>
         <param name="map_ros/depth_filter_mindist" value="0.1"/>
         <param name="map_ros/depth_filter_margin" value="2"/>
         <param name="map_ros/k_depth_scaling_factor" value="1000.0"/>

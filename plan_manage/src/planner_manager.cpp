@@ -151,8 +151,8 @@ namespace cane_planner
         // Timer
         exec_timer_ =
             nh.createTimer(ros::Duration(0.2), &PlannerManager::execFSMCallback, this);
-        replan_timer_ =
-            nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
+        // replan_timer_ =
+            // nh.createTimer(ros::Duration(0.1), &PlannerManager::checkCollisionCallback, this);
         // Visial
         astar_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/astar", 20);
         kin_vis_pub_ = nh.advertise<visualization_msgs::Marker>("/planning_vis/kin_astar", 20);
