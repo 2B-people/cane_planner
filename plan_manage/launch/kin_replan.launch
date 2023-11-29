@@ -33,7 +33,7 @@
         <param name="baseSpeed" value="1425"/>
         <param name="baseAngle" value="90.0"/>
         <param name="AngleGain" value="-2.0"/>
-        <param name="controller_freq" value="20"/>
+        <param name="controller_freq" value="15"/>
         <param name="SerialUsing" value="true"/>
         <param name="port" value="/dev/feedback_controller"/>
         <remap from="/odometry/filtered" to="$(arg odometry_topic)" />

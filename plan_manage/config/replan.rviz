@@ -169,7 +169,7 @@ Visualization Manager:
           Use Fixed Frame: true
           Use rainbow: true
           Value: true
-      Enabled: false
+      Enabled: true
       Name: map
     - Class: rviz/Group
       Displays:
@@ -226,7 +226,7 @@ Visualization Manager:
           Marker Topic: /planning_vis/kin_foot
           Name: Marker
           Namespaces:
-            "": true
+            {}
           Queue Size: 100
           Value: true
         - Class: rviz/Marker
@@ -292,7 +292,7 @@ Visualization Manager:
       Marker Topic: /car_path
       Name: Marker
       Namespaces:
-        Markers: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/TF
@@ -329,7 +329,7 @@ Visualization Manager:
       Marker Topic: /waypoint_generator/vis
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
@@ -376,7 +376,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 1.5647963285446167
       Target Frame: <Fixed Frame>
       Yaw: 1.1716973781585693
     Saved: ~
