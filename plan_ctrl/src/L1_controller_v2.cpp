@@ -315,7 +315,7 @@ bool L1Controller::isForwardWayPt(const geometry_msgs::Point &wayPt, const geome
 
     if (car_car2wayPt_x > 0 || car_car2wayPt_y > 0) /*is Forward WayPt*/
     {
-        ROS_WARN("Forward WayPt");
+        // ROS_WARN("Forward WayPt");
         return true;
     }
     else
@@ -533,8 +533,8 @@ void L1Controller::controlLoopCB(const ros::TimerEvent &)
         {
 
             cmd_vel.angular.z = getSteeringAngle(eta) * Angle_gain;
-            ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
-            ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z) * 100);
+            // ROS_WARN("\nEstimate Steering Angle angle = %f", eta);
+            // ROS_INFO("\nSteering angle = %d", (int)(cmd_vel.angular.z) * 100);
 
             /*Estimate Gas Input*/
             if (!goal_reached)

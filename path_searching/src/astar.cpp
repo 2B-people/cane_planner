@@ -64,6 +64,7 @@ namespace cane_planner
 
       bool reach_end = abs(cur_node->index(0) - end_index(0)) <= 1 &&
                        abs(cur_node->index(1) - end_index(1)) <= 1;
+      double reach_horizon = (cur_node->position - start_pt).norm();
 
       if (reach_end)
       {
@@ -77,7 +78,28 @@ namespace cane_planner
 
         return true;
       }
+      // horizon 为最大搜索距离, 如果到达了最大搜索距离, 但是还是没有找到路径, 则认为没有路径
+      // if (reach_horizon >= horizon_)
+      // {
+      //   double cur_near_end = (cur_node->position - end_pt).norm();
+      //   double start_near_end = (start_pt - end_pt).norm();
+      //   if (cur_near_end <= start_near_end)
+      //   {
+      //     std::cout << "[Astar](horizon):---------------------- " << use_node_num_ << std::endl;
+      //     std::cout << use_node_num_ << "," << iter_num_ << ",";
+      //     terminate_node = cur_node;
 
+      //     retrievePath(terminate_node);
+      //     has_path_ = true;
+
+      //     return true;
+      //   }
+      //   else
+      //   {
+      //     std::cout << "[Astar](horizon):---------------------- " << use_node_num_ << std::endl;
+      //     std::cout << "!---in horizion no find path--" << std::endl;
+      //   }
+      // }
       /* ---------- pop node and add to close set ---------- */
       open_set_.pop();
       cur_node->node_state = IN_CLOSE_SET;
@@ -204,6 +226,8 @@ namespace cane_planner
     nh.param("astar/lambda_heu", lambda_heu_, -1.0);
     // 分配的最大可以搜索的数量；
     nh.param("astar/allocate_num", allocate_num_, 1);
+
+    nh.param("astar/horizon", horizon_, -1.0);
     // tie_breaker 见路径规划课程
     tie_breaker_ = 1.0 + 1.0 / 10000;
   }

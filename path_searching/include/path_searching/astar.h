@@ -118,6 +118,7 @@ namespace cane_planner
     /* ---------- parameter ---------- */
     /* search */
     double lambda_heu_;
+    double horizon_;
     int allocate_num_;
     double tie_breaker_;
     /* map */

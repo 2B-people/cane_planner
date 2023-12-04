@@ -515,7 +515,7 @@ namespace cane_planner
             this_pose_stamped.pose.position.z = 0.0;
             this_pose_stamped.pose.orientation.x = 0.0;
             this_pose_stamped.pose.orientation.y = 0.0;
-            this_pose_stamped.pose.orientation.z = 1.0;
+            this_pose_stamped.pose.orientation.z = 0.0;
             this_pose_stamped.pose.orientation.w = 1.0;
             this_pose_stamped.header.frame_id = "world";
             this_pose_stamped.header.stamp = ros::Time::now();
