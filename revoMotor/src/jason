@@ -1,0 +1,317 @@
+#include "Jason.h"
+#include<qdebug.h>
+
+Jason::Jason()
+{
+	for (int i = 0; i < 9; i++)
+	{
+		this->data[i] = 0;
+	}
+	this->frame_head = 0x00;
+	this->frame_tail = 0x00;
+	this->P_MAX = 0;
+	this->P_MIN = 0;
+	this->V_MAX = 0;
+	this->V_MIN = 0;
+	this->KP_MAX = 0;
+	this->KP_MIN = 0;
+	this->KD_MAX = 0;
+	this->KD_MIN = 0;
+	this->T_MAX = 0;
+	this->T_MIN = 0;
+}
+int Jason::set_posi_range(float min, float max)
+{
+	this->P_MAX = max;
+	this->P_MIN = min;
+	return 0;
+}
+int Jason::set_velocity_range(float min, float max)
+{
+	this->V_MAX = max;
+	this->V_MIN = min;
+	return 0;
+}
+int Jason::set_kp_range(float min, float max)
+{
+	this->KP_MAX = max;
+	this->KP_MIN = min;
+	return 0;
+}
+int Jason::set_kd_range(float min, float max)
+{
+	this->KD_MAX = max;
+	this->KD_MIN = min;
+	return 0;
+}
+int Jason::set_torque_range(float min, float max)
+{
+	this->T_MAX = max;
+	this->T_MIN = min;
+	return 0;
+}
+
+int Jason::set_head_tail(char head, char tail)
+{
+	this->frame_head = head;
+	this->frame_tail = tail;
+	return 0;
+}
+
+int Jason::float_to_uint(float x, float x_min, float x_max, int bits)
+{
+	/// Converts a float to an unsigned int, given range and number of bits ///
+	float span = x_max - x_min;
+	float offset = x_min;
+	return (int)((x - offset) * ((float)((1 << bits) - 1)) / span);
+}
+//float Jason::uint_to_float(int x_int, float x_min, float x_max, int bits)
+//{
+//	/// converts unsigned int to float, given range and number of bits ///
+//	float span = x_max - x_min;
+//	float offset = x_min;
+//	return ((float)x_int) * span / ((float)((1 << bits) - 1)) + offset;
+//}
+float Jason::uint_to_float(int x_int, float x_min, float x_max, int bits){
+    /// converts unsigned int to float, given range and number of bits ///
+    float span = x_max - x_min;
+    float offset = x_min;
+    return ((float)x_int)*span/((float)((1<<bits)-1)) + offset;
+    }
+
+char* Jason::get_char_data()
+{
+	return this->data;
+}
+
+MotionSstate Jason::get_motor_state()
+{
+	MotionSstate a;
+	a.id = this->_id;
+	a.position = this->_posi;
+	a.velocity = this->_velo;
+	a.torque = this->_torque;
+	return a;
+}
+
+void Jason::convert_f2c(char id, float f_posi, float f_velo, float f_kp, float f_kd, float f_torque,float f_kp_i,float f_kd_i,float f_ki_i,char mode)
+{
+    int p = 0x00;
+    int v = 0x00;
+    int kp = 0x00;
+    int kd = 0x00;
+    int t = 0x00;
+    int kp_i = 0x00;
+    int kd_i = 0x00;
+    int ki_i = 0x00;
+
+#ifdef NEW_PROTOCOL
+	this->data[0] = this->frame_head;
+	this->data[1] = p >> 8;
+	this->data[2] = p & 0xFF;
+	this->data[3] = v >> 4;
+	this->data[4] = ((v & 0xF) << 4) | (kp >> 8);
+	this->data[5] = kp & 0xFF;
+	this->data[6] = kd >> 4;
+	this->data[7] = ((kd & 0xF) << 4) | (t >> 8);
+	this->data[8] = t & 0xff;
+	this->data[9] = id;
+    this->data[10] = kp_i>>4;
+    this->data[11] = ((kp_i & 0xF) << 4) | (kd_i >> 8);
+    this->data[12] = kd_i & 0xff;
+    this->data[13] = ki_i>>4;
+    mode = mode&0x0F;
+    this->data[14] = ((kp_i & 0xF) << 4) | mode;
+    this->data[15] = this->frame_tail;
+#endif
+#ifdef OLD_PROTOCOL
+    this->data[0] = this->frame_head;
+    this->data[1] = p >> 8;
+    this->data[2] = p & 0xFF;
+    this->data[3] = v >> 4;
+    this->data[4] = ((v & 0xF) << 4) | (kp >> 8);
+    this->data[5] = kp & 0xFF;
+    this->data[6] = kd >> 4;
+    this->data[7] = ((kd & 0xF) << 4) | (t >> 8);
+    this->data[8] = t & 0xff;
+    this->data[9] = id;
+    this->data[10] = this->frame_tail;
+#endif
+#ifdef PROTOCOL_V2_2
+    //qDebug()<<"PROTOCOL_V2_2";
+    this->data[0] = this->frame_head;
+    this->data[1] = p >> 8;
+    this->data[2] = p & 0xFF;
+    this->data[3] = v;
+    this->data[4] = kp;
+    this->data[5] = kd;
+    this->data[6] = kp_i;
+    this->data[7] = kd_i;
+    this->data[8] = ki_i;
+    this->data[9] = id;
+    this->data[10] = this->frame_tail;
+#endif
+#ifdef PROTOCOL_V2_3
+    switch (mode) {
+    case 0:
+        // 串级PID协议
+        p = float_to_uint(f_posi, this->P_MIN, this->P_MAX, 16);
+        v = float_to_uint(f_velo, this->V_MIN, this->V_MAX, 8);
+        kp = float_to_uint(f_kp, this->KP_MIN, this->KP_MAX, 8);
+        kd = float_to_uint(f_kd, this->KD_MIN, this->KD_MAX, 8);
+        t = float_to_uint(f_torque, this->T_MIN, this->T_MAX, 8);
+        kp_i = float_to_uint(f_kp_i,this->KPI_MIN,this->KPI_MAX,8);
+        kd_i = float_to_uint(f_kd_i,this->KDI_MIN,this->KDI_MAX,8);
+        ki_i = float_to_uint(f_ki_i,this->KII_MIN,this->KII_MAX,8);
+        this->data[0] = this->frame_head;
+        this->data[1] = p >> 8;
+        this->data[2] = p & 0xFF;
+        this->data[3] = v;
+        this->data[4] = kp;
+        this->data[5] = kd;
+        this->data[6] = kp_i;
+        this->data[7] = kd_i;
+        this->data[8] = ki_i;
+        this->data[9] = id;
+        this->data[10] = this->frame_tail;
+        break;
+    case 1:
+        // MIT 版协议
+        qDebug()<<"MIT Control>>>"<<data;
+        p = float_to_uint(f_posi, this->P_MIN, this->P_MAX, 16);
+        v = float_to_uint(f_velo, this->V_MIN, this->V_MAX, 12);
+        kp = float_to_uint(f_kp, this->KP_MIN, this->KP_MAX, 12);
+        kd = float_to_uint(f_kd, this->KD_MIN, this->KD_MAX, 12);
+        t = float_to_uint(f_torque, this->T_MIN, this->T_MAX, 12);
+        this->data[0] = this->frame_head;
+        this->data[1] = p >> 8;
+        this->data[2] = p & 0xFF;
+        this->data[3] = v >> 4;
+        this->data[4] = ((v & 0xF) << 4) | (kp >> 8);
+        this->data[5] = kp & 0xFF;
+        this->data[6] = kd >> 4;
+        this->data[7] = ((kd & 0xF) << 4) | (t >> 8);
+        this->data[8] = t & 0xff;
+        this->data[9] = id;
+        this->data[10] = this->frame_tail;
+        break;
+    case 2:
+        //纯torque控制
+        t = float_to_uint(f_torque, this->T_MIN, this->T_MAX, 16);
+        this->data[0] = this->frame_head;
+        this->data[1] = t >> 8;
+        this->data[2] = t & 0xFF;
+        this->data[3] = 0x00;
+        this->data[4] = 0x00;
+        this->data[5] = 0x00;
+        this->data[6] = 0x00;
+        this->data[7] = 0x00;
+        this->data[8] = 0xAB;       //纯torque控制下该字节必须是0xAB,帮助校验控制模式
+        this->data[9] = id;
+        this->data[10] = this->frame_tail;
+        break;
+    case 3:
+        //纯速度调节模式
+        v = float_to_uint(f_velo, this->V_MIN, this->V_MAX, 16);
+        kp_i = float_to_uint(f_kp_i,this->KPI_MIN,this->KPI_MAX,12);
+        kd_i = float_to_uint(f_kd_i,this->KDI_MIN,this->KDI_MAX,12);
+        ki_i = float_to_uint(f_ki_i,this->KII_MIN,this->KII_MAX,12);
+
+        this->data[0] = this->frame_head;
+        this->data[1] = v >> 8;
+        this->data[2] = v & 0xFF;
+        this->data[3] = kp_i>>4;    //kpi高8bits
+        this->data[4] = ((kp_i & 0xF)<<4)|(kd_i>>8);    //kpi低4bits+kdi高4bits
+        this->data[5] = kd_i&0xff;  //kdi低8bits
+        this->data[6] = ki_i>>4;    //kii高8bits
+        this->data[7] = ((ki_i & 0xF) << 4);
+        this->data[8] = 0xAC;       //纯速度控制下该字节必须是0xAC,帮助校验控制模式
+        this->data[9] = id;
+        this->data[10] = this->frame_tail;
+        break;
+    case 4:
+        v = float_to_uint(f_velo, this->V_MIN, this->V_MAX, 16);
+        kp_i = float_to_uint(f_kp_i,this->KPI_MIN,this->KPI_MAX,12);
+        //kd_i = float_to_uint(f_kd_i,this->KDI_MIN,this->KDI_MAX,12);
+        ki_i = float_to_uint(f_ki_i,this->KII_MIN,this->KII_MAX,12);
+
+        this->data[0] = this->frame_head;
+        this->data[1] = v >> 8;
+        this->data[2] = v & 0xFF;
+        this->data[3] = kp_i>>4;    //kpi高8bits
+        this->data[4] = ((kp_i & 0xF)<<4)|(kd_i>>8);    //kpi低4bits+kdi高4bits
+        this->data[5] = kd_i&0xff;  //kdi低8bits
+        this->data[6] = ki_i>>4;    //kii高8bits
+        this->data[7] = ((ki_i & 0xF) << 4);
+        this->data[8] = 0xAD;       //SMC控制下该字节必须是0xAD,帮助校验控制模式
+        this->data[9] = id;
+        this->data[10] = this->frame_tail;
+    default:
+        break;
+    }
+#endif
+}
+
+void Jason::convert_c2f(char* data)
+{
+    int id, p_int=0x00, v_int=0x00, t_int=0x00;
+	id = data[0];
+    //p_int = (data[1] << 8) | data[2];
+    p_int = (data[1] << 8)| (0x00ff&data[2]);
+    v_int = (data[3] << 4) | ((0x00ff&data[4]) >> 4);
+    t_int = ((data[4] & 0xF) << 8) | (0x00ff&data[5]);
+    p_int &= 0x0000ffff;
+    v_int &= 0x00000fff;
+    t_int &= 0x00000fff;
+    //qDebug("data: %x %x %x %x %x %x",data[0],data[1],data[2],data[3],data[4],data[5]);
+    //qDebug("p_int:%x,v_int:%x,t_int:%x",p_int,v_int,t_int);
+	this->_id = id;
+	this->_posi = uint_to_float(p_int, this->P_MIN, this->P_MAX, 16);
+	this->_velo = uint_to_float(v_int, this->V_MIN, this->V_MAX, 12);
+	this->_torque = uint_to_float(t_int, this->T_MIN, this->T_MAX, 12);
+	
+}
+
+void Jason::enter_reset_mode(char id)
+{
+	this->data[0] = this->frame_head;
+	this->data[1] = 0xFF;
+	this->data[2] = 0xFF;
+	this->data[3] = 0xFF;
+	this->data[4] = 0xFF;
+	this->data[5] = 0xFF;
+	this->data[6] = 0xFF;
+	this->data[7] = 0xFF;
+	this->data[8] = 0xFD;
+	this->data[9] = id;
+	this->data[10] = this->frame_tail;
+}
+void Jason::enter_motor_mode(char id)
+{
+	this->data[0] = this->frame_head;
+	this->data[1] = 0xFF;
+	this->data[2] = 0xFF;
+	this->data[3] = 0xFF;
+	this->data[4] = 0xFF;
+	this->data[5] = 0xFF;
+	this->data[6] = 0xFF;
+	this->data[7] = 0xFF;
+	this->data[8] = 0xFC;
+	this->data[9] = id;
+	this->data[10] = this->frame_tail;
+}
+
+void Jason::set_zero_posi(char id)
+{
+	this->data[0] = this->frame_head;
+	this->data[1] = 0xFF;
+	this->data[2] = 0xFF;
+	this->data[3] = 0xFF;
+	this->data[4] = 0xFF;
+	this->data[5] = 0xFF;
+	this->data[6] = 0xFF;
+	this->data[7] = 0xFF;
+	this->data[8] = 0xFE;
+	this->data[9] = id;
+	this->data[10] = this->frame_tail;
+}
