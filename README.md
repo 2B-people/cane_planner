@@ -1,8 +1,10 @@
 # CanePlanner
 
-The software framework of the Secure Path Guiding Cane(SPGC) is designed as a comprehensive system solution for blind navigation, incorporating perception, localization, planning, and control functions. All these functions are implemented on the microcomputer of the SPGC, providing a compact and efficient solution. To ensure safe navigation in complex environments, we have developed an end-to-end framework that integrates complete perception, localization, planning, and control functionalities.
+This repository contains the source code of the impact-aware planning and control algorithms described in our paper "Improving Walking Path Generation through Biped Constraint in Indoor Navigation System for Visually Impaired Individuals." accepted by IEEE Transactions on Neural Systems & Rehabilitation Engineering (TNRSE), 2024.
 
-![Alt text](figure/system.png)
+![Alt text](figure/system2.jpg)
+
+The software framework of the Smart Cane is designed as a comprehensive system solution for blind navigation, incorporating perception, localization, planning, and control functions. All these functions are implemented on the microcomputer of the Smart Cane, providing a compact and efficient solution. 
 
 ## 1. quick start
 
@@ -11,7 +13,7 @@ The project has been tested on Ubuntu 18.04(ROS Melodic) and 20.04(ROS Neotic). 
 ```ssh
     mkdir cane_ws/src
     cd cane_ws/src
-    git clone https://github.com/2B-people/cane_planner.git
+    git clone https://github.com/2B-peopletcane_planner.git
     cd ..
     catkin_make
 ```
@@ -38,5 +40,9 @@ Impaired Individuals with Secure Path Generation:
 
 ## 3.detail
 
-TODO
+### hardware
+
+Two configurations of the Smart Cane have been designed, utilizing the following hardware components, with a combined weight of 1.5kg.Next Figure  illustrates the distinct subsystems of both Smart Cane versions (V1 and V2), showcasing the arrangement and interconnection of sensors, high-level navigation unit, low-level control unit, and  battery.
+
+![figure 2](figure/hardware2.jpg)
 
