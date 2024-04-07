@@ -19,8 +19,8 @@
                 "/opt/ros/melodic/include",
                 "/opt/ros/melodic/include/**",
                 "${workspaceFolder}/plan_ctrl2/include",
-                "${workspaceFolder}/revoMotor/include",
-                "${workspaceFolder}/../../devel/include"
+                "${workspaceFolder}/../../devel/include",
+                "${workspaceFolder}/omniGKF_ctrl/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
