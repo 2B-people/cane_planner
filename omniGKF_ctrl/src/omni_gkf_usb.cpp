@@ -43,8 +43,8 @@ namespace omni_gkf
         frame.push_back(cmd);           // 命令码
         if (cmd == 0x01 || cmd == 0x02) // 如果命令码是0x01或0x02，添加数据内容
         {
-            frame.push_back(data & 0xFF);        // 数据低字节
             frame.push_back((data >> 8) & 0xFF); // 数据高字节
+            frame.push_back(data & 0xFF);        // 数据低字节
         }
         port_.write(frame);
     }
@@ -56,22 +56,26 @@ namespace omni_gkf
         {
             if (line.size() < 3) // 如果数据太短，忽略
                 return;
-            char id = line[0];                       // 数据标识
-            float value = std::stof(line.substr(2)); // 值
-            // test code
-            // std::cout << "id: " << id << " value: " << value << std::endl;
+            char id = line[0]; // 数据标识
+            float value = 0.0;
             switch (id)
             {
             case 'E': // 编码器脉冲数
                 // 处理编码器脉冲数
+                value = std::stof(line.substr(2)); // 值
                 break;
             case 'A': // 编码器角度
                 // 处理编码器角度
+                value = std::stof(line.substr(2)); // 值
                 break;
             case 'S': // 电机转子速度
                 // 处理电机转子速度
+                value = (float)std::stoi(line.substr(2)); // 值
                 break;
             }
+
+            // test code
+            std::cout << "id: " << id << " value: " << value << std::endl;
         }
     }
 } // namespace omni_gkf
