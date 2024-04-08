@@ -19,7 +19,7 @@
     <param name="queue_size" type="int" value="$(arg queue_size)" />
 
     <!-- load parameters (incl. tag family, tags, etc.) -->
-    <rosparam command="load" file="$(find apriltag_ros)/config/settings.yaml"/>
-    <rosparam command="load" file="$(find apriltag_ros)/config/tags.yaml"/>
+    <rosparam command="load" file="$(find plan_manage)/config/apriltag/settings.yaml"/>
+    <rosparam command="load" file="$(find plan_manage)/config/apriltag/tags.yaml"/>
   </node>
 </launch>
