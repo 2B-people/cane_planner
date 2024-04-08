@@ -32,6 +32,12 @@ include_directories(
 )
 
 
-add_executable(gkf_hardware_interface src/gkf_hardware_interface_node.cpp)
+# add_executable(gkf_hardware_interface src/gkf_hardware_interface_node.cpp)
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
-target_link_libraries(gkf_hardware_interface ${catkin_LIBRARIES})
+# target_link_libraries(gkf_hardware_interface ${catkin_LIBRARIES})
+
+add_executable(gkf_test_usb src/test_usb.cpp
+src/omni_gkf_usb.cpp
+)
+#add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
+target_link_libraries(gkf_test_usb ${catkin_LIBRARIES})

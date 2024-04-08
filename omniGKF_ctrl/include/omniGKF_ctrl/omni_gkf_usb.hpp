@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "serial/serial.h"
 
 #define OMNI_GKF_USB_HEAD
@@ -13,9 +15,8 @@ namespace omni_gkf
         ~OmniGKFUSB();
 
         void init(const std::string &portName, int baudRate);
-        void init();
         void read();
-        void write();
+        void write(uint8_t cmd, int16_t data);
 
     private:
         serial::Serial port_;
