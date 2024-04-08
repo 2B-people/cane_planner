@@ -12,6 +12,9 @@ namespace omni_gkf
         {
             port_.close();
         }
+        gkf_heading_ = 0.0;
+        gkf_velocity_.clear();
+        write(CMD_STOP, 0); // 停止运动
     }
 
     void OmniGKFUSB::init(const std::string &portName, int baudRate)
@@ -34,6 +37,11 @@ namespace omni_gkf
         {
             std::cout << "Unable to open port " << portName << std::endl;
         }
+
+        gkf_heading_ = 0.0;
+        gkf_velocity_.resize(2);
+        gkf_velocity_[0] = 0;
+        gkf_velocity_[1] = 0;
     }
 
     void OmniGKFUSB::write(uint8_t cmd, int16_t data)
@@ -49,8 +57,10 @@ namespace omni_gkf
         port_.write(frame);
     }
 
-    void OmniGKFUSB::read()
+    void OmniGKFUSB::update()
     {
+        write(CMD_UPDATE, 0); // 发送update，请求数据
+        
         std::string line;
         if (port_.readline(line)) // 读取一行数据
         {
@@ -66,16 +76,20 @@ namespace omni_gkf
                 break;
             case 'A': // 编码器角度
                 // 处理编码器角度
-                value = std::stof(line.substr(2)); // 值
+                gkf_heading_ = std::stof(line.substr(2)); // 值
                 break;
             case 'S': // 电机转子速度
                 // 处理电机转子速度
-                value = (float)std::stoi(line.substr(2)); // 值
+                gkf_velocity_[0] = (float)std::stoi(line.substr(2)); // 值
+                break;
+            case 'M': // 电机转子速度
+                // 处理电机转子速度
+                gkf_velocity_[1] = (float)std::stoi(line.substr(2)); // 值
                 break;
             }
 
             // test code
-            std::cout << "id: " << id << " value: " << value << std::endl;
+            // std::cout << "id: " << id << " value: " << value << std::endl;
         }
     }
 } // namespace omni_gkf

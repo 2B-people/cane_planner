@@ -14,12 +14,16 @@ int main(int argc, char **argv)
     while (ros::ok())
     {
         // 发送数据
-        usb.write(0x01, -2000); // 设定前进速度为1000
-        usb.write(0x02, -900); // 设定转向角度为2000/10 = 200.0
+        usb.write(CMD_VEL, -2000); // 设定前进速度为1000
+        usb.write(CMD_POS, -900); // 设定转向角度为2000/10 = 200.0
         // usb.write(0x03); // 停止运动
 
         // 读取数据
-        usb.read();
+        usb.update();
+        
+        ROS_INFO("heading: %.2f", usb.getHeading());
+        std::vector<int16_t> vel = usb.getVelocity();
+        ROS_INFO("velocity: %d, %d", vel[0], vel[1]);
 
         ros::spinOnce();
         loop_rate.sleep();

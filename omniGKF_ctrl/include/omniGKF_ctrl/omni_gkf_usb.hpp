@@ -4,7 +4,14 @@
 
 #include "serial/serial.h"
 
-#define OMNI_GKF_USB_HEAD
+// 帧头43->大写C
+#define CMD_FRAME_HEADER 0x43
+// cmd
+#define CMD_VEL  0x01
+#define CMD_POS  0x02
+#define CMD_STOP 0x03
+#define CMD_UPDATE 0x04
+
 
 namespace omni_gkf
 {
@@ -15,10 +22,16 @@ namespace omni_gkf
         ~OmniGKFUSB();
 
         void init(const std::string &portName, int baudRate);
-        void read();
+        void update();
         void write(uint8_t cmd, int16_t data);
+
+        float getHeading() const { return gkf_heading_; }
+        std::vector<int16_t> getVelocity() const { return gkf_velocity_; }
 
     private:
         serial::Serial port_;
+        float gkf_heading_;
+        std::vector<int16_t> gkf_velocity_;
+
     };
 } // namespace omni_gkf
