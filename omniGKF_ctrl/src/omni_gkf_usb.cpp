@@ -24,7 +24,6 @@ namespace omni_gkf
         port_.setPort(portName);
         port_.setBaudrate(baudRate);
         serial::Timeout to = serial::Timeout::simpleTimeout(1000);
-
         port_.setTimeout(to);
         std::cout << "open port: " << portName << " baudrate: " << baudRate << std::endl;
         try
@@ -40,10 +39,26 @@ namespace omni_gkf
             std::cout << "Unable to open port " << portName << std::endl;
         }
 
+        read_flag_ = 0;
         gkf_heading_ = 0.0;
         gkf_velocity_.resize(2);
         gkf_velocity_[0] = 0;
         gkf_velocity_[1] = 0;
+
+        // begin get data
+        port_.flush();
+
+        write(CMD_UPDATE, 0);
+    }
+
+    bool OmniGKFUSB::isAvailable()
+    {
+        if (read_flag_ > 2)
+        {
+            read_flag_ = 0;
+            return true;
+        }
+        return false;
     }
 
     void OmniGKFUSB::write(uint8_t cmd, int16_t data)
@@ -61,37 +76,46 @@ namespace omni_gkf
 
     void OmniGKFUSB::update()
     {
-        write(CMD_UPDATE, 0); // 发送update，请求数据
-
         std::string line;
-        while (port_.readline(line))
-        {
-            if (line.size() < 3) // 如果数据太短，忽略
-                return;
-            char id = line[0]; // 数据标识
-            float value = 0.0;
-            switch (id)
-            {
-            case 'E': // 编码器脉冲数
-                // 处理编码器脉冲数
-                value = std::stof(line.substr(2)); // 值
-                break;
-            case 'A': // 编码器角度
-                // 处理编码器角度
-                gkf_heading_ = std::stof(line.substr(2)); // 值
-                break;
-            case 'S': // 电机转子速度
-                // 处理电机转子速度
-                gkf_velocity_[0] = (float)std::stoi(line.substr(2)); // 值
-                break;
-            case 'M': // 电机转子速度
-                // 处理电机转子速度
-                gkf_velocity_[1] = (float)std::stoi(line.substr(2)); // 值
-                break;
-            }
 
-            // test code
-            // std::cout << "id: " << id << " value: " << value << std::endl;
+        try
+        {
+            if (port_.readline(line))
+            {
+                if (line.size() < 3) // 如果数据太短，忽略
+                    return;
+                char id = line[0]; // 数据标识
+                float value = 0.0;
+                switch (id)
+                {
+                case 'E': // 编码器脉冲数
+                    // 处理编码器脉冲数
+                    value = std::stof(line.substr(2)); // 值
+                    break;
+                case 'A': // 编码器角度
+                    // 处理编码器角度
+                    gkf_heading_ = std::stof(line.substr(2)); // 值
+                    read_flag_++;
+                    break;
+                case 'S': // 电机转子速度
+                    // 处理电机转子速度
+                    gkf_velocity_[0] = (float)std::stoi(line.substr(2)); // 值
+                    read_flag_++;
+                    break;
+                case 'M': // 电机转子速度
+                    // 处理电机转子速度
+                    gkf_velocity_[1] = (float)std::stoi(line.substr(2)); // 值
+                    read_flag_++;
+                    break;
+                }
+
+                // test code
+                // std::cout << "id: " << id << " value: " << value << std::endl;
+            }
+        }
+        catch (serial::IOException &e)
+        {
+            std::cout << "Error " << e.what() << std::endl;
         }
     }
 } // namespace omni_gkf

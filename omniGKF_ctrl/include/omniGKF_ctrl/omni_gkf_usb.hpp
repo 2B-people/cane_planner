@@ -25,6 +25,8 @@ namespace omni_gkf
         void update();
         void write(uint8_t cmd, int16_t data);
 
+        bool isAvailable();
+
         float getHeading() const { return gkf_heading_; }
         std::vector<int16_t> getVelocity() const { return gkf_velocity_; }
 
@@ -32,6 +34,7 @@ namespace omni_gkf
         serial::Serial port_;
         float gkf_heading_;
         std::vector<int16_t> gkf_velocity_;
+        int read_flag_;
 
     };
 } // namespace omni_gkf
