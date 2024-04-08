@@ -8,13 +8,14 @@ namespace omni_gkf
 
     OmniGKFUSB::~OmniGKFUSB()
     {
+        gkf_heading_ = 0.0;
+        gkf_velocity_.clear();
+        write(CMD_STOP, 0); // 停止运动
+
         if (port_.isOpen())
         {
             port_.close();
         }
-        gkf_heading_ = 0.0;
-        gkf_velocity_.clear();
-        write(CMD_STOP, 0); // 停止运动
     }
 
     void OmniGKFUSB::init(const std::string &portName, int baudRate)
@@ -60,7 +61,7 @@ namespace omni_gkf
     void OmniGKFUSB::update()
     {
         write(CMD_UPDATE, 0); // 发送update，请求数据
-        
+
         std::string line;
         if (port_.readline(line)) // 读取一行数据
         {
