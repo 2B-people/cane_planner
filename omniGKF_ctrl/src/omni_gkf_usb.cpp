@@ -14,6 +14,7 @@ namespace omni_gkf
 
         if (port_.isOpen())
         {
+            port_.flush();
             port_.close();
         }
     }
@@ -63,7 +64,7 @@ namespace omni_gkf
         write(CMD_UPDATE, 0); // 发送update，请求数据
 
         std::string line;
-        if (port_.readline(line)) // 读取一行数据
+        while (port_.readline(line))
         {
             if (line.size() < 3) // 如果数据太短，忽略
                 return;
