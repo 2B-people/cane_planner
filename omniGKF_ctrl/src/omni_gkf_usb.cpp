@@ -8,7 +8,8 @@ namespace omni_gkf
 
     OmniGKFUSB::~OmniGKFUSB()
     {
-        gkf_heading_ = 0.0;
+       // gkf_heading_ = 0.0;
+        encode_ =0;
         gkf_velocity_.clear();
         write(CMD_STOP, 0); // 停止运动
 
@@ -41,6 +42,8 @@ namespace omni_gkf
 
         read_flag_ = 0;
         gkf_heading_ = 0.0;
+        //gkf_heading_ = 0.0;
+        encode_ = 0;
         gkf_velocity_.resize(2);
         gkf_velocity_[0] = 0;
         gkf_velocity_[1] = 0;
@@ -90,7 +93,8 @@ namespace omni_gkf
                 {
                 case 'E': // 编码器脉冲数
                     // 处理编码器脉冲数
-                    value = std::stof(line.substr(2)); // 值
+                    encode_ = std::stof(line.substr(2)); // 值
+                    read_flag_++;
                     break;
                 case 'A': // 编码器角度
                     // 处理编码器角度

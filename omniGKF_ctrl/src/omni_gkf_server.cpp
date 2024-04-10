@@ -9,7 +9,8 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
 {
     // 将a和delta转换为int16_t
     int16_t a = static_cast<int16_t>(msg->a);              // 假设a的单位是m/s
-    int16_t delta = static_cast<int16_t>(msg->delta * 10); // 假设delta的单位是rad
+    int16_t delta = static_cast<int16_t>(msg->delta); // 假设delta的单位是rad
+    //int16_t delta = static_cast<int16_t>(msg->delta * 10); // 假设delta的单位是rad
 
     // 发送命令
     usb.write(CMD_VEL, a);     // 设定前进速度

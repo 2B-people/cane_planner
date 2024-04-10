@@ -20,10 +20,15 @@ pub = rospy.Publisher('omniGKFcmd', omniGKFcmd, queue_size=10)
 delta = 0
 direction = 1
 while not rospy.is_shutdown():
-    if delta == 360:
+    if delta == 8192:
         direction = -1
-    elif delta == -360:
+    elif delta == -8192:
         break
+          
+    #  if delta == 360:
+    #     direction = -1
+    # elif delta == -360:
+    #     break
 
     # 创建并发布命令
     cmd = omniGKFcmd()
@@ -33,11 +38,12 @@ while not rospy.is_shutdown():
     pub.publish(cmd)
 
     # 更新delta
-    delta += direction * 90
+    delta += direction * 2048
 
     # 等待0.1秒
     time.sleep(1)
 
 cmd.a = 0
-cmd.delta = 0.0  # 将delta从度转换为弧度
+cmd.delta = 0 # 将delta从度转换为弧度
+#cmd.delta = 0.0 # 将delta从度转换为弧度
 pub.publish(cmd)

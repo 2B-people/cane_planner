@@ -27,12 +27,14 @@ namespace omni_gkf
 
         bool isAvailable();
 
-        float getHeading() const { return gkf_heading_; }
+      //float getHeading() const { return gkf_heading_; }
+        int getHeading() const { return encode_; }
         std::vector<int16_t> getVelocity() const { return gkf_velocity_; }
 
     private:
         serial::Serial port_;
         float gkf_heading_;
+        int encode_;
         std::vector<int16_t> gkf_velocity_;
         int read_flag_;
 
