@@ -31,9 +31,6 @@ int main(int argc, char **argv)
 
         ros::spinOnce();
     }
-    std::cout<<"in here"<<std::endl;
-    std::cout<<"in here2"<<std::endl;
-
 
     return 0;
 }

@@ -92,11 +92,16 @@ namespace omni_gkf
     void OmniGKFUSB::haveData()
     {
         // Confirm whether port can read the data
-        if (port_.available() == 0)
+        static bool getdata = false;
+        if (read_flag_ != 0 && !getdata)
         {
-            std::cout << "NO DATA" << std::endl;
+            getdata = true;
         }
-        return;
+        // if not data ,log in terimal
+        if (!getdata)
+        {
+            std::cout << "No DATA" << std::endl;
+        }
     }
     void OmniGKFUSB::update()
     {
@@ -149,15 +154,16 @@ namespace omni_gkf
     void OmniGKFUSB_LS::init(const std::string &portName, int baudRate)
     {
         // port_.setPort(portName);
-        port_ls_.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
-        port_ls_.SetStopBits(LibSerial::StopBits::STOP_BITS_1);
-        port_ls_.SetCharacterSize(LibSerial::CharacterSize::CHAR_SIZE_8);
+
         std::cout << "open port: " << portName << " baudrate: " << baudRate << std::endl;
         try
         {
             port_ls_.Open(portName);
             if (port_ls_.IsOpen())
             {
+                port_ls_.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+                port_ls_.SetStopBits(LibSerial::StopBits::STOP_BITS_1);
+                port_ls_.SetCharacterSize(LibSerial::CharacterSize::CHAR_SIZE_8);
                 std::cout << "Serial Port initialized" << std::endl;
             }
         }
@@ -191,13 +197,4 @@ namespace omni_gkf
         return 0;
     }
 
-    void OmniGKFUSB_LS::haveData()
-    {
-        // Confirm whether port can read the data
-        if (port_ls_.IsDataAvailable() == 0)
-        {
-            std::cout << "NO DATA" << std::endl;
-        }
-        return;
-    }
 } // namespace omni_gkf

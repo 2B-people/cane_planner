@@ -24,11 +24,12 @@ namespace omni_gkf
         OmniGKFUSB();
         ~OmniGKFUSB();
 
-        void init(const std::string &portName, int baudRate);
         void update();
         void Set(uint8_t cmd, int16_t data);
-
+        void haveData();
         bool isAvailable();
+
+        virtual void init(const std::string &portName, int baudRate);
 
         float getHeading() const { return gkf_heading_; }
         int getEncoder() const { return encode_; }
@@ -41,11 +42,10 @@ namespace omni_gkf
         int read_flag_;
 
     private:
-        size_t write(std::vector<uint8_t> frame);
-        size_t read(std::string &line);
-        void haveData();
-
         serial::Serial port_;
+
+        virtual size_t write(std::vector<uint8_t> frame);
+        virtual size_t read(std::string &line);
     };
 
     class OmniGKFUSB_LS : public OmniGKFUSB
@@ -56,10 +56,9 @@ namespace omni_gkf
         void init(const std::string &portName, int baudRate);
 
     private:
+        LibSerial::SerialPort port_ls_;
+
         size_t write(std::vector<uint8_t> frame);
         size_t read(std::string &line);
-        void haveData();
-
-        LibSerial::SerialPort port_ls_;
     };
 } // namespace omni_gkf
