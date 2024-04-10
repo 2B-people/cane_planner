@@ -6,8 +6,8 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "omni_gkf_usb_test");
     ros::NodeHandle nh;
 
-    // omni_gkf::OmniGKFUSB usb;
-    omni_gkf::OmniGKFUSB_LS usb;
+    omni_gkf::OmniGKFUSB usb;
+    // omni_gkf::OmniGKFUSB_LS usb;
     usb.init("/dev/ttyACM0", 115200); // 使用你的串口和波特率
 
 
