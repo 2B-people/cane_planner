@@ -14,6 +14,8 @@ find_package(catkin REQUIRED COMPONENTS
   # three_dof_planar_manipulator
 )
 
+find_package(PkgConfig)
+pkg_check_modules(SERIAL libserial)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
@@ -42,6 +44,7 @@ catkin_package(
 include_directories(
  include
   ${catkin_INCLUDE_DIRS}
+  ${SERIAL_INCLUDE_DIRS}
 )
 
 
@@ -53,12 +56,12 @@ add_executable(gkf_test_usb src/test_usb.cpp
 src/omni_gkf_usb.cpp
 )
 #add_dependencies(robot_hardware_interface ${catkin_EXPORTED_TARGETS})
-target_link_libraries(gkf_test_usb ${catkin_LIBRARIES})
+target_link_libraries(gkf_test_usb ${catkin_LIBRARIES} ${SERIAL_LIBRARIES})
 
 
 add_executable(gkf_server_node src/omni_gkf_server.cpp
 src/omni_gkf_usb.cpp
 )
 
-target_link_libraries(gkf_server_node ${catkin_LIBRARIES})
+target_link_libraries(gkf_server_node ${catkin_LIBRARIES} ${SERIAL_LIBRARIES})
 

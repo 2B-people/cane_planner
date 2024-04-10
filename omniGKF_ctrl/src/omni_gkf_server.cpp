@@ -13,8 +13,8 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
     //int16_t delta = static_cast<int16_t>(msg->delta * 10); // 假设delta的单位是rad
 
     // 发送命令
-    usb.write(CMD_VEL, a);     // 设定前进速度
-    usb.write(CMD_POS, delta); // 设定转向角度
+    usb.Set(CMD_VEL, a);     // 设定前进速度
+    usb.Set(CMD_POS, delta); // 设定转向角度
 }
 
 int main(int argc, char **argv)
@@ -23,7 +23,12 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    usb.init("/dev/ttyACM0", 115200); // 使用你的串口和波特率
+    std::string usb_port;
+    int usb_baudrate;
+    nh.param("omni_gkf_usb_server/port", usb_port, std::string("/dev/ttyACM0"));
+    nh.param("omni_gkf_usb_server/baudrate", usb_baudrate, 115200);
+
+    usb.init(usb_port, usb_baudrate); // 使用你的串口和波特率
 
     ros::Subscriber sub = nh.subscribe("omniGKFcmd", 1000, cmdCallback);
     ros::Publisher pub = nh.advertise<omniGKF_control::omniGKFinfo>("omniGKFinfo", 1000);
