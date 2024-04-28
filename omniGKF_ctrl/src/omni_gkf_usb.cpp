@@ -67,18 +67,23 @@ namespace omni_gkf
         return false;
     }
 
-    void OmniGKFUSB::Set(uint8_t cmd, float data)
+    void OmniGKFUSB::Set(uint8_t cmd, int16_t data)
     {
         std::vector<uint8_t> frame;
         frame.push_back(0x43);          // 帧头
         frame.push_back(cmd);           // 命令码
         if (cmd == 0x01 || cmd == 0x02) // 如果命令码是0x01或0x02，添加数据内容
         {
-            int16_t data = static_cast<float>(data);
             frame.push_back((data >> 8) & 0xFF); // 数据高字节
             frame.push_back(data & 0xFF);        // 数据低字节
         }
         write(frame);
+    }
+
+    void OmniGKFUSB::Set(uint8_t cmd, float data , int n)
+    {
+        int16_t int_data = (int16_t)(data * n);
+        Set(cmd, int_data);
     }
 
     size_t OmniGKFUSB::write(std::vector<uint8_t> frame)

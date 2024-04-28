@@ -25,8 +25,8 @@ namespace omni_gkf
         ~OmniGKFUSB();
 
         void update();
-        // void Set(uint8_t cmd, int16_t data);
-        void Set(uint8_t cmd, float data);
+        void Set(uint8_t cmd, int16_t data);
+        void Set(uint8_t cmd, float data , int n);
         void haveData();
         bool isAvailable();
 
