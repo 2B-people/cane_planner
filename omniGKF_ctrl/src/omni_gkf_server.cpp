@@ -8,13 +8,21 @@ omni_gkf::OmniGKFUSB usb;
 void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
 {
     // 将a和delta转换为int16_t
-    int16_t a = static_cast<int16_t>(msg->a);              // 假设a的单位是m/s
-    int16_t delta = static_cast<int16_t>(msg->delta); // 假设delta的单位是rad
-    //int16_t delta = static_cast<int16_t>(msg->delta * 10); // 假设delta的单位是rad
+    float a = static_cast<float>(msg->a);                   // 假设a的单位是m/s^2
+    float varepsilon = static_cast<float>(msg->varepsilon); // 假设varepsilon的单位是rad/s
+    // int16_t delta = static_cast<int16_t>(msg->delta * 10); // 假设delta的单位是rad
+    static double last_time = 0;
+    double current_time = msg->header.stamp.toSec();
+    double dt = current_time - last_time;
 
+    double pos = pos + varepsilon * dt;
+    double vel = vel + a * dt;
     // 发送命令
-    usb.Set(CMD_VEL, a);     // 设定前进速度
-    usb.Set(CMD_POS, delta); // 设定转向角度
+    usb.Set(CMD_VEL, a);          // 设定前进加速度
+    usb.Set(CMD_POS, varepsilon); // 设定转向角速度
+    
+    last_time = current_time;
+
 }
 
 int main(int argc, char **argv)

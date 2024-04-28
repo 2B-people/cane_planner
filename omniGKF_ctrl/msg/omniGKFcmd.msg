@@ -1,3 +1,3 @@
 Header header
-float64 a       # a = velocity(rpm/s)
-float64 delta   # delta = angle(rad)
+float64 a       # a = 加速度(m/s^2)
+float64 varepsilon   # varepsilon = 角速度(rad/s)

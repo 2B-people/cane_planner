@@ -34,7 +34,7 @@ while not rospy.is_shutdown():
     cmd = omniGKFcmd()
     cmd.header = Header(stamp=rospy.Time.now())
     cmd.a = 1000
-    cmd.delta = delta  # 将delta从度转换为弧度
+    cmd.varepsilon = delta  # 将delta从度转换为弧度
     pub.publish(cmd)
 
     # 更新delta
