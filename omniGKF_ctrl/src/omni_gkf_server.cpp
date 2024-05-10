@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
     // set tranfer param
     k1 = 6.75 * 19 * 60 / (0.09 * 2 * 3.1415926) * k_vel;
-    k2 = 57.3 * k_pos;
+    k2 = 57.3 * 8192 / 360 * k_pos;
 
     usb.init(usb_port, usb_baudrate); // 使用你的串口和波特率
 

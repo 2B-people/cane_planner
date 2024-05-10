@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="omniGKF_ctrl" type="omni_gkf_usb_server" name="omni_gkf_usb_server">
+    <param name="gkf_k_vel" value="1" />
+    <param name="gkf_k_pos" value="1" />
+  </node>
+</launch>
