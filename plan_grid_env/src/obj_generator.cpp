@@ -35,7 +35,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <string>
 
-#include <plan_env/linear_obj_model.hpp>
+#include <plan_grid_env/linear_obj_model.hpp>
 using namespace std;
 
 int obj_num, _input_type;

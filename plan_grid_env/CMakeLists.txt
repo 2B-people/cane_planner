@@ -51,9 +51,9 @@ target_link_libraries( plan_grid_env
     ${OpenCV_LIBS}
     )  
 
-add_executable(obj_generator
+add_executable(grid_obj_generator
     src/obj_generator.cpp 
 )
-target_link_libraries(obj_generator 
+target_link_libraries(grid_obj_generator 
     ${catkin_LIBRARIES}
     )

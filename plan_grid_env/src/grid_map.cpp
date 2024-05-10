@@ -1,4 +1,4 @@
-#include "plan_env/grid_map.h"
+#include "plan_grid_env/grid_map.h"
 
 // #define current_img_ md_.depth_image_[image_cnt_ & 1]
 // #define last_img_ md_.depth_image_[!(image_cnt_ & 1)]
