@@ -1,3 +1,3 @@
 Header header
-int16 heading    # heading in radians
-int16[2] velocity  # velocity in rpm/s
+float64 heading    # heading in radians
+float64[2] velocity  # velocity in rpm/s

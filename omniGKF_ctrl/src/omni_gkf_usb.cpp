@@ -132,7 +132,7 @@ namespace omni_gkf
                     break;
                 case 'A': // 编码器角度
                     // 处理编码器角度
-                    gkf_heading_ = std::stof(line.substr(2)); // 值
+                    gkf_heading_ = std::stod(line.substr(2)); // 值
                     read_flag_++;
                     break;
                 case 'S': // 电机转子速度

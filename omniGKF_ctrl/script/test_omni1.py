@@ -25,14 +25,14 @@ while not rospy.is_shutdown():
     cmd = omniGKFcmd()
     cmd.header = Header(stamp=rospy.Time.now())
     cmd.gkf_state = True
-    cmd.a = 0.1
-    cmd.varepsilon = 0.1
+    cmd.a = 0.15
+    cmd.varepsilon = 0.2
     pub.publish(cmd)
 
     # 等待0.1秒
     time.sleep(0.1)
     i = i + 1
-    if i == 20:
+    if i == 50:
         break
 
 i = 0
@@ -47,7 +47,7 @@ while not rospy.is_shutdown():
     # 等待0.1秒
     time.sleep(0.1)
     i = i + 1
-    if i == 20:
+    if i == 50:
         break        
 
 # finish testing

@@ -12,8 +12,8 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
     // 将a和varepsilon转换为float
 
     static double last_time = 0;
-    static double pos = 0;
-    static double vel = 0;
+    double pos = usb.getHeading();
+    double vel = usb.getVelocity1() / k1;
     double current_time = msg->header.stamp.toSec();
 
     if (msg->gkf_state)
@@ -26,7 +26,7 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
             {
                 double dt = current_time - last_time;
                 pos = pos + varepsilon * dt;
-                // 这里的角度pos的单位是rad，需要转换为angle；
+                // 这里的角度pos的单位是rad，需要转换为encoder；
                 vel = vel + a * dt;
                 // 这里的速度vel的单位是m/s，需要转换成rpm
                 double vel_set = vel * k1;
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 
     // set tranfer param
     k1 = 6.75 * 19 * 60 / (0.09 * 2 * 3.1415926) * k_vel;
-    k2 = 57.3 * k_pos;
+    k2 = 57.3 * 8192 / 360 * k_pos;
 
     usb.init(usb_port, usb_baudrate); // 使用你的串口和波特率
 
@@ -104,8 +104,8 @@ int main(int argc, char **argv)
             // 测试中代替上面两行usb获取的数据
             //  info.heading = 10;
             //  std::vector<int16_t> vel = {10, 5};
-            info.velocity[0] = vel[0];
-            info.velocity[1] = vel[1];
+            info.velocity[0] = (double)vel[0] / k1;
+            info.velocity[1] = (double)vel[1] / k1;
 
             pub.publish(info);
         }

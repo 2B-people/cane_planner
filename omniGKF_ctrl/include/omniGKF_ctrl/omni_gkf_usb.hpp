@@ -32,12 +32,13 @@ namespace omni_gkf
 
         virtual void init(const std::string &portName, int baudRate);
 
-        float getHeading() const { return gkf_heading_; }
+        double getHeading() const { return gkf_heading_/57.3; }
         int getEncoder() const { return encode_; }
         std::vector<int16_t> getVelocity() const { return gkf_velocity_; }
+        double getVelocity1() const {return gkf_velocity_[0];}
 
     protected:
-        float gkf_heading_;
+        double gkf_heading_;
         int encode_;
         std::vector<int16_t> gkf_velocity_;
         int read_flag_;
