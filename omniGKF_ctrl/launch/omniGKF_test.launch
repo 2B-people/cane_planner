@@ -1,6 +1,9 @@
 <launch>
-  <node pkg="omniGKF_ctrl" type="omni_gkf_usb_server" name="omni_gkf_usb_server">
-    <param name="gkf_k_vel" value="1" />
-    <param name="gkf_k_pos" value="1" />
-  </node>
+    <node pkg="OmniGKF_control" type="omni_gkf_server" name="omni_gkf_usb_server" >
+        <param name="omni_gkf_usb_server/port" value="/dev/ttyACM0" />
+        <param name="omni_gkf_usb_server/baudrate" value="115200" />
+        <param name="gkf_k_vel" value="1.0" />
+        <param name="gkf_k_pos" value="1.0" />
+    </node>
+    <node pkg="OmniGKF_control" type="test_omni1.py" name="test_omni1"  />
 </launch>
