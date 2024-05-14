@@ -14,7 +14,7 @@ data_cmd = []
 def callback_info(msg):
     global data_info
     # 保存时间戳、heading、velocity[0]和velocity[1]
-    data_info.append([msg.header.stamp.to_sec(), msg.heading, msg.velocity[0]])
+    data_info.append([msg.header.stamp.to_sec(), msg.heading, msg.velocity[0], msg.velocity[1]])
 
 def callback_cmd(msg):
     global data_cmd
