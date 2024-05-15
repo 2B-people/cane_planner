@@ -34,7 +34,7 @@ def callback(msg):
     p = Point()
     p.x = msg.pose.pose.position.x
     p.y = msg.pose.pose.position.y
-    p.z = euler[2]
+    p.z = msg.pose.pose.position.z
     marker.points.append(p)
 
     # 发布Marker消息
