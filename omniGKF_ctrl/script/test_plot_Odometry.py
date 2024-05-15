@@ -55,27 +55,27 @@ with open('data_Odometry.csv', 'w') as f:
 fig = plt.figure()
 
 # 创建第一个子图
-plt.subplot(3, 1, 1)
+plt.subplot(2, 1, 1)
 plt.plot([d[1] for d in data], [d[2] for d in data])
 plt.title('Trajectory')
 plt.xlabel('X')
 plt.ylabel('Y')
 
 # 创建第二个子图
-plt.subplot(3, 1, 2)
+plt.subplot(2, 1, 2)
 plt.plot([d[0] for d in data], [d[3] for d in data])
 plt.title('Yaw')
 plt.xlabel('Time')
 plt.ylabel('Yaw')
 
 # 创建第三个子图
-plt.subplot(3, 1, 3)
-plt.plot([d[1] for d in data], [d[2] for d in data], label='Trajectory')
-plt.plot([d[1] for d in data], [d[3] for d in data], 'r-', label='Yaw')
-plt.title('Trajectory and Yaw')
-plt.xlabel('X')
-plt.ylabel('Y')
-plt.legend()
+# plt.subplot(3, 1, 3)
+# plt.plot([d[1] for d in data], [d[2] for d in data], label='Trajectory')
+# plt.plot([d[1] for d in data], [d[3] for d in data], 'r-', label='Yaw')
+# plt.title('Trajectory and Yaw')
+# plt.xlabel('X')
+# plt.ylabel('Y')
+# plt.legend()
 
 # 保存图形为PDF文件
 plt.savefig('Odometry->Trajectory and Yaw.pdf')

@@ -46,7 +46,7 @@ def callback(msg):
     p = Point()
     p.x = msg.pose.pose.position.x
     p.y = msg.pose.pose.position.y
-    p.z = euler[2]
+    p.z = msg.pose.pose.position.z
     marker_trajectory.points.append(p)
 
     # 设置箭头的位置和朝向
