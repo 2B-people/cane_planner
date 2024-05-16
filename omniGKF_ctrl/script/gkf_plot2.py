@@ -19,7 +19,7 @@ def callback_info(msg):
 def callback_cmd(msg):
     global data_cmd
     # 保存时间戳、heading、velocity[0]和velocity[1]
-    data_cmd.append([msg.header.stamp.to_sec(), msg.vel, msg.pos])
+    data_cmd.append([msg.header.stamp.to_sec(), msg.a, msg.varepsilon  ])
 
 
 # 初始化ROS节点
@@ -61,8 +61,8 @@ plt.plot([d[3] for d in data_info])
 plt.title('Velocity 1')
 plt.subplot(5, 1, 4)
 plt.plot([d[1] for d in data_cmd])
-plt.title('Velocity_cmd')
+plt.title('a')
 plt.subplot(5, 1, 5)
 plt.plot([d[2] for d in data_cmd])  
-plt.title('Position_cmd')
+plt.title('varepsilon')
 plt.show()
