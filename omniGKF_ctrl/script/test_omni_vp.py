@@ -29,20 +29,33 @@ def talker():
     msg.vel = vel
     msg.pos = pos
 
-    # 发布消息
-    pub.publish(msg)
+    # 创建一个Rate对象
+    rate = rospy.Rate(10)  # 10Hz
 
     # 计算需要的时间
     distance = 1.0  # m
     time_needed = distance / vel  # s
+    start_time = rospy.Time.now().to_sec()
 
-    # 等待需要的时间
-    time.sleep(time_needed)
+    while not rospy.is_shutdown():
+        # 更新消息的时间戳
+        msg.header.stamp = rospy.Time.now()
 
-    # 停止机器人
-    msg.vel = 0.0
-    pub.publish(msg)
+        # 发布消息
+        pub.publish(msg)
 
+        # 如果已经过了需要的时间，那么停止机器人
+        if rospy.Time.now().to_sec() - start_time >= time_needed:
+            msg.vel = 0.0
+            pub.publish(msg)
+            break
+
+        # 按照设定的频率等待
+        rate.sleep()
+    
+    # 让节点保持活动状态
+    rospy.spin()
+    
 if __name__ == '__main__':
     try:
         talker()
