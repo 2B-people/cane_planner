@@ -27,7 +27,7 @@ def talker():
     varepsilon_max = 0.5  # rad/s
 
     # 设置目标距离
-    distance_target = 3.0  # m
+    distance_target = 1.0  # m
 
     # 初始化变量
     v = 0.0  # 当前速度
