@@ -42,9 +42,10 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
         // debug ,deal with vel and pos
         if (msg->vel != 0 || msg->pos != 0)
         {
+            ROS_WARN("  deal with vel and pos! pos: %f, vel: %f", pos, vel);
             double vel_set = msg->vel * k1;
             double pos_set = msg->pos * k2;
-            ROS_WARN("pos_set: %f, vel_set: %f", pos_set, vel_set);
+            // ROS_WARN("  deal with vel and pos!pos_set: %f, vel_set: %f", pos_set, vel_set);
 
             usb.Set(CMD_VEL, (float)vel_set, 1); // 设定前进加速度
             usb.Set(CMD_POS, (float)pos_set, 1); // 设定转向角速度
@@ -54,6 +55,7 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
     }
     else
     {
+        ROS_WARN("STOP!");
         last_time = 0;
         pos = 0;
         vel = 0;

@@ -45,8 +45,8 @@ def talker():
         pub.publish(msg)
 
         # 如果已经过了需要的时间，那么停止机器人
-        if rospy.Time.now().to_sec() - start_time >= time_needed:
-            msg.vel = 0.0
+        if rospy.Time.now().to_sec() - start_time >= time_needed + 0.2:
+            msg.gkf_state = False
             pub.publish(msg)
             break
 
@@ -54,7 +54,7 @@ def talker():
         rate.sleep()
     
     # 让节点保持活动状态
-    rospy.spin()
+   # rospy.spin()
     
 if __name__ == '__main__':
     try:

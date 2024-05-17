@@ -30,7 +30,7 @@ def talker():
     distance_target = 1.0  # m
 
     # 初始化变量
-    v = 0.0  # 当前速度
+    v = 0.1  # 当前速度
     distance = 0.0  # 已经行驶的距离
 
     # 设置圆的半径
@@ -45,21 +45,25 @@ def talker():
         msg.header.stamp = rospy.Time.now()
         msg.gkf_state = True
 
-        # 计算时间间隔
+
+        # rospy.loginfo("acceleration: %s, vel: %s",msg.a,v)        # 计算时间间隔
+       
         dt = 1.0 / rate.sleep_dur.to_sec()
 
         # 计算剩余距离
         distance_remaining = distance_target - distance
 
         # 如果剩余距离小于0.5m，开始减速
-        if distance_remaining < 0.5:
-            msg.a = -a_max
+        if distance_remaining < 0.1:
+            msg.a = -a_max * distance_remaining 
         else:
             msg.a = a_max
 
         # 更新速度和距离
         v = v + msg.a * dt
         distance = distance + v * dt
+
+        
 
         # 限制速度不超过最大速度
         if v > v_max:
