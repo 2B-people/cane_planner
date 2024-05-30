@@ -20,7 +20,7 @@ def talker():
 
     # 设置速度和位置
     vel = 0.3  # m/s
-    pos = 0.0  # rad
+    pos = 1.6  # rad
 
     # 创建并填充消息
     msg = omniGKFcmd()

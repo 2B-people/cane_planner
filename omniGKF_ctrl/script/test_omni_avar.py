@@ -19,11 +19,11 @@ def talker():
     pub = rospy.Publisher('omniGKFcmd', omniGKFcmd, queue_size=10)
 
     # 设置发布频率
-    rate = rospy.Rate(50) # 10hz
+    rate = rospy.Rate(10) # 10hz
 
     # 设置最大速度和最大加速度
     v_max = 0.3  # m/s
-    a_max = 0.05  # m/s^2
+    a_max = 0.1  # m/s^2
     varepsilon_max = 0.5  # rad/s
 
     # 设置目标距离
@@ -38,45 +38,70 @@ def talker():
 
     # 设置初始角速度
     varepsilon = 0.0  # rad/s
+    angle = 0.0
     last_time =  0.0
+    msg = omniGKFcmd()
+    msg.a = 0.0
+    msg.varepsilon = 0.0
+
+    n = 0
 
     while not rospy.is_shutdown():
 
         current_time = rospy.Time.now()
 
         # 创建并填充消息
-        msg = omniGKFcmd()
         msg.header.stamp = current_time
-        msg.gkf_state = True
 
         if last_time != 0:
+            msg.gkf_state = True
             dt = current_time.to_sec() - last_time
-            # 计算剩余距离
-            distance_remaining = distance_target - distance
+            # # 更新速度和距离
+            v = v + msg.a * dt
+            angle = angle + msg.varepsilon *dt
+            # distance = distance + v * dt
 
-            # 如果剩余距离小于0.5m，开始减速
-            if distance_remaining < 0.5:
-                msg.a = -a_max * distance_remaining
-            else:
+            # # 计算剩余距离
+            # distance_remaining = distance_target - distance
+
+            # # 如果剩余距离小于0.5m，开始减速
+            # if distance_remaining < 0.2:
+            #     msg.a = -a_max * distance_remaining
+            # else:
+            #     msg.a = a_max
+
+            # if distance_remaining < 0:
+            #     msg.gkf_state = False
+            #     pub.publish(msg)
+            #     break  
+
+
+            # # 限制速度不超过最大速度
+            # if v >= v_max:
+            #     v = v_max
+            #     msg.a = 0.0000001
+
+            if n < 30:
                 msg.a = a_max
+                msg.varepsilon = 0.53
+                # msg.varepsilon = 3
+            if 30 <=n < 30+30:
+                msg.a = -a_max
+                msg.varepsilon = -0.53
+                # msg.varepsilon = -3
 
-            if distance_remaining < 0:
+            if n >60:
                 msg.gkf_state = False
                 pub.publish(msg)
                 break  
+               
+            pub.publish(msg)
 
-            v = v + msg.a * dt
-
-            # 限制速度不超过最大速度
-            if v >= v_max:
-                v = v_max
-                msg.a = 0.0
-
-
-            # 更新速度和距离
-            distance = distance + v * dt
+    
         
             rospy.loginfo("acceleration: %s, vel: %s",msg.a,v)        # 计算时间间隔
+            rospy.loginfo("varepsilon: %s, angle: %s",msg.varepsilon,angle)        # 计算时间间隔
+            
             rospy.loginfo("distance: %s, dt: %s",distance, dt)
 
 
@@ -89,6 +114,7 @@ def talker():
 
         # 按照设定的频率等待
         last_time = current_time.to_sec()
+        n = n + 1
         rate.sleep()
 
 if __name__ == '__main__':
