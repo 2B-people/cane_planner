@@ -19,18 +19,18 @@ def talker():
     pub = rospy.Publisher('omniGKFcmd', omniGKFcmd, queue_size=10)
 
     # 设置发布频率
-    rate = rospy.Rate(10) # 10hz
+    rate = rospy.Rate(50) # 10hz
 
     # 设置最大速度和最大加速度
-    v_max = 0.5  # m/s
-    a_max = 0.5  # m/s^2
+    v_max = 0.3  # m/s
+    a_max = 0.05  # m/s^2
     varepsilon_max = 0.5  # rad/s
 
     # 设置目标距离
     distance_target = 1.0  # m
 
     # 初始化变量
-    v = 0.1  # 当前速度
+    v = 0.0  # 当前速度
     distance = 0.0  # 已经行驶的距离
 
     # 设置圆的半径
@@ -38,49 +38,57 @@ def talker():
 
     # 设置初始角速度
     varepsilon = 0.0  # rad/s
+    last_time =  0.0
 
     while not rospy.is_shutdown():
+
+        current_time = rospy.Time.now()
+
         # 创建并填充消息
         msg = omniGKFcmd()
-        msg.header.stamp = rospy.Time.now()
+        msg.header.stamp = current_time
         msg.gkf_state = True
 
+        if last_time != 0:
+            dt = current_time.to_sec() - last_time
+            # 计算剩余距离
+            distance_remaining = distance_target - distance
 
-        # rospy.loginfo("acceleration: %s, vel: %s",msg.a,v)        # 计算时间间隔
-       
-        dt = 1.0 / rate.sleep_dur.to_sec()
+            # 如果剩余距离小于0.5m，开始减速
+            if distance_remaining < 0.5:
+                msg.a = -a_max * distance_remaining
+            else:
+                msg.a = a_max
 
-        # 计算剩余距离
-        distance_remaining = distance_target - distance
+            if distance_remaining < 0:
+                msg.gkf_state = False
+                pub.publish(msg)
+                break  
 
-        # 如果剩余距离小于0.5m，开始减速
-        if distance_remaining < 0.1:
-            msg.a = -a_max * distance_remaining 
-        else:
-            msg.a = a_max
+            v = v + msg.a * dt
 
-        # 更新速度和距离
-        v = v + msg.a * dt
-        distance = distance + v * dt
+            # 限制速度不超过最大速度
+            if v >= v_max:
+                v = v_max
+                msg.a = 0.0
 
+
+            # 更新速度和距离
+            distance = distance + v * dt
         
-
-        # 限制速度不超过最大速度
-        if v > v_max:
-            v = v_max
-            msg.a = 0.0
+            rospy.loginfo("acceleration: %s, vel: %s",msg.a,v)        # 计算时间间隔
+            rospy.loginfo("distance: %s, dt: %s",distance, dt)
 
 
-        
+            # # 如果机器人正在走圆形轨迹，那么需要设置varepsilon
+            # if distance_remaining < distance_target:
+            #     msg.varepsilon = v / r  # 这是新增的代码，用于设置角速度varepsilon
 
-        # # 如果机器人正在走圆形轨迹，那么需要设置varepsilon
-        # if distance_remaining < distance_target:
-        #     msg.varepsilon = v / r  # 这是新增的代码，用于设置角速度varepsilon
-
-        # 发布消息
-        pub.publish(msg)
+            # 发布消息
+            pub.publish(msg)
 
         # 按照设定的频率等待
+        last_time = current_time.to_sec()
         rate.sleep()
 
 if __name__ == '__main__':

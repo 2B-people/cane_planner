@@ -31,6 +31,7 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
                 // 这里的速度vel的单位是m/s，需要转换成rpm
                 double vel_set = vel * k1;
                 double pos_set = pos * k2;
+                ROS_WARN("a: %f,dt:%f",a,dt);
                 ROS_WARN("pos: %f, vel: %f", pos, vel);
                 ROS_WARN("pos_set: %f, vel_set: %f", pos_set, vel_set);
                 // 发送命令,打印测试的时候把usb相关的注释掉
@@ -45,7 +46,7 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
             ROS_WARN("  deal with vel and pos! pos: %f, vel: %f", pos, vel);
             double vel_set = msg->vel * k1;
             double pos_set = msg->pos * k2;
-            // ROS_WARN("  deal with vel and pos!pos_set: %f, vel_set: %f", pos_set, vel_set);
+            ROS_WARN("  deal with vel and pos!pos_set: %f, vel_set: %f", pos_set, vel_set);
 
             usb.Set(CMD_VEL, (float)vel_set, 1); // 设定前进加速度
             usb.Set(CMD_POS, (float)pos_set, 1); // 设定转向角速度
@@ -79,7 +80,7 @@ int main(int argc, char **argv)
     nh.param("gkf_k_pos", k_pos, 1.0);
 
     // set tranfer param
-    k1 = 6.75 * 19 * 60 / (0.09 * 2 * 3.1415926) * k_vel;
+    k1 = 6.75 * 19 * 60 / (0.046 * 2 * 3.1415926) * k_vel;
     k2 = 57.3 * 8192 / 360 * k_pos;
 
     usb.init(usb_port, usb_baudrate); // 使用你的串口和波特率

@@ -21,15 +21,16 @@ rate = rospy.Rate(10) # 10Hz
 
 # initial
 
-# pos = 2 * math.pi
+# pos = 1 * math.pi
 pos = 0
 vel = 0 
 last_time = rospy.Time.now().to_sec() 
 a = 0
 
+time.sleep(1)
 while not rospy.is_shutdown():
         # 圆形轨迹的半径
-    radius = 1.0
+    radius = 0.5
 
         # 机器人的前进速度
     forward_speed = 0.3
@@ -38,13 +39,13 @@ while not rospy.is_shutdown():
 
     
         # 计算机器人的转向速度
-    turning_speed = forward_speed / radius
+    turning_speed = forward_speed / (2.0*radius)
 
     # updata pos and vel
 
     current_time = rospy.Time.now().to_sec()
     dt = current_time - last_time
-    pos = pos - turning_speed * dt
+    pos = pos + turning_speed * dt
     vel = vel +  a * dt
     last_time = current_time
 
@@ -62,7 +63,7 @@ while not rospy.is_shutdown():
     
     
     # stop
-    if pos <= 0:
+    if pos >= 2.0 * math.pi:
         cmd.header = Header(stamp = rospy.Time.now())
         cmd.gkf_state = False
         cmd.pos = 0 
