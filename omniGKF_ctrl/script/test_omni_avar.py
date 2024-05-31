@@ -82,8 +82,8 @@ def talker():
             #     msg.a = 0.0000001
 
             if n < 30:
-                msg.a = a_max
-                msg.varepsilon = 0.53
+                msg.a = -a_max
+                msg.varepsilon = -0.53
                 # msg.varepsilon = 3
             if 30 <=n < 30+30:
                 msg.a = -a_max
