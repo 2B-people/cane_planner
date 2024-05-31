@@ -5,83 +5,46 @@
 
 omni_gkf::OmniGKFUSB usb;
 
+// k1 = 6.75 * 19 * 60 / (0.046 * 2 * 3.1415926) * k_vel == 26000 gkf_v2gpm_v 
+// k2 = 57.3 * 8192 / 360 * k_pos == 20000
+
 double k1, k2;
-omniGKF_control::omniGKFcmd cmd_set;
 
 void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
 {
     // 将a和varepsilon转换为float
-
     static double last_time = 0;
     double pos = usb.getHeading();
     double vel = usb.getVelocity1() / k1;
     double current_time = msg->header.stamp.toSec();
 
-    cmd_set.gkf_state = msg->gkf_state;
-    cmd_set.a = msg->a;
-    cmd_set.varepsilon = msg->varepsilon;
-    cmd_set.pos = msg->pos;
-    cmd_set.vel = msg->vel;
-    ROS_INFO("--------get set a:%f, var:%f", msg->a, msg->varepsilon);
-    if (msg->gkf_state == false)
+    if (msg->gkf_state)
     {
-        ROS_INFO("-----------------stop!-------------");
-    }
-    if (msg->gkf_state == true)
-    {
-        ROS_INFO("-----------------begin!-------------");
-    }
-}
-
-void execCallback(const ros::TimerEvent &e)
-{
-    // 将a和varepsilon转换为float
-
-    static double last_time = 0;
-    double pos = usb.getHeading();
-    double vel = usb.getVelocity1() / k1;
-    double current_time = ros::Time::now().toSec();
-    ROS_WARN("current pos:%f", pos);
-    if (cmd_set.gkf_state)
-    {
-        if (cmd_set.a != 0 || cmd_set.varepsilon != 0)
+        // work code, nmpc using a and varepsilon
+        if (msg->a != 0 || msg->varepsilon != 0)
         {
-            float a = static_cast<float>(cmd_set.a);                   // 假设a的单位是m/s^2
-            float varepsilon = static_cast<float>(cmd_set.varepsilon); // 假设varepsilon的单位是rad/s
-            if (last_time != 0)
-            {
-                double dt = current_time - last_time;
-                pos = pos + varepsilon * dt;
-                // 这里的角度pos的单位是rad，需要转换为encoder；
-                vel = vel + a * dt;
-                // 这里的速度vel的单位是m/s，需要转换成rpm
-                double vel_set = vel * k1;
-                double pos_set = pos * k2;
-                ROS_WARN("a: %f,varepsilon: %f,dt:%f", a, varepsilon, dt);
-                ROS_WARN("pos: %f, vel: %f", pos, vel);
-                ROS_WARN("pos_set: %f, vel_set: %f", pos_set, vel_set);
-                // 发送命令,打印测试的时候把usb相关的注释掉
-                // 这里发下去的时候，vel是电机0的转速rpm，pos是电机1的角度angle
-                usb.Set(CMD_VEL, (float)vel_set, 1); // 设定前进加速度
-                usb.Set(CMD_POS, (float)pos_set, 1); // 设定转向角速度
-            }
+            float a = static_cast<float>(msg->a);                   // a的单位是m/s^2
+            float varepsilon = static_cast<float>(msg->varepsilon); // varepsilon的单位是rad/s
+            ROS_WARN(" a: %f, varepsilon: %f", pos, vel);
+            usb.Set(CMD_A, a, 100); // 设定前进加速度
+            usb.Set(CMD_VAREPSILON, varepsilon, 100);
         }
         // debug ,deal with vel and pos
-        if (cmd_set.vel != 0 || cmd_set.pos != 0)
+        if (msg->vel != 0 || msg->pos != 0)
         {
-            ROS_WARN("  deal with vel and pos! pos: %f, vel: %f", pos, vel);
-            double vel_set = cmd_set.vel * k1;
-            double pos_set = cmd_set.pos * k2;
-            ROS_WARN("  deal with vel and pos!pos_set: %f, vel_set: %f", pos_set, vel_set);
-
+            ROS_WARN("pos: %f, vel: %f", pos, vel);
+            double vel_set = msg->vel * k1;
+            double pos_set = msg->pos * k2;
+            // ROS_WARN("pos_set: %f, vel_set: %f", pos_set, vel_set);
             usb.Set(CMD_VEL, (float)vel_set, 1); // 设定前进加速度
             usb.Set(CMD_POS, (float)pos_set, 1); // 设定转向角速度
         }
-
         last_time = current_time;
     }
-    else
+    else 
+    // deal with stop cmd
     {
+        ROS_WARN("STOP!");
         last_time = 0;
         pos = 0;
         vel = 0;
@@ -112,8 +75,6 @@ int main(int argc, char **argv)
 
     ros::Subscriber sub = nh.subscribe("omniGKFcmd", 10, cmdCallback);
     ros::Publisher pub = nh.advertise<omniGKF_control::omniGKFinfo>("omniGKFinfo", 10);
-    ros::Timer timer = nh.createTimer(ros::Duration(0.1), &execCallback);
-    cmd_set.gkf_state = false;
 
     while (ros::ok())
     {

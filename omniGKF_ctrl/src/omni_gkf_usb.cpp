@@ -77,10 +77,16 @@ namespace omni_gkf
             frame.push_back((data >> 8) & 0xFF); // 数据高字节
             frame.push_back(data & 0xFF);        // 数据低字节
         }
+        if (cmd == CMD_A || cmd == CMD_VAREPSILON)
+        {
+            frame.push_back((data >> 8) & 0xFF); // 数据高字节
+            frame.push_back(data & 0xFF);        // 数据低字节
+        }
+
         write(frame);
     }
 
-    void OmniGKFUSB::Set(uint8_t cmd, float data , int n)
+    void OmniGKFUSB::Set(uint8_t cmd, float data, int n)
     {
         int16_t int_data = (int16_t)(data * n);
         Set(cmd, int_data);

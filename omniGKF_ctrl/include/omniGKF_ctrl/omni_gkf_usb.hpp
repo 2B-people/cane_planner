@@ -13,6 +13,8 @@
 #define CMD_POS 0x02
 #define CMD_STOP 0x03
 #define CMD_UPDATE 0x04
+#define CMD_VAREPSILON 0X05
+#define CMD_A 0x06
 
 #define GKF_DATA_LEN 4
 
@@ -26,16 +28,16 @@ namespace omni_gkf
 
         void update();
         void Set(uint8_t cmd, int16_t data);
-        void Set(uint8_t cmd, float data , int n);
+        void Set(uint8_t cmd, float data, int n);
         void haveData();
         bool isAvailable();
 
         virtual void init(const std::string &portName, int baudRate);
 
-        double getHeading() const { return gkf_heading_/57.3; }
+        double getHeading() const { return gkf_heading_ / 57.3; }
         int getEncoder() const { return encode_; }
         std::vector<int16_t> getVelocity() const { return gkf_velocity_; }
-        double getVelocity1() const {return gkf_velocity_[0];}
+        double getVelocity1() const { return gkf_velocity_[0]; }
 
     protected:
         double gkf_heading_;
