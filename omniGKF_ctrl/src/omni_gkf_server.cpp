@@ -50,8 +50,6 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
         vel = 0;
         usb.Set(CMD_VEL, 0);
         usb.Set(CMD_POS, 0);
-        usb.Set(CMD_A, 0);
-        usb.Set(CMD_VAREPSILON, 0);
     }
 }
 

@@ -86,14 +86,16 @@ def talker():
                 msg.varepsilon = 0.53
                 # msg.varepsilon = 3
             if 30 <=n < 30+30:
+                msg.a = 0
+                msg.varepsilon = 0
+            if n > 60:
                 msg.a = -a_max
                 msg.varepsilon = -0.53
                 # msg.varepsilon = -3
-
-            if n >60:
+            if n > 100:
                 msg.gkf_state = False
                 pub.publish(msg)
-                break  
+                break 
                
             pub.publish(msg)
 
