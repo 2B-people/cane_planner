@@ -23,7 +23,7 @@ def talker():
 
     # 设置最大速度和最大加速度
     v_max = 0.3  # m/s
-    a_max = 0.1  # m/s^2
+    a_max = 0.2  # m/s^2
     varepsilon_max = 0.5  # rad/s
 
     # 设置目标距离
@@ -86,14 +86,16 @@ def talker():
                 msg.varepsilon = 0.53
                 # msg.varepsilon = 3
             if 30 <=n < 30+30:
+                msg.a = 0
+                msg.varepsilon = 0
+            if n > 60:
                 msg.a = -a_max
                 msg.varepsilon = -0.53
                 # msg.varepsilon = -3
-
-            if n >60:
+            if n > 100:
                 msg.gkf_state = False
                 pub.publish(msg)
-                break  
+                break 
                
             pub.publish(msg)
 

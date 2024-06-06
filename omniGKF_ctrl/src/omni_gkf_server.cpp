@@ -25,7 +25,7 @@ void cmdCallback(const omniGKF_control::omniGKFcmd::ConstPtr &msg)
         {
             float a = static_cast<float>(msg->a);                   // a的单位是m/s^2
             float varepsilon = static_cast<float>(msg->varepsilon); // varepsilon的单位是rad/s
-            ROS_WARN(" a: %f, varepsilon: %f", pos, vel);
+            ROS_WARN(" a: %f, varepsilon: %f", a , varepsilon);
             usb.Set(CMD_A, a, 100); // 设定前进加速度
             usb.Set(CMD_VAREPSILON, varepsilon, 100);
         }
