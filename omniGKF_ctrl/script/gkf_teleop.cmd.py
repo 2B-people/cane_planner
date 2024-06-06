@@ -13,15 +13,17 @@ from select import select
 pub = rospy.Publisher('omniGKFcmd', omniGKFcmd, queue_size=10)
 
 def getKey():
-    tty.setraw(sys.stdin.fileno())
-    rlist, _, _ = select([sys.stdin], [], [], 0.1)
-    if rlist:
-        key = sys.stdin.read(1)
-    else:
-        key = ''
-
-    return key
-
+    
+       tty.setraw(sys.stdin.fileno())
+       rlist, _, _ = select([sys.stdin], [], [], 0.1)
+       if rlist:
+          key = sys.stdin.read(1)
+          if key =='\x03':
+            rospy.signal_shutdown('shutdown')
+       else:
+           key = ''
+       return key
+    
 def keyboardLoop():
     # 初始化
     rospy.init_node('omniGKFcmd_publisher', anonymous=True)
