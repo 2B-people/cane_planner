@@ -7,9 +7,10 @@ import termios
 import roslib
 import rospy
 from omniGKF_control.msg import omniGKFcmd
+from select import select
 
 # 全局变量
-pub = rospy.Publisher('/omni_ctrl/commands', omniGKFcmd, queue_size=15)
+pub = rospy.Publisher('omniGKFcmd', omniGKFcmd, queue_size=10)
 
 def getKey():
     tty.setraw(sys.stdin.fileno())
@@ -23,24 +24,40 @@ def getKey():
 
 def keyboardLoop():
     # 初始化
-    rospy.init_node('omni_ctrl_teleop')
-    rate = rospy.Rate(rospy.get_param('~hz', 1))
+    rospy.init_node('omniGKFcmd_publisher', anonymous=True)
+    # rate = rospy.Rate(rospy.get_param('~hz', 1))
+    rate = rospy.Rate(10)  # 10Hz
+    vel = 0.3  # m/s
+    pos = 1 # rad
 
     while not rospy.is_shutdown():
         key = getKey()
         msg = omniGKFcmd()
 
         if key == 'w':  # 前进
-            msg.vel.x = 1.0
+            msg.gkf_state = True
+            msg.vel = vel
+            msg.pos = pos
+
         elif key == 's':  # 后退
-            msg.vel.x = -1.0
+            msg.gkf_state = True
+            msg.vel = -vel
+            msg.pos = -pos
         elif key == 'a':  # 左转
-            msg.vel.y = 1.0
+            msg.gkf_state = True
+            msg.a = 0.5
+            msg.varepsilon = 1.0
         elif key == 'd':  # 右转
-            msg.vel.y = -1.0
+            msg.gkf_state = True
+            msg.a = 0.5
+            msg.varepsilon = -1.0
         else:  # 停止
-            msg.vel.x = 0.0
-            msg.vel.y = 0.0
+            msg.gkf_state = False
+            msg.vel = 0.0
+            msg.pos = 0.0
+            msg.a = 0.0
+            msg.varepsilon = 0.0
+            
 
         # 发布消息
         pub.publish(msg)
@@ -50,9 +67,8 @@ def keyboardLoop():
 
 if __name__ == '__main__':
     try:
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+       
         keyboardLoop()
     except rospy.ROSInterruptException:
         pass
-    finally:
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+  

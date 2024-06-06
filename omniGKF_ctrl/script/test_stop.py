@@ -5,10 +5,10 @@ from omniGKF_control.msg import omniGKFcmd
 
 def stop_robot():
     # 初始化节点
-    rospy.init_node('stop_robot_node')
+    rospy.init_node('omniGKFcmd_publisher', anonymous=True)
 
     # 创建一个Publisher，发布名为'omni_gkf_cmd'的主题，消息类型为omniGKFcmd，队列长度为10
-    pub = rospy.Publisher('omni_gkf_cmd', omniGKFcmd, queue_size=10)
+    pub = rospy.Publisher('omniGKFcmd', omniGKFcmd, queue_size=10)
 
     # 创建一个omniGKFcmd类型的消息
     stop_msg = omniGKFcmd()
@@ -22,7 +22,7 @@ def stop_robot():
 
 
     # 设置频率
-    rate = rospy.Rate(10) # 10hz
+    rate = rospy.Rate(100) # 10hz
 
     while not rospy.is_shutdown():
         # 发布消息
